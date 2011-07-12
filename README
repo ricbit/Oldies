@@ -1,0 +1,9 @@
+Name: 1995-05-arkanoid
+Language: C
+Description: An arkanoid clone for text-mode DOS.
+
+Name: 1995-05-scancode
+Language: C
+Description: Prints the scancode of any pressed key on keyboard. We didn't have home internet to check scan code tables on those days :)
+
+
