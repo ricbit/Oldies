@@ -57,6 +57,11 @@ no ceiling or floor (but I did have distance cueing and texture mapping). The
 drawing is based on raycasting over a BSP tree, and most time-consuming
 tasks were done directly in assembly.
 
+Name: 1995-10-descent
+Language: Assembly x86
+Description: Improving on the doom clone, I started a descent clone. This
+one could place walls on any orientation, but had only flat shading.
+
 Name: 1995-10-firedemocpp
 Language: C++
 Description: A small demo with a realistic fire animation, written in C++.
@@ -70,6 +75,11 @@ Name: 1995-12-graphicseditor
 Language: C++
 Description: A small graphics editor for the VGA 256 color mode. I think I
 wrote this to draw textures for the doom clone.
+
+Name: 1996-01-engine
+Language: Assembly x86
+Description: Another 3D graphics engine, this one could place triangles in
+general position, with texture mapping and gouraud shading.
 
 Name: 1996-04-gomoku
 Language: C++

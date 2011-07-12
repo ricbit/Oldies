@@ -1,0 +1,15 @@
+7/10
+        Start of RB Descent
+8/10        
+        Fixed bug on loading of scene
+        Added routines for projection of a vertex
+        Added routines for wireframe draw of a wall
+10/10   
+        Fixed bug on the observer calculation
+12/10
+        Added A and Z keys controls
+13/10
+        Added video buffer
+        Added flat polygons
+        Added access to more than one wall
+
