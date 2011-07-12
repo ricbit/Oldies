@@ -1,0 +1,29 @@
+public  _strltu
+;같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같�
+; Make all lower case letters in string uppercase
+; In:
+;   EDX -> string
+; Out:
+;   None
+;같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같�
+_strltu:
+        push ax
+        push edx
+strltuml:
+        mov al,[edx]
+        or al,al
+        jz short strltumld
+        cmp al,'a'
+        jb short strltumlf0
+        cmp al,'z'
+        ja short strltumlf0
+        sub al,'a'-'A'
+        mov [edx],al
+strltumlf0:
+        inc edx
+        jmp strltuml
+strltumld:
+        pop edx
+        pop ax
+        ret
+

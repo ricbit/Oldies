@@ -1,0 +1,29 @@
+public  _strhtn
+;같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같�
+; Get number from mem
+; In:
+;   EDX -> ASCIIZ hex number string
+; Out:
+;   EAX - number
+;같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같�
+_strhtn:
+        push bx
+        push edx
+        xor eax,eax
+strhtnml:
+        mov bl,[edx]
+        inc edx
+	sub bl,'0'
+	jc short strhtnmld
+        cmp bl,0ah
+	jb short strhtnmlc
+	sub bl,('A'-'0')-10
+strhtnmlc:
+        shl eax,4
+        or al,bl
+	jmp strhtnml
+strhtnmld:
+        pop edx
+        pop bx
+        ret
+

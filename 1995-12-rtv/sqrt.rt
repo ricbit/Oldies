@@ -1,0 +1,71 @@
+public  _sqrt
+;같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같�
+; Square root
+; In:
+;   EAX - number to take root of
+; Out:
+;   EAX - root
+;같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같�
+sqrtbasetbl     db      0,1,4,9,16,25,36,49,64,81,100,121,144,169,196,225
+_sqrt:
+        pushad
+        mov ebp,eax
+        bsr ebx,eax
+        jnz short sqrtf0
+        xor ebx,ebx
+sqrtf0:
+        shr ebx,3
+        lea eax,[ebx*8]
+        mov cl,32
+        sub cl,al
+        rol ebp,cl
+        mov eax,ebp
+        movzx eax,al
+        mov edi,offset sqrtbasetbl
+        mov ecx,10h
+sqrtl0:
+        scasb
+        je short sqrtl0d
+        jb short sqrtl0d2
+        loop sqrtl0
+        inc edi
+sqrtl0d2:
+        dec edi
+        inc cl
+sqrtl0d:
+        movzx edx,byte ptr [edi-1]
+        dec cl
+        xor cl,0fh
+        mov edi,ecx
+        mov ecx,ebx
+        jecxz short sqrtdone
+        sub eax,edx
+sqrtml:
+        shld eax,ebp,8
+        rol ebp,8
+        mov ebx,edi
+        shl ebx,5
+        xor edx,edx
+        mov esi,eax
+        div ebx
+        rol edi,4
+        add edi,eax
+        add ebx,eax
+sqrtf2:
+        imul eax,ebx
+        mov edx,eax
+        mov eax,esi
+        sub eax,edx
+        jc short sqrtf1
+        loop sqrtml
+sqrtdone:
+        mov [esp+28],edi
+        popad
+        ret
+sqrtf1:
+        dec ebx
+        dec edi
+        movzx eax,bl
+        and al,1fh
+        jmp sqrtf2
+

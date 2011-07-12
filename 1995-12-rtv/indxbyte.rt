@@ -1,0 +1,29 @@
+public  _indexbyte
+;같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같�
+; Find a byte in a counted string and return index
+; In:
+;   AL - byte to find
+;   EDX -> string of bytes, first byte is length
+; Out:
+;   CF=1 - not found
+;   CF=0 - found
+;     EAX - index
+;같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같�
+_indexbyte:
+        push edi
+        push ecx
+        lea edi,[edx+1]
+        movzx ecx,byte ptr [edx]
+        repnz scasb
+        jnz short indexbytef0
+        movzx eax,byte ptr [edx]
+        sub eax,ecx
+        dec eax
+        jmp short indexbytef1
+indexbytef0:
+        stc
+indexbytef1:
+        pop ecx
+        pop edi
+        ret
+

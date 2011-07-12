@@ -76,6 +76,10 @@ Language: C++
 Description: A small graphics editor for the VGA 256 color mode. I think I
 wrote this to draw textures for the doom clone.
 
+Name: 1995-12-rtv
+Language: Assembly x86
+Description: A real-time raytracer over a voxel field.
+
 Name: 1996-01-engine
 Language: Assembly x86
 Description: Another 3D graphics engine, this one could place triangles in
@@ -84,6 +88,10 @@ general position, with texture mapping and gouraud shading.
 Name: 1996-04-gomoku
 Language: C++
 Description: Text-based Gomoku for DOS, this one had an AI based on heuristics.
+
+Name: 1996-04-videotun
+Language: C++
+Description: Display a static pattern to calibrate monitors.
 
 Name: 1996-06-asciieditor
 Language: C
