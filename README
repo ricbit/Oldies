@@ -1,6 +1,7 @@
 Name: 1994-11-raytracer
 Language: C++
-Description: An object-oriented raytracer. I had just learned C++ and thought it would be a nice language to write a raytracer.
+Description: An object-oriented raytracer. I had just learned C++ and thought
+it would be a nice language to write a raytracer.
 
 Name: 1995-05-arkanoid
 Language: C
@@ -8,16 +9,23 @@ Description: An arkanoid clone for text-mode DOS.
 
 Name: 1995-05-scancode
 Language: C
-Description: Prints the scancode of any pressed key on keyboard. We didn't have home internet to check scan code tables on those days, so I had to extract them manually.
+Description: Prints the scancode of any pressed key on keyboard. We didn't
+have home internet to check scan code tables on those days, so I had to
+extract them manually.
 
 Name: 1995-07-checkers
 Language: C++
-Description: A checkers implementation for text-mode DOS. Two-player only, I didn't write an AI for this.
+Description: A checkers implementation for text-mode DOS. Two-player only, I
+didn't write an AI for this.
 
 Name: 1996-06-asciieditor
 Language: C
-Description: An ASCII art editor. I used this mostly to write text-based UIs for my programs. The debug screens from BrMSX were written with this.
+Description: An ASCII art editor. I used this mostly to write text-based UIs
+for my programs. The debug screens from BrMSX were written with this.
 
 Name: 1996-06-boss
 Language: C++
-Description: A game development library providing low-level access to PC hardware. Since this accessed the hardware directly, I called it the Bittencourt Operating System (BOSS). The nicest thing about this was using operator[] to simulate linear memory arrays in DOS using the XMS driver.
+Description: A game development library providing low-level access to PC
+hardware. Since this accessed the hardware directly, I called it the
+Bittencourt Operating System (BOSS). The nicest thing about this was using
+operator[] to simulate linear memory arrays in DOS using the XMS driver.
