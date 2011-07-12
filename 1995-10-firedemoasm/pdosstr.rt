@@ -1,0 +1,35 @@
+public  _putdosstr
+
+;같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같�
+; Print ASCIIZ string to DOS
+; In:
+;   EDX -> ASCIIZ string in low mem
+; Out:
+;   None
+;같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같�
+_putdosstr:
+        push eax
+        push ecx
+        push edi
+        mov ecx,0ffffffffh
+        xor al,al
+        mov edi,edx
+        repnz scasb
+        dec edi
+        mov byte ptr [edi],'$'
+        mov ecx,_code32a
+        add ecx,edx
+        mov eax,ecx
+        and ax,0fh
+        shr ecx,4
+        mov v86r_ds,cx
+        mov v86r_dx,ax
+        mov v86r_ah,9
+        mov al,21h
+        int 30h
+        mov byte ptr [edi],0
+        pop edi
+        pop ecx
+        pop eax
+        ret
+
