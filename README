@@ -33,6 +33,15 @@ no ceiling or floor (but I did have distance cueing and texture mapping). The
 drawing is based on raycasting over a BSP tree, and most time-consuming
 tasks were done directly in assembly.
 
+Name: 1995-12-graphicseditor
+Language: C++
+Description: A small graphics editor for the VGA 256 color mode. I think I
+wrote this to draw textures for the doom clone.
+
+Name: 1996-04-gomoku
+Language: C++
+Description: Text-based Gomoku for DOS, this one had an AI based on heuristics.
+
 Name: 1996-06-asciieditor
 Language: C
 Description: An ASCII art editor. I used this mostly to write text-based UIs
@@ -44,3 +53,4 @@ Description: A game development library providing low-level access to PC
 hardware. Since this accessed the hardware directly, I called it the
 Bittencourt Operating System (BOSS). The nicest thing about this was using
 operator[] to simulate linear memory arrays in DOS using the XMS driver.
+
