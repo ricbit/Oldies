@@ -1,3 +1,8 @@
+Name: 1994-09-freecell
+Language: Pascal
+Description: Freecell implementation for text-mode DOS. I think this was the
+last program I wrote in Pascal.
+
 Name: 1994-11-raytracer
 Language: C++
 Description: An object-oriented raytracer. I had just learned C++ and thought
@@ -53,4 +58,12 @@ Description: A game development library providing low-level access to PC
 hardware. Since this accessed the hardware directly, I called it the
 Bittencourt Operating System (BOSS). The nicest thing about this was using
 operator[] to simulate linear memory arrays in DOS using the XMS driver.
+
+Name: 1996-06-psgplayer
+Language: C++
+Description: My first emulator! This one emulates the PSG chip from MSX, it
+could play MSX tunes on the PC by mapping the PSG registers on the FM
+registers of the SoundBlaster. Of course this method had a very low sound
+quality when compared to the original.
+
 
