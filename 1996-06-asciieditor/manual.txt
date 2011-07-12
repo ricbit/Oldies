@@ -1,0 +1,16 @@
+ASCII V1.0
+Ricardo Bittencourt
+
+F1              - Help: show hex equivalents to all ASCII table
+F2              - Save
+F3              - Load
+F4              - Put a hex in buffer
+F5              - Decrease foreground color
+F6              - Increase foreground color
+F7              - Decrease background color
+F8              - Increase background color
+F9              - Put buffer on screen
+SHIFT-F9        - Get buffer from screen
+F10             - Change only the color
+SHIFT-F10       - Get only the color from screen
+
