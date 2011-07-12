@@ -3,6 +3,13 @@ Language: C++
 Description: An object-oriented raytracer. I had just learned C++ and thought
 it would be a nice language to write a raytracer.
 
+Name: 1995-04-physics
+Language: C++
+Description: Rudimentary physics simulation: no integration, it just plotted a
+trajectory based on parametric equations. I think this was the first expression
+evaluator I wrote. In this package there's also a text-based windows manager
+called RicardoVision.
+
 Name: 1995-05-arkanoid
 Language: C
 Description: An arkanoid clone for text-mode DOS.
@@ -17,6 +24,14 @@ Name: 1995-07-checkers
 Language: C++
 Description: A checkers implementation for text-mode DOS. Two-player only, I
 didn't write an AI for this.
+
+Name: 1995-09-doom
+Language: C++, Assembly x86
+Description: Even though it' s called doom, this is actually a wolfenstein
+clone. I got a very high frame rate on a 386, but I had only 90-degree walls,
+no ceiling or floor (but I did have distance cueing and texture mapping). The
+drawing is based on raycasting over a BSP tree, and most time-consuming
+tasks were done directly in assembly.
 
 Name: 1996-06-asciieditor
 Language: C
