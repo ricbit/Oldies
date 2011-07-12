@@ -1,3 +1,22 @@
+Name: 1993-06-reflex
+Language: Pascal
+Description: Two-player game for DOS, when a beep sounds, the first one to 
+press Shift on the keyboard wins. One player uses left-shift and the other
+one uses right-shift.
+
+Name: 1993-07-cryptarithm
+Language: Pascal
+Description: Cryptharithm for text-mode DOS.
+
+Name: 1993-08-tictactoe4d
+Language: Pascal
+Description: 4D Tic-Tac-Toe for text-mode DOS. There are two versions, one
+is a two-player game, the other is single-player against a minimax AI.
+
+Name: 1994-05-pacman
+Language: Pascal
+Description: Pac-man clone for text-mode DOS.
+
 Name: 1994-09-freecell
 Language: Pascal
 Description: Freecell implementation for text-mode DOS. I think this was the
