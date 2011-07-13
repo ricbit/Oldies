@@ -71,6 +71,11 @@ Language: Assembly x86
 Description: A small demo with a realistic fire animation, rewritten from
 scratch in assembly, since the C++ version was too slow at the time.
 
+Name: 1995-11-sbplayer
+Language: C++
+Description: A macrolanguage player for SoundBlasters, compatible with the
+command PLAY from MSX. I made this three days after buying a SoundBlaster card.
+
 Name: 1995-12-graphicseditor
 Language: C++
 Description: A small graphics editor for the VGA 256 color mode. I think I
@@ -112,4 +117,11 @@ could play MSX tunes on the PC by mapping the PSG registers on the FM
 registers of the SoundBlaster. Of course this method had a very low sound
 quality when compared to the original.
 
+Name: 1998-12-mp2audio
+Language: C
+Description: Decodes the header of an mp2 audio file.
 
+Name: 1999-11-fractalcomp
+Language: C
+Description: Encoder and decoder for a fractal compression scheme. Quality was
+nice but it took a long, long time to encode an image.
