@@ -117,6 +117,12 @@ could play MSX tunes on the PC by mapping the PSG registers on the FM
 registers of the SoundBlaster. Of course this method had a very low sound
 quality when compared to the original.
 
+Name: 1997-12-psgplayer
+Language: C
+Description: Update to the old psgplayer, this time emulating the PSG using
+wave-based synthesis. This was a proof of concept before I implemented
+sound support in BrMSX.
+
 Name: 1998-12-mp2audio
 Language: C
 Description: Decodes the header of an mp2 audio file.
