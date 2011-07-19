@@ -1,0 +1,28 @@
+        db      "MSXSTATE",^Z   - file ID
+        db      VERSION         - this format is 00h
+        dw      AF              - Z80 registers
+        dw      BC
+        dw      DE
+        dw      HL
+        dw      PC
+        dw      SP
+        dw      IX
+        dw      IY
+        dw      AF'
+        dw      BC'
+        dw      DE'
+        dw      HL'
+        db      I
+        db      R
+        db      iff1
+        db      iff2
+        db      IM              - 00h,01h,02h
+        db      8 dup (0)       - VDP registers
+        db      16 dup (0)      - PSG registers
+        db      PPI-A
+        db      PPI-B
+        db      PPI-C
+        db      PPI-M
+        db      8 dup (0)       - MEGAROM bank selectors
+        db      65536 dup (0)   - RAM dump
+        db      16384 dup (0)   - VRAM dump

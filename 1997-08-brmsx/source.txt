@@ -1,0 +1,110 @@
+blit.asm        13124   8-14-98  8:11p 
+- RAM to VRAM blitter
+- Perform the filters to TV emulation
+
+brmsx.asm       65607   8-15-98 10:06a 
+- Initialization
+- Command line parser
+
+debug.asm       50267   8-14-98  8:11p 
+- Debugger
+- Serial communications manager
+
+drive.asm        9935   8-14-98  8:11p 
+- Emulation of the port-based disk drive
+
+gui.asm         41098   8-14-98  8:11p 
+- GUI
+- PSG Graph
+- CPU Graph
+
+io.asm          42131   8-14-98  8:11p 
+- DOS stdout print routines
+- File manipulation
+- Palette manager
+- Keyboard handler
+- Timer handler
+- LED emulation
+- Setup of VGA graphic modes
+
+joystick.asm     3852   8-14-98  8:11p 
+- Joystick driver
+
+mouse.asm        2550   8-14-98  8:11p 
+- Mouse driver
+
+patch.asm       10203   8-14-98  8:11p 
+- Cassete patch-based emulation
+- Disk Drive patch-based emulation
+
+pentium.asm      4605   8-14-98  8:11p 
+- Pentium-only functions
+
+pmode.asm       59695   8-14-98  8:11p 
+- Protected mode interface
+- Memory manager
+
+print.asm       10452   8-14-98  8:11p 
+- Disassembler for single Z80 opcodes
+
+printcb.asm     11846   8-14-98  8:11p 
+- Disassembler for CB and ED opcodes
+
+printdd.asm     16778   8-14-98  8:11p 
+- Disassembler for DD and CBDD opcodes
+
+printfd.asm     16780   8-14-98  8:11p 
+- Disassembler for FD and CBFD opcodes
+
+psg.asm         43294   8-16-98 12:22a 
+- Sound Blaster driver
+- PC Speaker driver
+- Emulation of Keyboard click
+- Emulation of PSG
+- Emulation of SCC
+
+saveload.asm    17918   8-14-98  8:11p 
+- Save and Load state
+- Save snapshot
+
+serial.asm       4074   8-14-98  8:11p 
+- Serial communications driver
+
+template.asm      609   8-14-98  8:11p 
+- Empty template to create new modules
+
+vdp.asm         67655   8-16-98 12:13a 
+- Emulation of the VDP
+- Video cache manager
+
+vesa.asm         6937   8-14-98  8:11p 
+- VESA 2.0 driver
+
+winsock.asm      1232   8-14-98  8:11p 
+- Winsock driver
+
+z80.asm         51595   8-16-98 12:17a 
+- Emulation of Z80 I/O ports
+- IRQ handler
+- RESET
+- Megarom Mapper manager
+
+z80cb.asm       13147   8-14-98  8:11p 
+- Emulation of Z80 CB opcodes
+
+z80core.asm     19538   8-14-98  8:11p 
+- Main emulation loop
+- Dynamic Recompiler
+
+z80dd.asm       24648   8-14-98  8:11p 
+- Emulation of Z80 DD and CBDD opcodes
+
+z80ed.asm        4430   8-14-98  8:11p 
+- Emulation of Z80 ED opcodes
+
+z80fd.asm       24647   8-14-98  8:11p 
+- Emulation of Z80 FD and CBFD opcodes
+
+z80sing.asm     14674   8-14-98  8:11p 
+- Emulation of Z80 single opcodes
+

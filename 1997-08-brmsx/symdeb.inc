@@ -1,0 +1,10 @@
+extrn install_symdeb: near
+extrn _printop322: near
+extrn _printop321: near
+extrn _printop312: near
+extrn _printop412: near
+extrn _printop422: near
+extrn _printop2jr: near
+extrn search_label: near
+extrn enable_symbolic: dword
+extrn printleftd: near

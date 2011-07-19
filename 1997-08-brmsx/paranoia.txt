@@ -1,0 +1,101 @@
+Paranoia MSX emulator test
+
+The softwares below tests all undocumented/hard to emulate MSX features
+
+
+Z80 related
+
+- undocumented flags
+  ZEXALL
+
+- R register emulation
+  Magical Tree
+
+- IRQ handling
+  Valkyr
+  Astro Marine Corps
+  Rally-X
+  Zanac
+
+- Clock counting
+  Delavy-test
+
+VDP related
+
+- 8x8 sprites
+  Hundra
+
+- 16x16 zoomed sprites
+  Rambo
+  Valis
+
+- 5th sprite ocultation
+  Parodius
+  Antartic Adventure
+
+- Sprite collision detection 
+  Magical Kid Wiz
+
+- Undocumented feature of registers 3 and 4
+  Thing Bounces Back  
+
+- Undocumented feature in register reading/writing  
+  Teenage Mutant Hero Turtles
+
+PSG related
+
+- Envelope emulation
+  Penguin Wars
+  1942
+
+- 4-bit PCM method 1
+  Star Wars
+
+- 4-bit PCM method 2
+  Valkyr
+
+PPI related
+
+- emulation of Caps Lock LED
+  Valkyr
+
+- 1-bit PCM 
+  Super Laydock
+
+SCC related
+
+- wavesample RAM emulation
+  Konami's Game Collection
+
+Drive related
+
+- port-based emulation
+  Robocop
+  Hello
+
+MegaROM Mapper related
+
+- Mapper #0
+  Super Laydock
+
+- Mapper #2
+  Penguin Adventure
+
+- Mapper #3
+  Nemesis 3
+
+- Mapper #4
+  Valis
+
+- Mapper #5
+  Gall Force
+
+- Mapper #6
+  Xanadu
+
+- Mapper #7
+  Hydlide 2
+
+- Mapper #8
+  Panasonic FM-PAC
+

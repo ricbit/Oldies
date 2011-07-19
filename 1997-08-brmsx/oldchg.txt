@@ -1,0 +1,554 @@
+$Log: changes.txt $
+Revision 1.74  1997/12/31 08:26:41  Ricardo
+first version with rcs
+
+release 1.169:
+
+
+release 1.168:
+
+- optimized the video cache a bit
+- support to Mapper #1 (MSX-DOS 2 cartridge)
+- "-dos2" support to MSX-DOS 2
+- "-mount" can mount DOS-2 disks
+- "-mount" will not mount files with size 0
+- fixed the winNT bug
+- now the mapper ports can be read
+- fudebug: screen 4 display the status of the mapper banks
+- fudebug: added screen 5 (symbolic debugger)
+- support to RTC real time clock
+- now brmsx can fix buggy port-based disk interfaces
+- fixed a bug in mapper #2
+- added LOAD DSK in the gui
+* preliminary msx2 emulation
+* support to extended slots
+* 128kb of vram
+* load MSX2.ROM in 0.0 and MSX2EXT.ROM in 0.1
+* 64 VDP registers
+* 16 VDP status 
+* support to r#17 and 9Bh (indirect register write) 
+* support to r#14 (select vram page)
+* support to r#15 (select status register)
+* support to TEXT-2 (screen 0, 80 columns)
+* support to SCREEN 5
+* support to palette registers
+* support to HMMM in screen 5
+* support to HMMV in screen 5
+* support to LMMM in screen 5
+* support to mode-2 sprites
+* screen 6
+* screen 7
+* screen 7 interlaced
+* "-res 7": 320x200x8 msx2 version
+* transparent sprite lines
+* support to 192/212 attribute
+
+release 1.160:
+
+- "-snespad" option enable SNES pad connected in LPT1
+- "-mmx" was removed and replaced with "-nommx"
+- "-vdptiming" option enable vdp timing ("emuleca.bin")
+- now the drive motor spins at 300 rpm ("hello","prokit zapper")
+- "-mount <dir>" mounts a directory as drive A:
+- enabled again the cassete noises
+- added "-res 6" to enable Parrot engine 512x384x16
+- fixed the last irq bug ("Thezeus","HERO")
+- now brmsx can detect bad dumps
+- fudebug: "up" "down" scroll diasssembler windows
+- fudebug: "R" modify register value
+
+release 1.155:
+
+- "-mapper" option to change size of memory mapper
+- "-speaq" option controls sound quality for PC speaker
+- "-sr" option changes the sample rate
+- "-ifreq" option changes the interrupt frequency
+- now the speaker can be turned off with the "sound" option of the gui
+- fixed emulation of R register in "LD R,A"
+- fixed R emulation in LDIR
+- fixed R emulation/IRQ handling in LDDR
+- fixed R emulation/IRQ handling/Clock counting in CPIR,CPDR
+- fixed R emulation/IRQ handling/Clock counting/Flag affection for OUTI,OTIR
+
+release 1.153:
+
+- fixed the SCC bug in "F1 Spirit"
+- "-megaram" option to change size of megaram
+- fixed a bug in "EI" emulation ("Thezeus", "Feud", "yawara/goon", "crosbla")
+
+release 1.152:
+
+- fast forward key (NumLock)
+- more undocumented vdp modes ("Atselous")
+- fixed flag affection for "ld r,a" and "ld i,a"
+
+release 1.151:
+
+- reenabled FETCH1 optimizations
+- support to another undocumented function of vdp ("cross blaim")
+
+release 1.150:
+
+- fixed a bug in PSG registers 1,3,5 ("Crazy Train")
+- support to MegaROM Mapper #8: Panasonic FM-PAC with 8kb SRAM
+- support to 8kb roms ("Frogger", "Video Hustler")
+- fixed the support for 48kb roms ("Donkey Kong")
+- very preliminary emulation of the YM2413 ("-fmpac")
+- new video engine, "-win" and "-dos" are now obsolete
+- support to sprite collision detection ("Magical Kid Wiz", "Abu S. Prof.")
+- new option "-nosprcol" disables sprite collision detection
+- fixed a bug in video cache ("Red Moon")
+- fixed a bug in vertical position of zoomed sprites
+- fixed the sound skipping bug
+- fixed a minor bug in LOAD ROM for megarom games
+- fixed a crashing bug when trying to execute code on a non-existent page
+- fixed emulation of R register in JR opcodes
+- fixed a problem of psggraph in SCREEN 0
+- now the sram is saved on disk only for cartridges with sram
+- now brmsx adjust the system clock at exit
+- new debugger screens: "3" and "4"
+- megaram is cleared when emulation is turned off
+- major cleanup of sound routines
+
+release 1.145:
+
+- fixed a minor bug in vdpstatus lower nibble
+- adjusted PSG pitch
+- support to PSG envelopes
+- support to 512kb ROMs ("Hydlide 3")
+- autodetect MegaROM Mapper
+- support to MegaROM Mapper #6: ASCII 8kb with 8kb SRAM ("Xanadu")
+- autofire, autorun and autospeed
+- support to MegaROM Mapper #7: ASCII 16kb with 2kb SRAM ("Hydlide 2")
+- sram is saved to disk
+
+release 1.143:
+
+- faster fetch on CB DD ED FD opcodes
+- dynamic recompiler (disabled)
+- support to PSG noise
+- fixed the megaram emulation
+- optimized the sound routines
+- fixed a remaining vdp/irq bug (intro of "Zanac")
+- now LDIR can be interrupted by a irq
+- fixed a bug in mode FAST
+- more info on debug screen 2
+- changed debug commands: "A"->"F2", "L"->"F3"
+- now the debug screen is updated after a load state
+- new debug command: "0" to watch the current MSX screen
+- 3-channel sound through the speaker (option "-speaker")
+- fixed two problems in video cache ("River Raid","K. Tyme")
+- fixed some problems in RESET and LOAD ROM options of the GUI
+- new option in the GUI: "TURN OFF" (hard reset)
+- new sprite engine: 16x16N 8x8N 16x16Z 8x8Z (with full crop)
+- support to 5th sprite ocultation (including the relevant vdp status bits)
+- option "-fakejoy" remaps the keyboard into the joystick
+- support to SCC wavesamples (but with only 5-bit DAC output)
+
+release 1.136: 
+
+- lots of missing MSX keys were added (cedilha,acento,[,],\)
+- fixed a minor bug in the "clocks left" section of debugger
+- support to another undocumented feature of VDP ("LIKE", "Thing BB")
+- support to MegaROM Mapper #4 ("Valis")
+- support to 8x8 sprites ("LIKE", "Alcazar")
+- new command of debugger: "U dddd" (change address of disassembler)
+- new command of debugger: "E dddd xx" (edit memory)
+- huge user's manual
+
+release 1.134:
+
+- fixed a minor bug in memory dump of debugger
+- fixed a memory bug that makes "super laydock" works again
+- added new commands F7 and F8 to the debugger
+
+release 1.133:
+
+- fixed a boundary bug on the "read memory" function ("Phantis 2", "Mopir")
+- support for two cartridges at the same time (combo "Nem2"+"PenAdv")
+- "-roma" and "-romb" options to select MegaROM mappers
+- support to MegaROM Mapper #2 (Konami with SCC)
+- support to MegaROM Mapper #3 (Konami without SCC)
+- support to MegaROM Mapper #5 (original "Gall Force", "Eggerland Mystery 2")
+- support to 80t/1s (360kb) disk images ("Elite")
+- TURBO mode is even faster than before
+- new in the debugger: stack dump and advanced info
+
+release 1.128:
+
+- "-ramslot" select slot 2 (expert) or 3 (hotbit)
+- fixed a minor bug in load rom ("Magical Kid Wiz")
+- fixed a bug in Sound Blasters configured to IRQs greater than 7
+- fixed the IRQ bug!!!! ("Astro MC", "Aekrus", "Titanic 2")
+- now brmsx can read from cd-roms
+- save screen snapshot to BRMSX.PCX
+- option to adjust joystick sensivity ("-joysens")
+- support to undocumented behavior of VDP in VRAM reads ("TMNT")
+- improved idle bus emulation (now reading an unconnected I/O port return FF)
+- support to korean memory layout
+- emulation of Kana LED (on Num Lock LED, require japanese or korean roms)
+- support to 180kb (40/1) and 360kb (40/2) .DSK disk images
+- emulation of the green monitor!! (use the option "-green")
+
+release 1.126:
+
+- new resolution: 256x192, square pixels
+- fixed a bug in the GUI: now LOAD ROM works again
+- now you can create tape images instead of just reading it
+
+release 1.123:
+
+- 128kb of memory mapper
+- removed stupid memory allocation bug
+- new command line option: "-nopentium"
+- removed a bug in "B" debug command
+
+release 1.122:
+
+- support to tape images (.CAS files)
+- support for 0000h 16kb cartridges ("keystone")
+- idle bus emulation
+- port-based disk emulation ("hello", "prokit zapper")
+- caps lock led emulation ("valkyr")
+- disk drive led emulation (in scroll lock led)
+- command line switches
+- fixed bug in sound buffer
+- 64kb of memory mapper in slot 2
+- new debug command : "?"
+- emulation of SCC wavesample-RAM ("kgc")
+- fixed another irq bug ("Valkyr")
+
+release 1.105:
+
+- fixed bug in old konami games like pingpong
+- keyboard click
+- voice through method 1 (PPI 1-bit PCM)
+- voice through method 2 (PSG 4-bit PCM)
+- emulation of port ABh (PPI indirect set/reset bit)
+- new debugger screen with new debug options
+- fake SCC sound (wave samples are not emulated)
+
+release 1.104:
+
+- fixed bug on video cache of SCREEN 1
+- support for joystick in both port-A and port-B
+- added volume control
+- added full sprite cropping
+- fixed bug with transparent sprites
+- support to SCREEN 3
+- fixed bug in interrupt handling (frogger)
+- added PSG graph
+- fixed bug in color 2
+- fixed bug in "PLAY" basic statement.
+- added support for 256kb megaram
+
+release 1.101:
+
+- DSK images are no longer write-protected
+- full Z80 emulation, including all documented and undocumented opcodes
+- IM 2 emulation
+- fully operational SCREEN 1 video cache
+- fully operational save and load state
+- save and load state through the GUI
+- fixed minor bug in TV-emulation VESA2 mode
+- support for #8000 cartridges
+
+release 1.73:
+
+- removed a stupid warning in VDP.ASM
+
+release 1.72:
+
+- sprite Y-clipping: no more bugs on penguin, zanac, kv2
+
+release 1.71:
+
+- removed bug when a 0D0h is inserted in sprite attribute table
+  now salamander don't have those ugly sprites when starting
+- compiler recognizes CB and ED, but ED doesn'r works properly
+
+release 1.70:
+
+- automatic fetch
+
+release 1.69:
+
+- fixed last bugs on compiler: now it works!!!
+
+release 1.68:
+
+- optimized MMX renderer one more time
+- added new "compiler" pipeline
+- fixed bug on CALL NC,dddd
+
+release 1.67:
+
+- now ALL the opcodes are in new pipe
+
+release 1.66:
+
+- put a lot of opcodes in the new pipe
+
+release 1.65:
+
+- optimized MMX renderer again
+
+release 1.64:
+
+- fixed disk-patchs, but msx-dos still doesn't work
+- fixed logo borders
+
+release 1.63:
+
+- optimized MMX renderer
+- added LD SP,IX
+- pause on F12: stop Z80, change palette and show logo
+
+release 1.62:
+
+- new MMX graphics renderer (25% speed gain)
+
+release 1.61: [*] public version
+
+- fixed bug on writememw: now the intro of Super Laydock works
+- fixed bug on readmemw
+
+release 1.60:
+
+- fixed bug on 16-bit ADC and SBC 
+  stupid bug! it was not V flag after all, 
+  the incorrect flag was the Z flag!!!
+  now Zanac starts fine, and F1 Spirit
+  doesn't have those graphics bugs.
+
+release 1.59:
+
+- added video cache for 256x200 mode
+
+release 1.58:
+
+- optimized base address evaluation
+- added support to EC bit (sprite horizontal shifter)
+
+release 1.57:
+
+- fixed yet another bug on new graphics pipeline
+  now the vram is segmented in 64 bytes blocks
+- added a help page
+
+release 1.56:
+
+- fixed bug on new graphics pipeline
+
+release 1.55:
+
+- new pipeline for block screen updates
+
+release 1.54:
+
+- new, improved FETCH1 and FETCHW1 macro
+
+release 1.53:
+
+- histogram evaluation
+- superscalar extensions
+
+release 1.52:
+
+- removed the "clockcounter" variable: 
+  now ebp decreases instead of increase
+  this saved more than two clocks in all opcodes!
+
+release 1.51:
+
+- optimized a lot of opcodes
+
+release 1.50:
+
+- optimized the sprite check in block mode
+- added new "fetchw1" routine: another clock cycle saved
+- added new "readmemw" and "writememw": a lot of clocks saved!
+- optimized PUSH, CALL, POP and RET
+
+release 1.49:
+
+- fixed bug on ADC and SBC (8-bit): they weren't setting V flag correctly
+- optimized "EMULATE" macro
+- added new "fetch1" routine: this should save 1 clock for each opcode
+- optimized yet again the screen 2 renderer: now even penguin adv.
+  and the nemesis are very fast.
+
+release 1.48:
+
+- dynamic CPU optimizer: auto-detect konami end-of-interrupt
+
+release 1.47:
+
+- now the numeric display averages 10 samples and has three digits
+- fixed bugs on screen 2 block renderer
+- moved blit code from IO.ASM to BLIT.ASM
+
+release 1.46:
+
+- added a new, super-fast, block-based renderer for screen 2
+
+release 1.45:
+
+- added a new, super-fast, block-based renderer for screen 1
+
+release 1.44:
+
+- fixed undocument flag affection for CP opcodes
+- optimized JR and JRCC
+- moved gui code from IO.ASM to GUI.ASM
+- added a new bar graph 
+  1st bar: z80 emulation
+  2nd bar: screen renderer
+  3rd bar: sprite renderer
+  4th bar: blitting time
+  5th bar: overhead of bar graph
+
+release 1.43:
+
+- added a message line at the bottom of debugger screen
+- added some pentium profiling options
+
+release 1.42:
+
+- added save/load machine state
+  keys: "A" for save and "L" for load
+
+release 1.41: [*] public version
+
+- added yet more extensions to the debugger
+- fixed bug on numeric display, now it uses color 4 instead of color 0
+- optimized CALL dddd a little
+
+release 1.40:
+
+- added more extensions to the debugger
+
+release 1.39:
+
+- added a numeric display in the bar graph
+- now only the mode fast check for interrupts before the synch
+  with this, emulation get faster in modes normal and turbo
+  and mode normal should have no bugs when run in very slow machines
+- added a new, improved debugger
+
+release 1.38: [*] public version
+
+- added a bar graph to display emulator performance
+  1st bar: z80 emulation
+  2nd bar: screen renderer+sprite renderer
+  3rd bar: blitting time
+  4th bar: overhead of bar graph
+  key "G" turns on/off the bar graph
+
+release 1.37: [*] public version
+
+- put a protection on the options that requires a pentium
+- now brmsx estimate the clock speed of the processor in startup
+
+release 1.36:
+
+- added a tweaked-vga mode to do 256x200 resolution;
+  with this, the msx screen uses almost all the monitor area,
+  and as a bonus we get another 19% in speed gain,
+  in all the screens!!
+- added a new debug key: "V" - changes the resolution 
+  available now are 320x200 and 256x200
+  default is 320x200
+- disabled "K" key since it is not working yet
+- optimized again the screen 0 renderer: speed gain is 10%
+
+release 1.35:
+
+- did more optimization on screen 2 renderer
+- added info screen: free low/high memory and cpu type
+
+release 1.34:
+
+- optimized the screen 0 renderer: speed gain is 1.8%
+- renamed debug command from "V" to "0"
+- added clock counter in command "1"
+- optimized the screen 1 renderer: speed gain is 22%
+
+release 1.33:
+
+- optimized JP cc,dddd
+- optimized AND rr/nn
+- optimized the initialization of "emulate"
+- optimized JR dd
+- optimized OR (HL)
+- optimized ADC A,(II+DD)
+- optimized the screen 2 renderer: speed gain is 21%
+- now brmsx has two executables: one for DOS and one for windows
+
+release 1.32:
+
+- optimized LDI
+- added 1 waitstate for each instruction 
+  now everything should run at correct speed
+- added SRL (HL)
+- aaargh: "clockcounter" was not dword-aligned
+  now the emulation should be faster
+
+release 1.31:
+
+- added pseudo-support for megarom mode-5 (ascii 16kb) 
+- added new debug key "K" to switch between megarom modes
+- now an error in emulation will generate an interrupt
+  this will make emulation about 5% faster since
+  the error checking is done outside the main loop  
+- optimized CP opcode
+
+release 1.30: [*] public version
+
+- added IN reg,(C)
+
+release 1.29:
+
+- added three levels of synchronization:
+  NORMAL MODE: synchronizes on every interrupt
+  FAST MODE: does not synchronize, but ints are still generated at 60 Hz
+  TURBO MODE: ints are generated at more than 60 Hz
+  "M" key switches between the modes
+- removed useless debug commands: X, P, K
+- added EX (SP),IX -> now Animal Basket is playable
+
+release 1.28:
+
+- new unificated "emulate" pipeline
+- msxvram is now allocated in real time, it reduces the executable size
+  and will make life easier when I'll implement msx2 emulation
+- fixed timing of automatic opcodes  
+- RETI does not enable interrupts now, because of this megarom games 
+  doesn't lock anymore
+
+release 1.27:
+
+- changed the memory model to 8k banks instead of 16k banks
+- now the bank switch is also done on the "slot" variable,
+  this way you can change the banks to another slot and then
+  back, preserving the megarom bank selectors. With this change
+  F1 Spirit now run.
+- changed interrupt emulation, now MSX timing has higher priority
+  than PC timing. This will slow down emulation on slower machines,
+  but it can prevent deadlocks. As a side effect, Nemesis run on 
+  correct speed.
+- added LD SP,IY instruction
+
+release 1.26:
+
+- fixed timings of instructions in Z80??.ASM
+- added synchronization at interrupt-level
+
+release 1.25:
+
+- optimized LD rr,dd
+- optimized LD (HL),dd
+- sorted OPCODE.INC file
+- added RL (II+dd)
+- added ADD II,rrw
+- fixed timings of instructions on OPCODE.INC

@@ -1,0 +1,1 @@
+EXTENDED_SLOT equ 10+2

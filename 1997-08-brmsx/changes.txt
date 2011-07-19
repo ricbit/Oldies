@@ -1,0 +1,88 @@
+[2.10]
+
+- all: added "-nomegaram" to disable the megaram emulation
+
+[2.9]
+
+- all: support to Windows XP
+
+[2.8]
+
+- MSX2: support to 8x8 sprites in screen 8 
+
+[2.7]
+
+- MSX2+: support to horiz scroll in SCREEN 4 ("Space Manbow")
+- all: support to 360kb disks in -diskhigh mode
+- all: fixed a bug in the debugger with RRC mnemonics
+
+[2.6] (10/5/2000)
+
+- MSX2: added "-trtimer" to enable the highresolution timer at 0E6h-0E7h
+- MSX2: support to VDP timing (intro "SD-Snatcher","Space Manbow","FireHawk")
+- MSX2: added "-novdptiming" to disable the vdp timing
+- MSX2: fixed support to bit 7 of VDP[9] (intro of "Space Manbow")
+- MSX2: improved VRAM layout ("Breaker", intro of "F1 Spirit 3D Special")
+- MSX2: support to sprites in SCREEN 8 with correct palette ("Breaker")
+- MSX2: support to 8x8 sprites in SCREEN 5 (to be used in "GEM")
+- MSX2+: support to horiz scroll in SCREEN 5,6 ("F1 Spirit 3D", "Laydock2")
+- MSX2+: support to MSX2+ intro
+
+[2.5] (23/4/2000)
+
+- all: added "-ciel" to enable 7MHz Z80 cpu
+- all: added "-advram" to enable the new ADVRAM brazilian hardware
+- MSX2: now LMMM has support to DIX ("Fbout")
+- MSX2: now LMMC has support to DIX/DIY ("Nemesis Dawn" BASIC two-liner)
+- MSX2: fixed small bugs in LMCM and LMMC commands
+- MSX2: added vdp command POINT (used by BASIC command POINT)
+
+[2.4] (31/3/2000)
+
+- all: fixed "-mount" switch, full support to 720kb disks
+- MSX2: fixed a small problem in the SCREEN 8 palette
+- MSX2: now HMMV has support to DIY ("Kyokugen")
+- MSX2: fixed a bug in SCREEN 6 when using VESA 2 modes
+- MSX2: improved support to LMCM ("Feedback", "Aleste Gaiden")
+- MSX2: improved support to LINE ("Kyokugen", "Fony Demo Disk 1")
+
+[2.3] (16/2/2000)
+
+- all: fixed a bug in JR CC emulation ("UZIX")
+- MSX1: fixed the "-res 1" video mode
+- MSX2: fixed a IRQ bug ("Peach Up Special #2-1")
+- MSX2: improved vram initialization (intro of "Puyo Puyo")
+- MSX2+: added "-msx2+" to enable MSX2+ emulation
+- MSX2+: added "-res 12" 512x384x15 with support to YJK system
+- MSX2+: added support to SCREEN 10 and SCREEN 12
+
+[2.2] (5/8/1999)
+
+- all: now the fast forward key preserves any breakpoint previously set
+- all: added "-truevsync" (sync only with the monitor)
+- MSX2: improved set adjust support (intro of "Burai")
+- MSX2: support to raster Display Enable effects ("Lenam" intro of DS#9a)
+- MSX2: new SCREEN 2/4 renderer ("Space Manbow", "Fire Hawk")
+- MSX2: support to screensplits ("Zanac EX","Aleste 2","Super Cooks")
+- MSX2: support to horizontal interrupts 
+- MSX2: now HMMC has support to DIX/DIY ("Aleste", "Out Run")
+- MSX2: now LMMM has support to DIY ("Fray")
+- Fudebug: added command "6": view V9938 registers (not finished yet)
+
+[2.1] (29/7/1999)
+
+- MSX2: now YMMM has support to DIY (intro of "Emerald Dragon")
+- MSX2: now HMMM has support to DIX/DIY ("Columns","Peach Up Special #2-4")
+- MSX2: added vdp command LMCM (not sure if it's working)
+- MSX2: now the palette is restored when you exit the GUI in SCREEN 8/0
+- MSX2: now the palette is restored when you exit the debugger in SCREEN 8/0
+- MSX2: set adjust will work in 512-pixels mode (SCR 6,7,0/80)
+- MSX2: SCREEN 0 has correct palette and support to set adjust
+- MSX2: SCREEN 1 has correct palette and support to set adjust
+- MSX2: SCREEN 3 has correct palette and support to set adjust
+- MSX2: SCREEN 2/4 have support to set adjust
+- Fudebug: now the command "E" will change the VRAM contents in 4th screen
+
+[2.0] (27/7/1999)
+
+- MSX2: initial release

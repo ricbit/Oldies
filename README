@@ -117,6 +117,13 @@ could play MSX tunes on the PC by mapping the PSG registers on the FM
 registers of the SoundBlaster. Of course this method had a very low sound
 quality when compared to the original.
 
+Name: 1997-08-brmsx
+Language: Assembly x86, Binary x86
+Description: This MSX emulator raised the bar for all others, the faster and
+most accurate of its time. You may like to check the self-modifying code in
+psg.asm, and also some code written in binary on blit.asm (I was using tasm at
+the time, and it didn't have MMX support, so I had to encode it manually).
+
 Name: 1997-12-psgplayer
 Language: C
 Description: Update to the old psgplayer, this time emulating the PSG using
