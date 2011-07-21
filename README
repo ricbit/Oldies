@@ -176,6 +176,11 @@ Name: 2000-05-ameba
 Language: C
 Description: Artificial life simulator, to watch evolution in real time.
 
+Name: 2003-04-superopt
+Language: C
+Description: Superoptimization, uses brute force to find the minimum assembly
+code that is equivalent to a given C snippet. Generates Z80 assembly.
+
 Name: 2003-11-plasma
 Language: Assembly x86
 Description: Plasma demo using only 176 bytes.
