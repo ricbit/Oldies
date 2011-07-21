@@ -99,7 +99,7 @@ Language: C++
 Description: Display a static pattern to calibrate monitors.
 
 Name: 1996-06-asciieditor
-Language: C
+Language: C++
 Description: An ASCII art editor. I used this mostly to write text-based UIs
 for my programs. The debug screens from BrMSX were written with this.
 
@@ -116,6 +116,10 @@ Description: My first emulator! This one emulates the PSG chip from MSX, it
 could play MSX tunes on the PC by mapping the PSG registers on the FM
 registers of the SoundBlaster. Of course this method had a very low sound
 quality when compared to the original.
+
+Name: 1996-12-vesa
+Language: C
+Description: Lists all video modes available from a VESA videocard.
 
 Name: 1997-08-brmsx
 Language: Assembly x86, Binary x86
