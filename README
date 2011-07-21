@@ -130,6 +130,11 @@ Description: Update to the old psgplayer, this time emulating the PSG using
 wave-based synthesis. This was a proof of concept before I implemented
 sound support in BrMSX.
 
+Name: 1998-04-dsktool
+Language: C
+Description: A FAT12 implementation, useful to insert and extract files
+from floppy disk images.
+
 Name: 1998-12-mp2audio
 Language: C
 Description: Decodes the header of an mp2 audio file.
