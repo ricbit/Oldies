@@ -205,6 +205,10 @@ Name: 2003-11-plasma
 Language: Assembly x86
 Description: Plasma demo using only 176 bytes.
 
+Name: 2004-08-modplayer
+Language: Java
+Description: MOD Player written in java.
+
 Name: 2006-08-nurikabe
 Language: C++
 Description: Nurikabe solver using human-based reasoning.
