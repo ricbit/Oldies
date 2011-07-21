@@ -213,6 +213,11 @@ Name: 2004-08-brmc1000
 Language: Java
 Description: An MC-1000 emulator written as a Java applet.
 
+Name: 2004-12-particle
+Language: C
+Description: Particle demo, implements the same effect seen on the Star Wars
+Episode 3 DVD menu.
+
 Name: 2006-08-nurikabe
 Language: C++
 Description: Nurikabe solver using human-based reasoning.
