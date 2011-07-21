@@ -209,6 +209,10 @@ Name: 2004-08-modplayer
 Language: Java
 Description: MOD Player written in java.
 
+Name: 2004-08-brmc1000
+Language: Java
+Description: An MC-1000 emulator written as a Java applet.
+
 Name: 2006-08-nurikabe
 Language: C++
 Description: Nurikabe solver using human-based reasoning.
