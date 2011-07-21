@@ -117,6 +117,10 @@ could play MSX tunes on the PC by mapping the PSG registers on the FM
 registers of the SoundBlaster. Of course this method had a very low sound
 quality when compared to the original.
 
+Name: 1996-08-doom
+Language: C, Lex, Yacc
+Description: Another 3d engine, this time with a DSL to describe polygons.
+
 Name: 1996-11-rbrt
 Language: C++, Lex, Yacc
 Description: An adaptative ray tracer. Much improved since the 1994-11 version,
@@ -167,3 +171,7 @@ Name: 1999-11-fractalcomp
 Language: C
 Description: Encoder and decoder for a fractal compression scheme. Quality was
 nice but it took a long, long time to encode an image.
+
+Name: 2000-05-ameba
+Language: C
+Description: Artificial life simulator, to watch evolution in real time.
