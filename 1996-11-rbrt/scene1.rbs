@@ -1,0 +1,69 @@
+threshold 0.7 interp
+reflection 0.1
+
+punctual {
+  position (0,0.5,-1.5)
+  color (0.5,0.5,0.8)
+}
+
+punctual {
+  position (0,2.5,-0.5)
+  color (1,0.5,0.5)
+}
+
+sphere {
+  center (0.6,0,-0.41)
+  surface {
+    color (1.0,0.0,0.0)
+    ka 0.2
+    kd 0.8
+    ks 0.0
+  }
+  radius 0.5
+}
+
+sphere {
+  center (-0.2,0,0.01)
+  surface {
+    color (1.0,0.7,0.5)
+    ka 0.2
+    kd 0.5
+    ks 0.0
+  }
+  radius 1.0
+}
+
+sphere {
+  center (0.32,-0.5,-0.26)
+  surface {
+    color (0.0,0.7,0.5)
+    ka 0.2
+    kd 0.8
+    ks 0.0
+  }
+  radius 0.5
+}
+
+plane {
+  center (-0.2,-0.5,0.01)
+  surface {
+    color (0.9,0.9,0.9)
+    ka 0.2
+    kd 0.8
+    ks 0.0
+  }
+  dirV (1,0,0)
+  dirU (0,0.2,1)
+}
+
+plane {
+  center (-0.5,0,0)
+  dirV (0,0,1)
+  dirU (0,1,0)
+  surface {
+    color (0.3,0.3,0.7)
+    ka 0.2
+    kd 0.5
+    ks 0.0
+  }
+}

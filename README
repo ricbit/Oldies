@@ -117,6 +117,12 @@ could play MSX tunes on the PC by mapping the PSG registers on the FM
 registers of the SoundBlaster. Of course this method had a very low sound
 quality when compared to the original.
 
+Name: 1996-11-rbrt
+Language: C++, Lex, Yacc
+Description: An adaptative ray tracer. Much improved since the 1994-11 version,
+this one has more primitives, and include a DSL to describe the scene to be
+rendered.
+
 Name: 1996-12-vesa
 Language: C
 Description: Lists all video modes available from a VESA videocard.
@@ -131,6 +137,12 @@ the time, and it didn't have MMX support, so I had to encode it manually).
 Name: 1997-10-wave
 Language: C
 Description: Plays a 440Hz square wave on sound blaster using dma transfers.
+
+Name: 1997-11-rbz
+Language: C
+Description: Comparison of many pre-encoding schemes to improve image
+compression. The goal was to check which scheme was the best to encode a
+dithered image.
 
 Name: 1997-12-psgplayer
 Language: C

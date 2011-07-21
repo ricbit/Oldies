@@ -1,0 +1,77 @@
+threshold 0.1 interp
+reflection 0.1
+
+plane {
+  dirU (1,0,5)
+  dirV (0,-1,0)
+  center (0,0,15)
+  surface {
+    color (1,1,1)
+    ka 0.2
+    kd 0.2
+    ks 0.6
+  }
+}
+
+plane {
+  dirU (-1,0,5)
+  dirV (0,1,0)
+  center (0,0,15)
+  surface {
+    color (1,1,1)
+    ka 0.2
+    kd 0.2
+    ks 0.6
+  }
+}
+
+punctual {
+  position (2,0,-2)
+  color (0.5,0.5,0.5)
+}
+
+punctual {
+  position (-2,0,-2)
+  color (0.5,0.5,0.5)
+}
+
+poliedra {                        
+  vertex    0       (0.0000 ,0.5257 ,2.8507 )
+  vertex    1       (0.0000 ,-0.5257,2.8507 )
+  vertex    2       (0.8507 ,0.0000 ,2.5257 )
+  vertex    3       (0.5257 ,0.8507 ,2.0000 )
+  vertex    4       (-0.5257,0.8507 ,2.0000 )
+  vertex    5       (-0.8507,0.0000 ,2.5257 )
+  vertex    6       (-0.5257,-0.8507,2.0000 )
+  vertex    7       (0.5257 ,-0.8507,2.0000 )
+  vertex    8       (0.8507 ,-0.0000,1.5257)
+  vertex    9       (0.0000 ,-0.5257,1.8507)
+  vertex   10       (0.0000 ,0.5257 ,1.8507)
+  vertex   11       (-0.8507,-0.0000,1.5257)
+  face (1,2,0)
+  face (2,3,0)
+  face (3,4,0)
+  face (4,5,0)
+  face (5,1,0)
+  face (5,6,1)
+  face (6,7,1)
+  face (7,2,1)
+  face (2,8,3)
+  face (2,7,8)
+  face (6,9,7)
+  face (9,8,7)
+  face (8,10,3)
+  face (8,9,10)
+  face (6,11,9)
+  face (11,10,9)
+  face (10,4,3)
+  face (10,11,4)
+  face (6,5,11)
+  face (5,4,11)
+  surface {
+    color (0.5,0.5,0.8)
+    ka 0.2
+    kd 0.8
+    ks 0.0
+  }
+}
