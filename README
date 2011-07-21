@@ -159,6 +159,10 @@ Name: 1998-12-mp2audio
 Language: C
 Description: Decodes the header of an mp2 audio file.
 
+Name: 1999-10-fourfours
+Language: C
+Description: Solve the four fours puzzle using forward chaining.
+
 Name: 1999-11-fractalcomp
 Language: C
 Description: Encoder and decoder for a fractal compression scheme. Quality was
