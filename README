@@ -175,3 +175,7 @@ nice but it took a long, long time to encode an image.
 Name: 2000-05-ameba
 Language: C
 Description: Artificial life simulator, to watch evolution in real time.
+
+Name: 2006-08-nurikabe
+Language: C++
+Description: Nurikabe solver using human-based reasoning.
