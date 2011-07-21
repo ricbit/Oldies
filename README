@@ -138,8 +138,8 @@ Description: Lists all video modes available from a VESA videocard.
 
 Name: 1997-08-brmsx
 Language: Assembly x86, Binary x86
-Description: This MSX emulator raised the bar for all others, the faster and
-most accurate of its time. You may like to check the self-modifying code in
+Description: This MSX emulator raised the bar for all others, being the faster
+and most accurate of its time. You may like to check the self-modifying code in
 psg.asm, and also some code written in binary on blit.asm (I was using tasm at
 the time, and it didn't have MMX support, so I had to encode it manually).
 
@@ -159,10 +159,19 @@ Description: Update to the old psgplayer, this time emulating the PSG using
 wave-based synthesis. This was a proof of concept before I implemented
 sound support in BrMSX.
 
+Name: 1998-07-serial
+Language: C
+Description: Connects two computers using a serial cable. This was a proof of
+concept before I implemented multiplayer over serial in BrMSX.
+
 Name: 1998-04-dsktool
 Language: C
 Description: A FAT12 implementation, useful to insert and extract files
 from floppy disk images.
+
+Name: 1998-08-scr2grp
+Language: C
+Description: Converts ZX Spectrum .SCR screenshots to the MSX .GRP format.
 
 Name: 1998-12-mp2audio
 Language: C
