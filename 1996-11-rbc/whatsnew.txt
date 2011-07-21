@@ -1,0 +1,38 @@
+v1.4: 
+        otimizador RBLO
+
+v1.3:
+
+        ordem de avaliacao agora e' sempre da direita para a esquerda
+        operador ?:
+        novo tipo char (sizeof=1)
+        cast
+        otimizacoes de imediatos
+        novo tipo pointer 
+        indirecao via *
+        indirecao via []
+        inicializacao de variaveis
+        operador +=
+        operador -=
+        operador <<
+        argumentos para funcoes podem ter qualquer tipo
+        ajuste automatico do tamanho do tipo
+        operador &
+        operador >>
+        constantes string
+        asm-lib: getchar(),bios(),bdos(),vpoke(),
+                 screen(),fill_vram(),malloc()
+        c-lib: open(),read(),puts()
+
+v1.2:
+
+        novo formato de arquivo .cfg
+        for
+        do while
+        -
+        pre --
+        pos --
+        >
+        <=
+        !=
+        z8016.cfg

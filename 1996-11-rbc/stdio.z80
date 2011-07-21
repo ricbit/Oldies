@@ -1,0 +1,254 @@
+; Standard library for RBC (Z80 version)
+
+ifdef _putchar$
+_putchar:
+        push    ix
+        ld      ix,0
+        add     ix,sp
+        ld      e,(ix+4)
+        ld      c,2
+        call    5
+        pop     ix
+        ret
+endif
+
+ifdef _getchar$
+_getchar:
+        push    ix
+        ld      c,8
+        call    5
+        ld      h,0
+        ld      l,a
+        pop     ix
+        ret
+endif
+
+ifdef _vpeek$
+_vpeek:
+        push    ix
+        ld      ix,0
+        add     ix,sp
+        ld      l,(ix+4)
+        ld      h,(ix+5)
+        ld      a,(02dh)
+        or      a
+        jr      z,_vpeek1
+        xor     a
+        out     (099h),a
+        ld      a,08eh
+        out     (099h),a
+_vpeek1:
+        ld      a,l
+        out     (099h),a
+        ld      a,h
+        and     03fh
+        out     (099h),a
+        ex      (sp),hl
+        ex      (sp),hl
+        in      a,(098h)
+        pop     ix
+        ret
+endif
+
+ifdef _fill_vram$
+_fill_vram:
+        push    ix
+        ld      ix,0
+        add     ix,sp
+        ld      l,(ix+4)
+        ld      h,(ix+5)
+        ld      a,(02dh)
+        or      a
+        jr      z,_fill_vram1
+        xor     a
+        out     (099h),a
+        ld      a,08eh
+        out     (099h),a
+_fill_vram1:
+        ld      a,l
+        out     (099h),a
+        ld      a,h
+        and     03fh
+        or      040h
+        out     (099h),a
+        ex      (sp),hl
+        ex      (sp),hl
+        ld      l,(ix+6)
+        ld      h,(ix+7)
+        ld      b,(ix+9)
+        ld      c,098h
+_fill_vram2:
+        out     (c),b
+        dec     hl
+        ld      a,l
+        or      h
+        jr      nz,_fill_vram2
+        pop     ix
+        ret
+endif
+
+ifdef _malloc$
+_malloc:
+        push    ix
+        ld      ix,0
+        add     ix,sp
+        ld      hl,(heap)
+        push    hl
+        ld      e,(ix+4)
+        ld      d,(ix+5)
+        add     hl,de
+        ld      (heap),hl
+        pop     hl
+        pop     ix
+        ret
+endif
+
+ifdef _bdos$
+_bdos:
+        push    ix
+        ld      ix,0
+        add     ix,sp
+        ld      c,(ix+5)
+        ld      e,(ix+6)
+        ld      d,(ix+7)
+        ld      l,(ix+8)
+        ld      h,(ix+9)
+        call    5
+        pop     ix
+        ret
+endif
+
+ifdef _bios$
+_bios:
+        call_bios$ defl 0
+        push    ix
+        ld      ix,0
+        add     ix,sp
+        ld      l,(ix+4)
+        ld      h,(ix+5)
+        push    hl
+        pop     ix
+        call    call_bios
+        pop     ix
+        ret
+endif
+
+ifdef _screen$
+_screen:
+        call_bios$ defl 0
+        call_subrom$ defl 0
+        push    ix
+        ld      ix,0
+        add     ix,sp
+        ld      a,(0faf8h) 
+        and     a
+        ld      a,(ix+5)
+        jr      z,_screen1  
+        ld      ix,01b5h   
+        call    call_subrom
+        jr      _screen2
+_screen1:
+        ld      a,(ix+5)
+        ld      ix,05fh
+        call    call_bios
+_screen2:
+        pop     ix
+        ret
+endif
+
+ifdef _vpoke$
+_vpoke:
+        set_vdp_write$ defl 0
+        push    ix
+        ld      ix,0
+        add     ix,sp
+        ld      l,(ix+4)
+        ld      h,(ix+5)
+        ld      e,(ix+7)
+        call    set_vdp_write
+        out     (c),e
+        pop     ix
+        ret
+endif
+
+
+ifdef set_vdp_write$
+set_vdp_write:
+        set_vdp_address$ defl 0
+        call    set_vdp_address
+        or      01000000b               
+        ei
+        out     (c),a
+        dec     c
+        ret
+endif
+
+ifdef set_vdp_address$
+set_vdp_address:
+        push    de
+        ld      c,099h
+        ld      a,(0faf8h)              
+        and     a
+        jr      z,set_vdp_address2      
+        ld      a,h                     
+        rlca
+        rlca
+        and     00000011b
+        ld      d,a                     
+        ld      a,(0fcafh)
+        cp      7
+        ld      a,(0faf6h)
+        jr      c,set_vdp_address1      
+        add     a,a
+set_vdp_address1:
+        add     a,a
+        add     a,d
+        di
+        out     (c),a                   
+        ld      a,80h+14                
+        out     (c),a
+set_vdp_address2:
+        di
+        out     (c),l                   
+        ld      a,h                     
+        and     00111111b
+        pop     de
+        ret
+endif
+
+ifdef call_subrom$
+call_subrom:
+        exx             
+        ex      af,af'
+        ld      hl,015fh
+        push    hl
+        ld      hl,0C300h
+        push    hl
+        push    ix
+        ld      hl,021DDh
+        push    hl
+        ld      hl,03333h
+        push    hl
+        ld      hl,0
+        add     hl,sp
+        ld      a,0C3h
+        ld      (0fdd6h),a
+        ld      (0fdd7h),hl
+        ex      af,af'  
+        exx
+        ld      ix,066h
+        call    call_bios
+        ld      hl,10   
+        add     hl,sp
+        ld      sp,hl
+        ret
+endif
+
+ifdef call_bios$
+call_bios:
+        ld      iy,(0fcc0h)
+        call    01ch
+        ei
+        ret
+endif
+

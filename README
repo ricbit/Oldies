@@ -121,6 +121,11 @@ Name: 1996-08-doom
 Language: C, Lex, Yacc
 Description: Another 3d engine, this time with a DSL to describe polygons.
 
+Name: 1996-11-rbc
+Language: C, Lex, Yacc
+Description: A portable C compiler, it generates code for a virtual stack
+machine, and this code is then converted to Assembly Z80 or Assembly x86.
+
 Name: 1996-11-rbrt
 Language: C++, Lex, Yacc
 Description: An adaptative ray tracer. Much improved since the 1994-11 version,
