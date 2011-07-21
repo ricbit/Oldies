@@ -186,6 +186,12 @@ Language: C
 Description: Encoder and decoder for a fractal compression scheme. Quality was
 nice but it took a long, long time to encode an image.
 
+Name: 2000-01-3dtictactoe
+Language: Java
+Description: 3D tic tac toe as a java applet. This game differs from classic
+3d tic tac toe, since it's played on a board topologically equivalent to
+a toroid.
+
 Name: 2000-05-ameba
 Language: C
 Description: Artificial life simulator, to watch evolution in real time.
