@@ -1,0 +1,891 @@
+; -----------------------------------------------------------------------        
+;
+;    Elite 2 1.0
+;    Copyright (C) 2002 by Ricardo Bittencourt
+;
+;
+;    Project started at 9/5/2022. Last modification was on 11/5/2002.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@lsi.usp.br
+;        http://www.lsi.usp.br/~ricardo
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt 
+;
+;       Graphics
+;               Ricardo Bittencourt 
+;
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+	ORG     0100h
+
+BDOS    EQU     00005h
+OPEN    EQU     0000Fh
+RDSEQ   EQU     00014h
+PRINT   EQU     00009h
+DTA     EQU     00080h
+INIMLT  EQU     00075h
+INIT32  EQU     0006Fh
+INITXT  EQU     0006Ch
+INIGRP  EQU     00072h
+SETWRT  EQU     00053h
+FILVRM  EQU     00056h
+LDIRMV  EQU     0005Ch
+CLRSPR  EQU     00069h
+PRTCHR  EQU     00002h
+ENASLT  EQU     00024h
+RSLREG  EQU     00138h
+TOTEXT  EQU     000D2h
+BDRCLR  EQU     0F3EBh
+CHGCLR  EQU     007F7h
+DISSCR  EQU     00041h
+ENASCR  EQU     00044h
+EXPTBL  EQU     0FCC1h
+RG1SAV  EQU     0F3E0h
+WRTVDP  EQU     00047h
+RDBLK   EQU     00027h
+SETDTA  EQU     0001Ah
+CHGET   EQU     0009Fh
+JIFFY   EQU     0FC9Eh
+
+MAXVERTEX       EQU     9
+MAXLINES        EQU     16
+
+; -----------------------------------------------------------------------
+
+ALIGN   MACRO
+LOCAL VOID
+
+VOID:
+        DS      256*(HIGH (VOID+255))-VOID
+
+        ENDM
+
+; -----------------------------------------------------------------------
+; BIG_SHIFT - promote the accumulator to 16-bit and shift left by N
+
+BIG_SHIFT       MACRO   REGH,REGL,N
+
+        IF N LT 5
+          REPT    N
+          RLCA
+          ENDM
+        ELSE
+          REPT 8-N
+          RRCA
+          ENDM
+        ENDIF  
+	LD      REGL,A
+	AND     (1 SHL N)-1
+	LD      REGH,A
+	XOR     REGL
+	LD      REGL,A
+
+		ENDM
+
+; -----------------------------------------------------------------------
+; NEGHL: negate value of HL (destroy DE)
+
+NEGHL   MACRO
+
+        LD      DE,0
+        OR      A
+        EX      DE,HL
+        SBC     HL,DE
+
+        ENDM
+
+; -----------------------------------------------------------------------
+
+START:
+	; prepare compatibility
+
+	CALL    PREPARE
+
+; -----------------------------------------------------------------------
+
+        ; border color = BLACK
+        LD      A,1h
+	CALL    SCREEN2
+
+        ; fill the color table of vram to white over black
+        LD      A,0F1h
+        LD      HL,02000h
+        LD      BC,32*192
+        LD      IX,FILVRM
+        CALL    CALLBIOS
+
+; -----------------------------------------------------------------------
+
+        LD      HL,(JIFFY)
+        LD      (SAVE),HL
+
+        LD      B,0
+
+OUTER:
+        PUSH    BC
+
+        ; clear the bitmap to black
+        CALL    CLEAR_SCREEN
+
+        ; rotate the vertex of the model
+        CALL    ROTATE
+
+        ; project all the vertex onto 2d screen space
+        CALL    PROJECT
+
+        ; draw the vertex in the bitmap
+        CALL    DRAW
+
+        ; draw the lines
+        CALL    LINE
+
+        ; copy bitmap to screen
+        CALL    BLIT
+
+        POP     BC
+        DJNZ    OUTER
+
+        ; measure time spent in rendering
+        LD      HL,(JIFFY)
+        LD      DE,(SAVE)
+        OR      A
+        SBC     HL,DE
+        LD      (SAVE),HL
+
+        LD      IX,CHGET
+        CALL    CALLBIOS
+
+; -----------------------------------------------------------------------
+
+        ; return to dos
+        LD      IX,TOTEXT
+        CALL    CALLBIOS
+
+        LD      A,(SAVE+1)
+        CALL    PRINTHEX
+        LD      A,(SAVE)
+        CALL    PRINTHEX
+
+        JP      0
+
+; -----------------------------------------------------------------------
+; CLEAR_SCREEN: clear the memory buffer
+
+CLEAR_SCREEN:
+        LD      HL,BITMAP
+        LD      (HL),L
+        LD      DE,BITMAP+1
+        LD      BC,32*192
+CLEAR_LOOP:
+        REPT    256
+        LDI
+        ENDM
+        JP      PE,CLEAR_LOOP
+        RET
+
+; -----------------------------------------------------------------------
+; ROTATE: rotate the vertex
+
+ROTATE:
+        LD      B,MAXVERTEX
+        LD      IX,VERTEX
+        LD      IY,ROTATED
+ROTATE_LOOP:
+        PUSH    BC
+
+        ; X'=X*SIN(T)+Z*COS(T)
+        LD      L,(IX+0)
+        LD      H,(IX+1)
+        LD      A,(THETA)
+        LD      C,A
+        CALL    SIN
+        PUSH    HL
+        LD      L,(IX+4)
+        LD      H,(IX+5)
+        LD      A,(THETA)
+        LD      C,A
+        CALL    COS
+        POP     DE
+        ADD     HL,DE
+        LD      (IY+0),L
+        LD      (IY+1),H
+
+        ; Z'=Z*SIN(T)-X*COS(T)
+        LD      L,(IX+4)
+        LD      H,(IX+5)
+        LD      A,(THETA)
+        LD      C,A
+        CALL    SIN
+        PUSH    HL
+        LD      L,(IX+0)
+        LD      H,(IX+1)
+        LD      A,(THETA)
+        LD      C,A
+        CALL    COS
+        POP     DE
+        OR      A
+        SBC     HL,DE
+        LD      (IY+4),L
+        LD      (IY+5),H
+
+        ; Y'=Y
+        LD      A,(IX+2)
+        LD      (IY+2),A
+        LD      A,(IX+3)
+        LD      (IY+3),A
+
+        LD      DE,6
+        ADD     IX,DE
+        ADD     IY,DE
+        POP     BC
+        DJNZ    ROTATE_LOOP
+
+        LD      HL,THETA
+        INC     (HL)
+        RET
+
+; -----------------------------------------------------------------------
+; PROJECT: project the vertex onto 2d screen space
+
+PROJECT:
+        LD      IX,ROTATED
+        LD      IY,PROJECTED
+        LD      B,9
+PROJECT_LOOP:
+        PUSH    BC
+        LD      H,(IX+5)
+        LD      L,(IX+4)
+        LD      D,(IX+1)
+        LD      E,(IX+0)
+        PUSH    HL
+        CALL    DIVZ
+        ADD     A,128
+        LD      (IY),A
+        POP     HL
+        LD      D,(IX+3)
+        LD      E,(IX+2)
+        CALL    DIVZ
+        ADD     A,96
+        LD      (IY+1),A
+        INC     IY
+        INC     IY
+        POP     BC
+        LD      DE,6
+        ADD     IX,DE
+        DJNZ    PROJECT_LOOP
+        RET
+
+; -----------------------------------------------------------------------
+; DIVZ: division of X or Y by Z
+; warning: works only for X<Z and positive Z 
+
+DIVZ:
+        LD      BC,20*256
+        ADD     HL,BC
+        LD      B,H
+        LD      C,L
+        EX      DE,HL
+
+        BIT     7,H
+        JR      Z,DIVZ_POS
+        EX      AF,AF'
+        NEGHL
+        EX      AF,AF'
+DIVZ_POS:
+        EX      AF,AF'
+        IRP     I,<0,1,2,3,4,5,6,7>
+        ADD     HL,HL                   ; 12 1
+        LD      D,H                     ; 5 1
+        LD      E,L                     ; 5 1
+        SBC     HL,BC                   ; 17 2
+        JR      NC,DIVZ&I               ; 13/8 3/2
+        EX      DE,HL                   ; 5 1
+DIVZ&I:
+        RLA                             ; 5 1
+        ENDM
+        CPL
+        EX      AF,AF'
+        JR      Z,DIVZ_END
+        EX      AF,AF'
+        NEG
+        RET
+DIVZ_END:
+        EX      AF,AF'
+        RET
+
+; -----------------------------------------------------------------------
+; CMASK: build a mask to draw a pixel
+;        enter E=X, A=Y
+;        exit HL=address, A=mask
+;        modify DE
+
+CMASK   MACRO
+
+        BIG_SHIFT H,L,5
+        LD      D,HIGH (SCR2_MASK)
+        LD      A,(DE)
+        OR      L
+        LD      L,A
+        SET     6,H
+        INC     D
+        LD      A,(DE)
+
+        ENDM
+
+; -----------------------------------------------------------------------
+; PSET: draw a pixel in the bitmap
+;       enter E=X, A=Y
+
+PSET    MACRO
+
+        CMASK
+        OR      (HL)
+        LD      (HL),A
+
+        ENDM
+
+; -----------------------------------------------------------------------
+; DRAW: draw the projected vertex into bitmap
+
+DRAW:
+        LD      IX,PROJECTED
+        LD      B,MAXVERTEX
+DRAW_LOOP:
+        LD      A,(IX+1)
+        LD      E,(IX)
+        PSET
+        INC     IX
+        INC     IX
+        DJNZ    DRAW_LOOP
+        RET
+
+; -----------------------------------------------------------------------
+; SIN: evalute HL*sin(C)
+
+SIN:
+        LD      A,H
+        XOR     C
+        EX      AF,AF'
+        BIT     7,H
+        JR      Z,SIN_POS
+        NEGHL
+SIN_POS:
+        LD      B,HIGH (SIN_TABLE)
+        LD      A,(BC)
+        LD      DE,0
+        LD      B,0
+        LD      C,A
+        XOR     A
+        ; ade=0 bhl=valor positivo c=sin
+        IRP     I,<0,1,2,3,4,5,6,7>
+        RRC     C
+        JR      NC,SIN_&I
+        EX      DE,HL
+        ADD     HL,DE
+        EX      DE,HL
+        ADC     A,B
+SIN_&I:    
+        ADD     HL,HL
+        RL      B
+        ENDM
+        LD      L,D
+        LD      H,A
+        EX      AF,AF'
+        RET     P
+        NEGHL
+        RET
+
+; -----------------------------------------------------------------------
+; COS: evalute HL*cos(C)
+
+COS:
+        LD      A,C
+        ADD     A,64
+        LD      C,A
+        JP      SIN
+
+; -----------------------------------------------------------------------
+; INCX: increment a pixel in CMASK
+
+INCX    MACRO
+LOCAL CHANGE
+
+        RRC     C
+        JR      NC,CHANGE
+        LD      (HL),A
+        INC     HL
+        LD      A,(HL)
+CHANGE:
+
+        ENDM
+
+; -----------------------------------------------------------------------
+; DECX: decrement a pixel in CMASK
+
+DECX    MACRO
+LOCAL CHANGE
+
+        RLC     C
+        JR      NC,CHANGE
+        LD      (HL),A
+        DEC     HL
+        LD      A,(HL)
+CHANGE:
+
+        ENDM
+
+; -----------------------------------------------------------------------
+; BRESENHAM: implements bresenham line algorithm  ;768
+
+YPOS    EQU     0
+YNEG    EQU     1
+XPOS    EQU     2
+XNEG    EQU     3
+
+BRESENHAM       MACRO SGN
+LOCAL LOOP,PLUS,NEXT
+
+        IF (SGN EQ YNEG) OR (SGN EQ YPOS)
+          LD      L,(IY+YDIFF)
+        ELSE
+          LD      L,(IY+XDIFF)
+        ENDIF
+        LD      H,0
+        LD      D,H
+        ADD     HL,HL
+        LD      B,H
+        LD      C,L
+        IF (SGN EQ YNEG) OR (SGN EQ YPOS)
+          LD      E,(IY+XDIFF)
+        ELSE
+          LD      E,(IY+YDIFF)
+        ENDIF
+        SBC     HL,DE
+        PUSH    HL
+        OR      A
+        SBC     HL,DE
+        EX      DE,HL
+        POP     HL
+
+        EXX
+        IF (SGN EQ YNEG) OR (SGN EQ YPOS)
+          LD      B,(IY+XDIFF)
+        ELSE
+          LD      B,(IY+YDIFF)
+        ENDIF
+        LD      E,(IY+X1)
+        LD      A,(IY+Y1)
+        CMASK
+        IF (SGN EQ YNEG)
+          LD      DE,-32
+        ELSE
+          LD      DE,32
+        ENDIF
+        LD      C,A
+
+;; enter C=mask, HL=address, DE=32, B=xdiff
+;;       HL'=2*ydiff-xdiff BC'=2*ydiff DE'=2*(ydiff-xdiff)
+
+        LD      A,(HL)
+LOOP:
+        OR      C
+        EXX
+        BIT     7,H
+        JR      Z,PLUS
+        ADD     HL,BC
+        EXX
+        JR      NEXT
+PLUS:
+        ADD     HL,DE
+        EXX
+        IF (SGN EQ YNEG) OR (SGN EQ YPOS)
+          LD      (HL),A
+          ADD     HL,DE
+          LD      A,(HL)
+        ELSE
+          IF (SGN EQ XPOS)
+            INCX
+          ELSE
+            DECX
+          ENDIF
+        ENDIF
+NEXT:
+        IF (SGN EQ YNEG) OR (SGN EQ YPOS)
+          INCX
+        ELSE
+          LD      (HL),A
+          ADD     HL,DE
+          LD      A,(HL)
+        ENDIF
+        DJNZ    LOOP
+        LD      (HL),A
+
+        ENDM
+
+; -----------------------------------------------------------------------
+; SWAP: swap two vertices
+
+SWAP    MACRO   P1,P2
+LOCAL SKIP
+
+        LD      A,(IY+P1)
+        SUB     (IY+P2)
+        JR      C,SKIP
+
+        LD      D,(IY+X2)
+        LD      A,(IY+X1)
+        LD      (IY+X2),A
+        LD      (IY+X1),D
+
+        LD      D,(IY+Y2)
+        LD      A,(IY+Y1)
+        LD      (IY+Y2),A
+        LD      (IY+Y1),D
+
+SKIP:
+        ENDM
+
+; -----------------------------------------------------------------------
+; ABS: eval pdiff=ABS(p1-p2)
+
+ABS     MACRO   PDIFF,P1,P2
+LOCAL POSITIVE
+
+        LD      A,(IY+P1)
+        SUB     (IY+P2)
+        JR      NC,POSITIVE
+        NEG
+POSITIVE:
+        LD      (IY+PDIFF),A
+
+        ENDM
+
+; -----------------------------------------------------------------------
+; LINE: draw all lines of the model
+
+LINE:
+        LD      IX,MODEL_LINES
+        LD      IY,LINE_TEMP
+        LD      B,MAXLINES
+LINE_LOOP:
+        PUSH    BC
+        LD      C,(IX)
+        LD      B,0
+        LD      HL,PROJECTED
+        ADD     HL,BC
+        ADD     HL,BC
+        LD      A,(HL)
+        LD      (IY+X1),A
+        INC     HL
+        LD      A,(HL)
+        LD      (IY+Y1),A
+
+        LD      C,(IX+1)
+        LD      B,0
+        LD      HL,PROJECTED
+        ADD     HL,BC
+        ADD     HL,BC
+        LD      A,(HL)
+        LD      (IY+X2),A
+        INC     HL
+        LD      A,(HL)
+        LD      (IY+Y2),A
+
+        ABS     YDIFF,Y1,Y2
+        ABS     XDIFF,X1,X2
+
+        LD      A,(IY+XDIFF)
+        SUB     (IY+YDIFF)
+        JP      C,Y_GREATER
+
+X_GREATER:
+        SWAP    X1,X2
+        LD      A,(IY+Y1)
+        SUB     (IY+Y2)
+        JR      NC,X_GREATER_YNEG
+
+        BRESENHAM YPOS
+        JP      LINE_EXIT
+
+X_GREATER_YNEG:
+        BRESENHAM YNEG
+        JP      LINE_EXIT
+
+Y_GREATER:
+        SWAP    Y1,Y2
+        LD      A,(IY+X1)
+        SUB     (IY+X2)
+        JR      NC,Y_GREATER_XNEG
+
+        BRESENHAM XPOS
+        JR      LINE_EXIT
+
+Y_GREATER_XNEG:
+        BRESENHAM XNEG
+        ;JP      LINE_EXIT  ; fall through
+
+LINE_EXIT:
+        POP     BC
+        INC     IX
+        INC     IX
+        DEC     B
+        JP      NZ,LINE_LOOP
+        RET
+
+X1      EQU     0
+Y1      EQU     1
+X2      EQU     2
+Y2      EQU     3
+XDIFF   EQU     4
+YDIFF   EQU     5
+
+LINE_TEMP:       DS      6
+
+; -----------------------------------------------------------------------
+; BLIT: copy bitmap to screen
+
+BLIT:
+        LD      HL,0
+        LD      IX,SETWRT
+        CALL    CALLBIOS
+
+        LD      HL,BITMAP
+        LD      C,098h
+        LD      DE,32*256+24
+        LD      A,L
+BLIT_LOOP:
+        REPT    32
+        REPT    7
+        OUTI
+        ADD     A,D
+        LD      L,A
+        ENDM
+        OUTI
+        ADD     A,D
+        INC     A
+        LD      L,A
+        ENDM
+        SUB     D
+        LD      L,A
+        DEC     E
+        JP      NZ,BLIT_LOOP
+        RET
+
+; -----------------------------------------------------------------------
+; Call SubRom - SubRom Function on IX
+
+CALLSUB:
+	LD      IY,(0FAF7h)
+	CALL    001Ch
+	RET
+
+; -----------------------------------------------------------------------
+; CALLBIOS - call a bios routine
+; enter: IX = address
+
+CALLBIOS:
+	LD      (CALLBIOS1),IX
+	RST     030h
+CALLBIOS0:
+	DB      0
+CALLBIOS1:
+	DW      0
+	RET
+
+; -----------------------------------------------------------------------
+; PREPARE - prepare compatibility
+
+PREPARE:
+	LD      A,(EXPTBL)
+	LD      (CALLBIOS0),A
+	RET
+
+; -----------------------------------------------------------------------
+; PRINTHEX - print a byte in hexadecimal format
+; enter: A = byte
+
+PRINTHEX:
+	PUSH    AF
+	RRCA
+	RRCA
+	RRCA
+	RRCA
+	AND     0Fh
+	CALL    PRINTDIG
+	POP     AF
+	AND     0Fh
+PRINTDIG:
+        PUSH    HL
+	CP      10
+	JR      C,PRINTDIG0
+	ADD     A,'A'-10
+	JR      PRINTDIG1
+PRINTDIG0:
+	ADD     A,'0'
+PRINTDIG1:
+	LD      C,PRTCHR
+	LD      E,A
+	CALL    BDOS
+        POP     HL
+	RET
+
+; -----------------------------------------------------------------------
+; Portable routine to change to SCREEN 2 in any MSX model
+; written by Daniel Caetano
+
+; Enter: A = border color
+
+SCREEN2:
+	PUSH    AF
+
+	; Verify if MSX Type is NOT MSX 1
+	LD      A,(0FCC1h)
+	LD      HL,02Dh
+	CALL    0Ch
+	CP      0
+	JR      NZ, SCREEN2_MSX2
+
+; set up SCREEN 2 on MSX1
+
+	; Change to Screen2
+	LD      IX,INIGRP
+	CALL    CALLBIOS
+
+	; set the sprites to 16x16
+	LD      A,(RG1SAV)
+	OR      2
+	LD      B,A
+	LD      C,1
+	LD      IX,WRTVDP
+	CALL    CALLBIOS
+
+	; set border color to light yellow
+	POP     AF
+	;LD      A,0Bh
+	LD      (BDRCLR),A
+	LD      IX,CHGCLR
+	CALL    CALLBIOS
+
+	RET
+
+; set up SCREEN 2 on MSX2
+
+SCREEN2_MSX2:        
+	; Change to Screen2
+	LD      IX,00DDh
+	CALL    CALLSUB
+	LD      IX,0141h
+	CALL    CALLSUB
+
+	; clear SCREEN
+	LD      IX,0115h
+	CALL    CALLSUB
+
+	; set the sprites to 16x16
+	LD      A,(RG1SAV)
+	OR      2
+	LD      B,A
+	LD      C,1
+	LD      IX,012Dh
+	CALL    CALLSUB
+
+        ; set border color 
+
+	POP     AF
+	LD      (BDRCLR),A
+	LD      IX,0111h
+	CALL    CALLBIOS
+
+	RET
+
+
+
+; -----------------------------------------------------------------------
+; Object models
+
+POINT   MACRO   X,Y,Z
+
+        DW      X*256,Y*256,Z*256
+
+        ENDM
+
+VERTEX:
+        POINT   1,1,-2
+        POINT   1,1,2
+        POINT   1,-1,2
+        POINT   1,-1,-2
+        POINT   7,1,-2
+        POINT   7,1,2
+        POINT   7,-1,2
+        POINT   7,-1,-2
+        POINT   -7,0,0
+
+ROTATED:
+        DS      6*MAXVERTEX
+
+PROJECTED:
+        DS      2*MAXVERTEX
+
+MODEL_LINES:
+        DB      0,1
+        DB      1,2
+        DB      2,3
+        DB      3,0
+        DB      4,5
+        DB      5,6
+        DB      6,7
+        DB      7,4
+        DB      0,4
+        DB      1,5
+        DB      2,6
+        DB      3,7
+        DB      0,8
+        DB      1,8
+        DB      2,8
+        DB      3,8
+
+SAVE:   DW      0
+THETA:  DB      0
+
+; -----------------------------------------------------------------------
+; Look Up Tables
+
+ALIGN
+
+SCR2_MASK:
+        I       DEFL 0
+        REPT    256
+        DB      I SHR 3
+        I       DEFL I+1
+        ENDM
+
+        I       DEFL 0
+        REPT    256
+        DB      1 SHL (7-(I AND 7))
+        I       DEFL I+1
+        ENDM
+
+; SIN_TABLE definition
+INCLUDE SIN.INC
+
+ALIGN
+ENDOFCODE:
+
+; bitmap must be at 4000h
+; remember to change SET 6,H in DRAW if you need to move BITMAP
+BITMAP          EQU     04000h
+
+	END     START
+
+
+
+

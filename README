@@ -210,6 +210,10 @@ Name: 2002-02-bfcompiler
 Language: BASIC
 Description: A brainfuck compiler written in 3 lines of MSX BASIC.
 
+Name: 2002-05-elite
+Language: Assembly Z80
+Description: 3D wireframe engine for MSX.
+
 Name: 2003-04-superopt
 Language: C
 Description: Superoptimization, uses brute force to find the minimum assembly
