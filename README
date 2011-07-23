@@ -177,6 +177,11 @@ Name: 1998-12-mp2audio
 Language: C
 Description: Decodes the header of an mp2 audio file.
 
+Name: 1999-02-castool
+Language: C
+Description: Reads a wave file containing an MSX cassete image and demodulate
+the FSK to get a .cas binary stream.
+
 Name: 1999-10-fourfours
 Language: C
 Description: Solve the four fours puzzle using forward chaining.
