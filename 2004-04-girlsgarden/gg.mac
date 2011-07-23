@@ -1,0 +1,301 @@
+; -----------------------------------------------------------------------        
+;
+;    loader pra sg1000
+;    Copyright (C) 2004 by Ricardo Bittencourt
+;
+;    Project started at 12/4/2004. Last modification was on 18/4/2004.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@700km.com.br
+;        http://www.700km.com.br/mundobizarro
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+;
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+	ORG     0100h
+
+; -----------------------------------------------------------------------
+
+START:
+        JP      LOADER
+
+GAME_DATA:
+        INCLUDE GG.INC
+
+LOADER:
+        DI
+        LD      HL,GAME_DATA
+        LD      DE,0
+        LD      BC,32768
+        LDIR
+        JP      0
+
+; -----------------------------------------------------------------------
+
+GET_DC:
+;	  0xDC / 0xC0 : Joypad Port 1 (read-only)
+;                  bit 0 : Joypad 1 Up
+;                  bit 1 : Joypad 1 Down
+;                  bit 2 : Joypad 1 Left
+;                  bit 3 : Joypad 1 Right
+;                  bit 4 : Joypad 1 Button 1
+;                  bit 5 : Joypad 1 Button 2
+;                  bit 6 : Joypad 2 Up
+;                  bit 7 : Joypad 2 Down
+;                Low logic port. 0 = pressed, 1 = released
+
+	
+	PUSH	BC
+	PUSH	HL
+	; keyboard player 1
+	IN	A,(0AAh)
+	AND	0F0h
+	OR	8
+	OUT	(0AAh),A
+	IN	A,(0A9h)
+	LD	HL,KEYCONVERT
+	LD	B,0
+	LD	C,A
+	ADD	HL,BC
+	LD	B,(HL)
+	; joystick player 1
+	LD	A,15
+	OUT	(0A0h),A
+	IN 	A,(0A2h)
+	AND	10111111b
+	OUT	(0A1h),A
+	LD	A,14
+	OUT	(0A0h),A
+	IN	A,(0A2h)
+	OR	0E0h
+	AND	B
+	POP	HL
+	POP	BC
+	RET
+
+
+; -----------------------------------------------------------------------
+
+INIT_SOUND:
+	PUSH	BC
+	PUSH	DE
+	LD	A,7
+	OUT	(0A0h),A
+	IN	A,(0A2h)
+	AND	11111000b
+	OR	00111000b
+	OUT	(0A1h),A
+	LD	BC,03A1h
+	LD	E,0
+	LD	A,8
+INIT_SOUND_LOOP:	
+	OUT	(0A0h),A
+	OUT	(C),E
+	INC	A
+	DJNZ	INIT_SOUND_LOOP
+	
+	POP	DE
+	POP	BC
+	RET
+	
+; -----------------------------------------------------------------------
+
+DRAW_RICBIT:
+	CALL	07D7h
+	LD	DE,03AE4h
+	RST	18h
+	LD	HL,RICBIT
+	LD	B,6
+	JP	02F27h
+	
+RICBIT:
+	DB	66,60,45,44,60,68
+
+; -----------------------------------------------------------------------
+
+FILLER:	DS 08200h-FILLER
+        
+; -----------------------------------------------------------------------
+
+J8200: 	JP 	GET_DC
+J8203:	JP	PUT_7F
+J8206:	JP	INIT_SOUND
+J8209:	JP	DRAW_RICBIT
+
+; -----------------------------------------------------------------------
+
+PUT_7F:
+	PUSH	HL
+	PUSH	BC
+	
+	OR	A
+	JP	P,SOUND_DATA
+	
+	LD	(LATCH),A
+	BIT	4,A
+	JR	NZ,VOLUME
+	
+	; select low bits of frequency for tone channels
+	LD	B,A
+	RLCA
+	RLCA
+	RLCA
+	RLCA
+	AND	6
+	PUSH	AF
+	CALL	LOAD_FREQ_TABLE
+	LD	A,(HL)
+	AND	0F0h
+	LD	C,A
+	LD	A,B
+	AND	0Fh
+	OR	C
+	LD	(HL),A
+	POP	AF
+	
+FREQ_DATA:	
+	CP	6
+	JR	Z,FREQ_NOISE
+	OUT	(0A0h),A
+	PUSH	AF
+	CALL	LOAD_FREQ_TABLE
+	LD	A,(HL)
+	OUT	(0A1h),A
+	INC	HL
+	POP	AF
+	INC	A
+	OUT	(0A0h),A
+	LD	A,(HL)
+	OUT	(0A1h),A
+	
+	JR	SOUND_EXIT
+	
+	; select volume for tone channels
+VOLUME:
+	LD	B,A
+VOLUME_DATA:	
+	RLCA
+	RLCA
+	RLCA
+	AND	3
+	LD	C,A
+	ADD	A,LOW(VOL0)
+	LD	L,A
+	LD	A,HIGH(VOL0)
+	ADC	A,0
+	LD	H,A
+	LD	A,B
+	AND	0Fh
+	XOR	0Fh
+	LD	(HL),A
+	
+	LD	A,C
+	CP	3
+	JR	Z,VOLUME_NOISE
+	ADD	A,8
+	OUT	(0A0h),A
+	LD	A,(HL)
+	OUT	(0A1h),A
+	JR	SOUND_EXIT
+	
+SOUND_DATA:
+	LD	HL,LATCH
+	BIT	4,(HL)
+	JR	Z,HIGH_FREQ
+	
+	LD	B,A
+	LD	A,(LATCH)
+	JR	VOLUME_DATA
+
+	; select high bits of frequency for tone channels
+HIGH_FREQ:
+	LD	B,A
+	LD	A,(HL)
+	RLCA
+	RLCA
+	RLCA
+	RLCA
+	AND	6
+	PUSH	AF	
+	CALL	LOAD_FREQ_TABLE
+	LD	A,B
+	RLCA
+	RLCA
+	RLCA
+	RLCA
+	LD	B,A
+	AND	0F0h
+	LD	C,A	
+	LD	A,(HL)
+	AND	0Fh
+	OR	C
+	LD	(HL),A
+	INC	HL
+	LD	A,B
+	AND	3
+	LD	C,A
+	LD	A,(HL)
+	AND	11111100b
+	OR	C
+	LD	(HL),A
+	POP	AF
+	JR	FREQ_DATA
+
+VOLUME_NOISE:	
+FREQ_NOISE:
+	; not implemented yet
+	; not used in girl's garden
+
+SOUND_EXIT:
+	POP	BC
+	POP	HL	
+	RET
+
+; -----------------------------------------------------------------------
+
+LOAD_FREQ_TABLE:
+	ADD	A,LOW(FREQ0)
+	LD	L,A
+	LD	A,HIGH(FREQ0)
+	ADC	A,0
+	LD	H,A
+	RET
+	
+; -----------------------------------------------------------------------
+
+FREQ0:	DW	0
+FREQ1:	DW	0
+FREQ2:	DW	0
+FREQN:	DW	0
+
+VOL0:	DB	0
+VOL1:	DB	0
+VOL2:	DB	0
+VOLN:	DB	0
+
+LATCH:	DB	0
+
+; -----------------------------------------------------------------------
+
+KEYCONVERT:
+	I DEFL 0
+	REPT 256
+	DB ((I AND 128) SHR 4) OR ((I AND 96) SHR 5) OR ((I AND 16) SHR 2) OR ((I AND 1) SHL 4) OR 0E0h
+	I DEFL I+1
+	ENDM
+
+ENDOFCODE:
+
+	END     START
+
+
+

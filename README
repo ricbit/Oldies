@@ -232,6 +232,11 @@ Language: Assembly Z80
 Description: This is a remake of 1995-10-firedemo, this time running on MSX2
 with a binary of only 256 bytes.
 
+Name: 2004-04-girlsgarden
+Language: Assembly Z80
+Description: Patch to convert the SG1000 game Girl's Garden to MSX. This is
+mainly a SN76489 sound chip emulator on top of the AY-3-8912.
+
 Name: 2004-08-modplayer
 Language: Java
 Description: MOD Player written in java.
