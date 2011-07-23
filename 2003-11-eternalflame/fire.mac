@@ -1,0 +1,233 @@
+; -----------------------------------------------------------------------
+;
+;    FireDemo 1.3
+;    Copyright (C) 2000 by Ricardo Bittencourt
+;
+;    Project started at 16/4/2000. Last modification was on 24/11/2003.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@lsi.usp.br
+;        http://www.lsi.usp.br/~ricardo
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+; 
+;       No penguins were burned during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+	.PHASE 	0C000h-7
+	
+	DB	0FEh
+	DW	0C000h
+	DW	PROGEND
+	DW	0C000h
+	 
+CHGMOD   	EQU     0005Fh
+WRTVDP   	EQU     00047h
+RG8SAV   	EQU     0FFE7h
+SNSMAT		EQU	00141h
+BREAKX		EQU	000B7h
+SETWRT		EQU	00053h
+LEFT_TABLE	EQU	0C800h
+
+; -----------------------------------------------------------------------
+
+START:
+	; change to screen 5
+	LD	HL,0
+	LD	(0F3EAH),HL
+	LD      A,5
+	CALL    CHGMOD
+	
+	; init the palette
+	LD	BC,16
+	CALL	WRTVDP
+	LD      HL,PALETTE
+	LD      BC,32*256+09Ah
+	OTIR
+	
+	LD	C,0Eh		; B is zero
+	CALL	WRTVDP
+
+	LD	HL,LEFT_TABLE
+LEFT_LOOP:
+	LD	A,L
+	RLCA
+	RLCA
+	AND	0F0h
+	LD	(HL),A
+	INC	L
+	JR	NZ,LEFT_LOOP
+
+	EXX
+	LD      BC,0
+	LD	D,B
+	LD      L,1
+	EXX
+	
+	LD      H,080h		; L is zero
+	LD      DE,08001h
+	LD      BC,03FA0h
+	LD      (HL),L
+	LDIR
+	LD      C,64		; B is zero
+	LD      (HL),111111b
+	LDIR
+
+OUTER:
+	LD      IX,08000H+127*128+32
+	LD      DE,08000H+126*128+32
+INNER:
+	LD	HL,0C010h
+	ADD	HL,DE
+	CALL	SETWRT
+
+	LD      H,HIGH (LEFT_TABLE)
+	LD      BC,32*256
+	
+	PUSH    IX
+
+	EXX
+	ADD     IX,BC
+	EXX
+
+FIRECORE_LOOP:
+	EXX
+
+RNDLOOP:
+	ADD     HL,HL
+	SBC     A,A
+	AND     083h
+	XOR     L
+	LD      L,A
+	AND     3
+	JR      Z,RNDLOOP
+
+	LD      E,A
+	ADD     IX,DE
+	EXX
+
+	EX      DE,HL
+	ADD     A,(HL)
+	ADD     A,(IX-5-1)
+	ADD     A,(IX-1-1)
+	ADD     A,(IX+3-1)
+	RRCA
+	RRCA
+	AND     03Fh
+	LD      (HL),A
+	INC     HL
+	LD      E,A
+
+	EX      DE,HL        
+	LD      A,(DE)
+	ADD     A,(IX-4-1)
+	ADD     A,(IX-1)
+	ADD     A,(IX+4-1)
+	RRCA
+	RRCA
+	AND     03Fh
+	LD      (DE),A
+	INC     DE
+
+	RRCA
+	RRCA
+	AND     0Fh
+	OR      (HL)
+	OUT     (098h),A
+
+	OR      C
+	LD      C,A
+	
+	DJNZ	FIRECORE_LOOP
+
+	POP     IX
+
+	LD      HL,-128-64
+	ADD     HL,DE
+	EX      DE,HL
+	
+	LD      BC,-128
+	ADD     IX,BC
+	
+	OR      A
+	JP      NZ,INNER
+
+	EXX     
+
+	; read line 8 [ right down up left del ins home space ]
+	LD	A,8
+	CALL	SNSMAT
+	LD      B,D
+	LD	C,D
+	BIT	4,A
+	JR      NZ,CHECK_RIGHT
+
+	INC	BC
+	INC	BC
+
+CHECK_RIGHT:
+	RLCA
+	JR      C,CHECK_NEXT
+
+	DEC	BC
+	DEC	BC
+
+CHECK_NEXT:        
+	EXX
+
+	CALL	BREAKX
+	JP      NC,OUTER
+
+; -----------------------------------------------------------------------
+
+EXIT_NOW:
+	; exit the program
+	RET
+
+; Work Area
+
+COLOR   MACRO R,G,B
+
+	DB      R*16+B
+	DB      G
+
+	ENDM                
+
+; blue - yellow - red - black
+
+PALETTE:
+  COLOR 0 0 0
+  
+  COLOR 1 0 0 
+  COLOR 3 0 0
+  COLOR 4 0 0 
+  COLOR 6 0 0 
+  COLOR 7 0 0 
+  
+  COLOR 7 1 0
+  COLOR 7 3 0 
+  COLOR 7 4 0 
+  COLOR 7 6 0 
+  COLOR 7 7 0 
+  
+  COLOR 6 6 1
+  COLOR 4 4 3 
+  COLOR 3 3 4
+  COLOR 1 1 6
+  COLOR 0 0 7
+
+; -----------------------------------------------------------------------
+
+PROGEND:	
+	END     START
+
+
+
+
