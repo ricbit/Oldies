@@ -186,6 +186,10 @@ Name: 1999-10-fourfours
 Language: C
 Description: Solve the four fours puzzle using forward chaining.
 
+Name: 1999-10-readwav
+Language: Assembly Z80
+Description: Plays a .wav file on an MSX without additional hardware.
+
 Name: 1999-11-fractalcomp
 Language: C
 Description: Encoder and decoder for a fractal compression scheme. Quality was
