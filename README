@@ -237,6 +237,11 @@ Language: Assembly Z80
 Description: Patch to convert the SG1000 game Girl's Garden to MSX. This is
 mainly a SN76489 sound chip emulator on top of the AY-3-8912.
 
+Name: 2004-05-nsub
+Language: Assembly Z80
+Description: Patch to convert the SG1000 game N-Sub to MSX. Improves on the
+original game adding a new opening screen.
+
 Name: 2004-08-modplayer
 Language: Java
 Description: MOD Player written in java.
