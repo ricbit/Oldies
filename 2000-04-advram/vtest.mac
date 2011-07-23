@@ -1,0 +1,1704 @@
+; -----------------------------------------------------------------------
+;
+;    Video Test 1.0
+;    Copyright (C) 2000 by Ricardo Bittencourt
+;
+;    Project started at 21/4/2000. Last modification was on 22/4/2000.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@lsi.usp.br
+;        http://www.lsi.usp.br/~ricardo
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+; 
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+; ---- SELECT HERE WHICH VERSION OF THIS PROGRAM YOU WANT TO COMPILE ----
+
+ADVRAM  EQU     0
+OUT98H  EQU     1
+VDPCMD  EQU     2
+
+VERSION EQU     VDPCMD
+
+; -----------------------------------------------------------------------        
+	
+	ASEG
+	ORG     0100h
+	 
+TOTEXT  EQU     000D2h
+EXPTBL  EQU     0FCC1h
+GETPNT  EQU     0F3FAh
+PUTPNT  EQU     0F3F8h
+CHGMOD  EQU     000D1h
+CLSSUB  EQU     00115h
+WRTVDP  EQU     0012Dh
+RG8SAV  EQU     0FFE7h
+BDOS    EQU     00005h
+PRINT   EQU     00009h
+CHGET   EQU     0009Fh
+ENASLT  EQU     00024h
+
+; -----------------------------------------------------------------------
+; ALIGN - align the code in 100h bytes boundaries
+
+ALIGN          MACRO  
+LOCAL   VOID
+
+VOID:
+		DS      256*(HIGH (VOID+255))-VOID
+
+		ENDM
+
+; -----------------------------------------------------------------------
+; ENABLE_COUNTER - enable a custom IRQ handler
+
+ENABLE_COUNTER MACRO
+LOCAL LOOP
+
+	DI
+	PUSH    HL
+	PUSH    AF
+	LD      HL,(038h)
+	LD      (SAVE_IRQ),HL
+	LD      A,(038h+2)
+	LD      (SAVE_IRQ+2),A
+	LD      A,0C3h
+	LD      (038h),A
+	LD      HL,CUSTOM_IRQ
+	LD      (039h),HL
+	XOR     A
+	LD      (END_TEST),A
+	LD      HL,0
+	LD      (COUNTER),HL
+
+	; now we must wait time enough to assure that
+	; a irq will be requested right after the EI
+
+	; the loop below can do it even on the Turbo-R
+
+	LD      HL,0
+LOOP:
+	DEC     HL
+	LD      A,H
+	OR      L
+	JR      NZ,LOOP
+
+	POP     AF
+	POP     HL
+	EI
+
+	ENDM
+
+; -----------------------------------------------------------------------
+; DISABLE_COUNTER - disable the custom IRQ handler
+
+DISABLE_COUNTER MACRO
+
+	DI
+	LD      HL,(SAVE_IRQ)
+	LD      (038h),HL
+	LD      A,(SAVE_IRQ+2)
+	LD      (038h+2),A
+	EI
+
+	ENDM
+
+; -----------------------------------------------------------------------
+
+START:
+	; prepare compatibility
+	CALL    PREPARE
+
+	; enable advram 
+	IF      VERSION EQ ADVRAM
+	CALL    WHEREAMI
+	LD      (MAINRAM),A
+	LD      A,(EXPTBL)
+	LD      HL,08000h
+	CALL    ENASLT
+	LD      A,11000000b
+	IN      A,(09Ah)
+	ENDIF
+
+	; print start message
+	LD      DE,START_MESSAGE
+	LD      C,PRINT
+	CALL    BDOS
+
+	; perform the tests
+	
+	CALL    SCR8_GENERIC
+	CALL    SCR5_GENERIC
+	CALL    SCR8_BURST
+	CALL    SCR5_BLOCK
+	CALL    SCR8_BLOCK
+	CALL    SCR8_TPSET
+
+	LD      DE,THANKS_MSG
+	LD      C,PRINT
+	CALL    BDOS
+	
+	; clear keyboard buffer
+	LD      HL,(GETPNT)
+	LD      (PUTPNT),HL
+
+	; disable advram 
+	IF      VERSION EQ ADVRAM
+	LD      A,(MAINRAM)
+	LD      HL,08000h
+	CALL    ENASLT
+	LD      A,00000000b
+	IN      A,(09Ah)
+	ENDIF
+
+	; return to dos
+	JP      0
+
+; -----------------------------------------------------------------------
+; SCREEN 8 8x8 TPSET BLOCK COPY test
+
+SCR8_TPSET:
+	; print message
+	LD      DE,SCR8_TPSET_MESSAGE
+	CALL    PRINT_HEADER
+
+	; set up screen 8
+	CALL    SCREEN8
+
+	EXX
+	LD      HL,0
+	LD      DE,0
+	LD      BC,0
+	EXX
+	
+	LD      HL,BLOCK8
+	LD      DE,0
+	
+	ENABLE_COUNTER
+
+SCR8_TPSET_LOOP:
+	LD      A,D
+	ADD     A,9
+	LD      D,A
+	CP      184
+	JR      C,SCR8_TPSET_XOK
+	SUB     184
+	LD      D,A
+SCR8_TPSET_XOK:
+	LD      A,E
+	ADD     A,9
+	LD      E,A
+	CP      248
+	JR      C,SCR8_TPSET_YOK
+	SUB     248
+	LD      E,A
+SCR8_TPSET_YOK:
+	LD      BC,8*8
+	ADD     HL,BC
+	LD      A,H
+	CP      HIGH (BLOCK8)+64
+	JR      C,SCR8_TPSET_OK
+	LD      H,HIGH (BLOCK8)
+SCR8_TPSET_OK:
+
+	; this routine requires 
+	; HL = address of block to be copied
+	; D = Y coord (0<Y<184)
+	; E = X coord (0<Y<248)
+
+	; ---- OUT98H VERSION ----------------
+	IF VERSION EQ OUT98H     
+	DI
+	PUSH    AF
+	PUSH    DE
+	PUSH    HL
+	PUSH    BC
+	LD      A,D
+	RLCA
+	RLCA
+	AND     3
+	LD      C,A
+	LD      B,E
+	OUT     (099h),A
+	LD      A,080h+14
+	OUT     (099h),A
+	LD      A,D
+	AND     03Fh
+	CP      64-8
+	JP      C,SCR8_TPSET_OUSIMPLE
+	OR      040h
+	LD      D,A
+	IRP     I,<0,1,2,3,4,5,6,7>
+	LD      A,E
+	OUT     (099h),A
+	LD      A,D
+	OUT     (099h),A
+	IRP     J,<0,1,2,3,4,5,6,7>
+	LD      A,(HL)
+	INC     HL
+	AND     A
+	JP      Z,OUSKIPXX&J&I
+	OUT     (098h),A
+	JP      OUSKIPXE&J&I
+OUSKIPXX&J&I:
+	IN      A,(098h)
+OUSKIPXE&J&I:
+	ENDM
+	INC     D
+	BIT     6,D
+	JR      NZ,SCR8_TPSET_OU&I
+	INC     C
+	LD      A,C
+	OUT     (099h),A
+	LD      A,080h+14
+	OUT     (099h),A
+	RES     7,D
+	SET     6,D
+SCR8_TPSET_OU&I:
+	ENDM
+	JP      SCR8_TPSET_OUEND
+SCR8_TPSET_OUSIMPLE:
+	OR      040h
+	LD      D,A
+	IRP     I,<0,1,2,3,4,5,6,7>
+	LD      A,E
+	OUT     (099h),A
+	LD      A,D
+	OUT     (099h),A
+	IRP     J,<0,1,2,3,4,5,6,7>
+	LD      A,(HL)
+	INC     HL
+	AND     A
+	JP      Z,OUSKIPX&J&I
+	OUT     (098h),A
+	JP      OUSKIPE&J&I
+OUSKIPX&J&I:
+	IN      A,(098h)
+OUSKIPE&J&I:
+	ENDM
+	INC     D
+	ENDM
+SCR8_TPSET_OUEND:
+	POP     BC
+	POP     HL
+	POP     DE
+	POP     AF
+	EI
+	ENDIF
+
+	; ---- ADVRAM VERSION ----------------
+	IF VERSION EQ ADVRAM
+	PUSH    AF
+	PUSH    DE
+	PUSH    HL
+	PUSH    BC
+	LD      A,D
+	RLCA
+	RLCA
+	AND     3
+	LD      C,A
+	LD      B,E
+	OUT     (0FEh),A
+	LD      A,D
+	AND     03Fh
+	CP      64-8
+	JP      C,SCR8_TPSET_SIMPLE
+	OR      080h
+	LD      D,A
+	IRP     I,<0,1,2,3,4,5,6,7>
+	IRP     J,<0,1,2,3,4,5,6,7>
+	LD      A,(HL)
+	INC     HL
+	AND     A
+	JP      Z,ADSKIP&J&I
+	LD      (DE),A
+ADSKIP&J&I:
+	INC     E
+	ENDM
+	LD      E,B
+	INC     D
+	BIT     6,D
+	JP      Z,ADJUMP&I
+	INC     C
+	LD      A,C
+	OUT     (0FEh),A
+	RES     6,D
+ADJUMP&I:
+	ENDM
+	JP      SCR8_TPSET_END
+SCR8_TPSET_SIMPLE:
+	OR      080h
+	LD      D,A
+	IRP     I,<0,1,2,3,4,5,6,7>
+	IRP     J,<0,1,2,3,4,5,6,7>
+	LD      A,(HL)
+	INC     HL
+	AND     A
+	JP      Z,ADSKIPX&J&I
+	LD      (DE),A
+ADSKIPX&J&I:
+	INC     E
+	ENDM
+	LD      E,B
+	INC     D
+	ENDM
+SCR8_TPSET_END:
+	POP     BC
+	POP     HL
+	POP     DE
+	POP     AF
+	ENDIF
+
+	; ---- VDPCMD VERSION ----------------
+	IF VERSION EQ VDPCMD
+	DI
+	PUSH    AF
+	PUSH    HL
+	PUSH    BC
+	LD      A,36
+	OUT     (099h),A
+	LD      A,080h+17
+	OUT     (099h),A
+	LD      A,E
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,D
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,8
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,8
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,(HL)
+	INC     HL
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,10111000b
+	OUT     (09Bh),A
+	LD      A,080h+44
+	OUT     (099h),A
+	LD      A,080h+17
+	OUT     (099h),A
+	LD      C,09Bh
+	REPT    8*8-1
+	OUTI
+	ENDM
+	POP     BC
+	POP     HL
+	POP     AF
+	EI
+	ENDIF
+
+	EXX
+	INC     C
+	EX      DE,HL
+	ADD     HL,BC
+	EX      DE,HL
+	DEC     C
+	ADC     HL,BC     
+	EXX
+
+	LD      A,(END_TEST)
+	OR      A
+	JP      Z,SCR8_TPSET_LOOP
+
+	DISABLE_COUNTER
+
+	EXX
+	LD      (OBJECTS),DE
+	LD      (OBJECTS+2),HL
+	EXX
+
+	CALL    RESTORE_TEXT
+
+	LD      DE,NUMBER_BLOCKS
+	LD      C,PRINT
+	CALL    BDOS
+
+	LD      DE,(OBJECTS)
+	LD      HL,(OBJECTS+2)
+	CALL    PRINTDECIMAL
+
+	RET
+
+; -----------------------------------------------------------------------
+; SCREEN 8 8x8 ALIGNED BLOCK COPY test
+
+SCR8_BLOCK:
+	; print message
+	LD      DE,SCR8_BLOCK_MESSAGE
+	CALL    PRINT_HEADER
+
+	; set up screen 8
+	CALL    SCREEN8
+
+	EXX
+	LD      HL,0
+	LD      DE,0
+	LD      BC,0
+	EXX
+	
+	LD      HL,BLOCK8
+	LD      DE,0
+	
+	ENABLE_COUNTER
+
+SCR8_BLOCK_LOOP:
+	LD      A,E
+	ADD     A,8
+	LD      E,A
+	JR      NC,SCR8_BLOCK_CHOOSE
+	LD      A,D
+	ADD     A,8
+	LD      D,A
+	CP      192
+	JR      C,SCR8_BLOCK_CHOOSE
+	LD      D,0
+	LD      BC,8*8
+	ADD     HL,BC
+SCR8_BLOCK_CHOOSE:
+	LD      BC,8*8
+	ADD     HL,BC
+	LD      A,H
+	CP      HIGH (BLOCK8)+64
+	JR      C,SCR8_BLOCK_OK
+	LD      H,HIGH (BLOCK8)
+SCR8_BLOCK_OK:
+
+	; this routine requires 
+	; HL = address of block to be copied
+	; D = Y coord (must be a multiple of 8)
+	; E = X coord (must be a multiple of 8)
+
+	; ---- OUT98H VERSION ----------------
+	IF VERSION EQ OUT98H     
+	DI
+	PUSH    AF
+	PUSH    DE
+	PUSH    HL
+	PUSH    BC
+	LD      A,D
+	RLCA
+	RLCA
+	AND     3
+	OUT     (099h),A
+	LD      A,080h+14
+	OUT     (099h),A
+	SET     6,D
+	RES     7,D
+	LD      A,E
+	LD      C,099h
+	IRP     I,<0,1,2,3,4,5,6,7>
+	  OUT   (C),E
+	  OUT   (C),D
+	  DEC   C
+	  REPT    8
+	  OUTI 
+	  ENDM
+	  INC   C
+	  LD    E,A
+	  INC   D
+	ENDM
+	POP     BC
+	POP     HL
+	POP     DE
+	POP     AF
+	EI
+	ENDIF
+
+	; ---- ADVRAM VERSION ----------------
+	IF VERSION EQ ADVRAM
+	PUSH    AF
+	PUSH    DE
+	PUSH    HL
+	LD      A,D
+	RLCA
+	RLCA
+	AND     3
+	OUT     (0FEh),A
+	SET     7,D
+	RES     6,D
+	LD      A,E
+	CP      256-8
+	JP      Z,SCR8_BLOCK_ADSPECIAL
+	IRP     I,<0,1,2,3,4,5,6,7>
+	  REPT    8
+	  LDI     
+	  ENDM
+	  LD    E,A
+	  INC   D
+	ENDM
+	JP      SCR8_BLOCK_ADEND
+SCR8_BLOCK_ADSPECIAL:
+	IRP     I,<0,1,2,3,4,5,6,7>
+	  REPT    8
+	  LDI     
+	  ENDM
+	  LD    E,A
+	ENDM
+SCR8_BLOCK_ADEND:
+	POP     HL
+	POP     DE
+	POP     AF
+	ENDIF
+
+	; ---- VDPCMD VERSION ----------------
+	IF VERSION EQ VDPCMD
+	DI
+	PUSH    AF
+	PUSH    HL
+	PUSH    BC
+	LD      A,36
+	OUT     (099h),A
+	LD      A,080h+17
+	OUT     (099h),A
+	LD      A,E
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,D
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,8
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,8
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,(HL)
+	INC     HL
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,11110000b
+	OUT     (09Bh),A
+	LD      A,080h+44
+	OUT     (099h),A
+	LD      A,080h+17
+	OUT     (099h),A
+	LD      C,09Bh
+	REPT    8*8-1
+	OUTI
+	ENDM
+	POP     BC
+	POP     HL
+	POP     AF
+	EI
+	ENDIF
+
+	EXX
+	INC     C
+	EX      DE,HL
+	ADD     HL,BC
+	EX      DE,HL
+	DEC     C
+	ADC     HL,BC     
+	EXX
+
+	LD      A,(END_TEST)
+	OR      A
+	JP      Z,SCR8_BLOCK_LOOP
+
+	DISABLE_COUNTER
+
+	EXX
+	LD      (OBJECTS),DE
+	LD      (OBJECTS+2),HL
+	EXX
+
+	CALL    RESTORE_TEXT
+
+	LD      DE,NUMBER_BLOCKS
+	LD      C,PRINT
+	CALL    BDOS
+
+	LD      DE,(OBJECTS)
+	LD      HL,(OBJECTS+2)
+	CALL    PRINTDECIMAL
+
+	RET
+
+ALIGN
+BLOCK8:
+	I DEFL 0
+	REPT 256
+	DB      0,0,0,I,I,0,0,0
+	DB      0,0,I,I,I,I,0,0
+	DB      0,I,I,I,I,I,I,0
+	DB      I,I,I,I,I,I,I,I
+	DB      I,I,I,I,I,I,I,I
+	DB      0,I,I,I,I,I,I,0
+	DB      0,0,I,I,I,I,0,0
+	DB      0,0,0,I,I,0,0,0
+	I DEFL I+1
+	ENDM
+
+; -----------------------------------------------------------------------
+; SCREEN 5 8x8 ALIGNED BLOCK COPY test
+
+SCR5_BLOCK:
+	; print message
+	LD      DE,SCR5_BLOCK_MESSAGE
+	CALL    PRINT_HEADER
+
+	; set up screen 5
+	CALL    SCREEN5
+
+	EXX
+	LD      HL,0
+	LD      DE,0
+	LD      BC,0
+	EXX
+	
+	LD      HL,BLOCK5
+	LD      DE,0
+	
+	ENABLE_COUNTER
+
+SCR5_BLOCK_LOOP:
+	LD      A,E
+	ADD     A,8
+	LD      E,A
+	JR      NC,SCR5_BLOCK_CHOOSE
+	LD      A,D
+	ADD     A,8
+	LD      D,A
+	CP      192
+	JR      C,SCR5_BLOCK_CHOOSE
+	LD      D,0
+	LD      BC,4*8
+	ADD     HL,BC
+SCR5_BLOCK_CHOOSE:
+	LD      BC,4*8
+	ADD     HL,BC
+	LD      A,H
+	CP      HIGH (BLOCK5)+2
+	JR      C,SCR5_BLOCK_OK
+	LD      H,HIGH (BLOCK5)
+SCR5_BLOCK_OK:
+
+	; this routine requires 
+	; HL = address of block to be copied
+	; D = Y coord (must be a multiple of 8)
+	; E = X coord (must be a multiple of 8)
+
+	; ---- OUT98H VERSION ----------------
+	IF VERSION EQ OUT98H     
+	DI
+	PUSH    AF
+	PUSH    DE
+	PUSH    HL
+	PUSH    BC
+	XOR     A
+	RL      D
+	RLA
+	OUT     (099H),A
+	LD      A,080h+14
+	OUT     (099h),A
+	SCF
+	RR      D
+	RR      D
+	RR      E
+	LD      C,099h
+	LD      A,E
+	IRP     I,<0,1,2,3,4,5,6,7>
+	  OUT     (C),E
+	  OUT     (C),D
+	  DEC     C
+	  REPT    4
+	    OUTI
+	  ENDM
+	  INC   C
+	  XOR   080h
+	  LD    E,A
+	  IF    (I AND 1) EQ 1
+	    INC D
+	  ENDIF
+	ENDM
+	POP     BC
+	POP     HL
+	POP     DE
+	POP     AF
+	EI
+	ENDIF
+
+	; ---- ADVRAM VERSION ----------------
+	IF VERSION EQ ADVRAM
+	PUSH    AF
+	PUSH    DE
+	PUSH    HL
+	XOR     A
+	RL      D
+	RLA
+	OUT     (0FEh),A
+	RR      D
+	SCF
+	RR      D
+	RR      E
+	LD      A,E
+	CP      128-4
+	JP      Z,SCR5_BLOCK_ADSPECIAL
+	IRP     I,<0,1,2,3,4,5,6,7>
+	  REPT    4
+	  LDI     
+	  ENDM
+	  XOR   080h      
+	  LD    E,A
+	  IF    (I AND 1) EQ 1
+	    INC D
+	  ENDIF
+	ENDM
+	JP      SCR5_BLOCK_ADEND
+SCR5_BLOCK_ADSPECIAL:
+	IRP     I,<0,1,2,3,4,5,6,7>
+	  REPT    4
+	  LDI     
+	  ENDM
+	  XOR   080h
+	  LD    E,A
+	ENDM
+SCR5_BLOCK_ADEND:
+	POP     HL
+	POP     DE
+	POP     AF
+	ENDIF
+
+	; ---- VDPCMD VERSION ----------------
+	IF VERSION EQ VDPCMD
+	DI
+	PUSH    AF
+	PUSH    HL
+	PUSH    BC
+	LD      A,36
+	OUT     (099h),A
+	LD      A,080h+17
+	OUT     (099h),A
+	LD      A,E
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,D
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,8
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,8
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,(HL)
+	INC     HL
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,11110000b
+	OUT     (09Bh),A
+	LD      A,080h+44
+	OUT     (099h),A
+	LD      A,080h+17
+	OUT     (099h),A
+	LD      C,09Bh
+	REPT    4*8-1
+	OUTI
+	ENDM
+	POP     BC
+	POP     HL
+	POP     AF
+	EI
+	ENDIF
+
+	EXX
+	INC     C
+	EX      DE,HL
+	ADD     HL,BC
+	EX      DE,HL
+	DEC     C
+	ADC     HL,BC     
+	EXX
+
+	LD      A,(END_TEST)
+	OR      A
+	JP      Z,SCR5_BLOCK_LOOP
+
+	DISABLE_COUNTER
+
+	EXX
+	LD      (OBJECTS),DE
+	LD      (OBJECTS+2),HL
+	EXX
+
+	CALL    RESTORE_TEXT
+
+	LD      DE,NUMBER_BLOCKS
+	LD      C,PRINT
+	CALL    BDOS
+
+	LD      DE,(OBJECTS)
+	LD      HL,(OBJECTS+2)
+	CALL    PRINTDECIMAL
+
+	RET
+
+ALIGN
+BLOCK5:
+	I DEFL 0
+	REPT 16
+	DB      0,I,I*16,0
+	DB      0,I*17,I*17,0
+	DB      I,I*17,I*17,I*16
+	DB      I*17,I*17,I*17,I*17
+	DB      I*17,I*17,I*17,I*17
+	DB      I,I*17,I*17,I*16
+	DB      0,I*17,I*17,0
+	DB      0,I,I*16,0
+	I DEFL I+1
+	ENDM
+
+; -----------------------------------------------------------------------
+; SCREEN 8 BURST COPY test
+
+SCR8_BURST:
+	; print message
+	LD      DE,SCR8_BURST_MESSAGE
+	CALL    PRINT_HEADER
+
+	; set up screen 8
+	CALL    SCREEN8
+
+	EXX
+	LD      HL,0
+	LD      DE,0
+	LD      BC,0
+	EXX
+	
+	LD      HL,BURST_LINE
+	LD      D,0
+	
+	ENABLE_COUNTER
+
+SCR8_BURST_LOOP:
+	INC     D
+	LD      A,D
+	CP      192
+	JR      NZ,SCR8_BURST_192
+	LD      D,0
+SCR8_BURST_192:
+	INC     L
+
+	; this routine requires 
+	; HL = address of line to be copied
+	; D = line
+
+	; ---- OUT98H VERSION ----------------
+	IF VERSION EQ OUT98H     
+	DI
+	PUSH    BC
+	PUSH    HL
+	LD      A,D
+	RLCA
+	RLCA
+	AND     3
+	OUT     (099h),A
+	LD      A,080h+14
+	OUT     (099h),A
+	XOR     A
+	OUT     (099h),A
+	LD      A,D
+	AND     03Fh
+	OR      040h
+	OUT     (099h),A
+	LD      C,098h
+	REPT    256
+	OUTI
+	ENDM
+	POP     HL
+	POP     BC
+	EI
+	ENDIF
+
+	; ---- ADVRAM VERSION ----------------
+	IF VERSION EQ ADVRAM
+	PUSH    DE
+	PUSH    HL
+	PUSH    AF
+	PUSH    BC
+	LD      A,D
+	RLCA
+	RLCA
+	AND     3
+	OUT     (0FEh),A
+	SET     7,D
+	RES     6,D
+	LD      E,0
+	REPT    256
+	LDI
+	ENDM
+	POP     BC
+	POP     AF
+	POP     HL
+	POP     DE
+	ENDIF
+
+	; ---- VDPCMD VERSION ----------------
+	IF VERSION EQ VDPCMD
+	DI
+	PUSH    AF
+	PUSH    HL
+	PUSH    BC
+	LD      A,36
+	OUT     (099h),A
+	LD      A,080h+17
+	OUT     (099h),A
+	XOR     A
+	OUT     (09Bh),A
+	OUT     (09Bh),A
+	LD      A,D
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	OUT     (09Bh),A
+	INC     A
+	OUT     (09Bh),A
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,(HL)
+	INC     HL
+	OUT     (09Bh),A
+	XOR     A
+	OUT     (09Bh),A
+	LD      A,11110000b
+	OUT     (09Bh),A
+	LD      A,080h+44
+	OUT     (099h),A
+	LD      A,080h+17
+	OUT     (099h),A
+	LD      C,09Bh
+	REPT    255
+	OUTI
+	ENDM
+	POP     BC
+	POP     HL
+	POP     AF
+	EI
+	ENDIF
+
+	EXX
+	INC     C
+	EX      DE,HL
+	ADD     HL,BC
+	EX      DE,HL
+	DEC     C
+	ADC     HL,BC     
+	EXX
+
+	LD      A,(END_TEST)
+	OR      A
+	JP      Z,SCR8_BURST_LOOP
+
+	DISABLE_COUNTER
+
+	EXX
+	LD      (OBJECTS),DE
+	LD      (OBJECTS+2),HL
+	EXX
+
+	CALL    RESTORE_TEXT
+
+	LD      DE,NUMBER_LINES
+	LD      C,PRINT
+	CALL    BDOS
+
+	LD      DE,(OBJECTS)
+	LD      HL,(OBJECTS+2)
+	CALL    PRINTDECIMAL
+
+	RET
+
+ALIGN
+BURST_LINE:
+	I DEFL 0
+	REPT    512
+	DB      LOW (I)
+	I DEFL I+1
+	ENDM
+
+; -----------------------------------------------------------------------
+; SCREEN 8 GENERIC POINT test
+
+SCR8_GENERIC:
+	; print message
+	LD      DE,SCR8_GEN_MESSAGE
+	CALL    PRINT_HEADER
+
+	; set up screen 8
+	CALL    SCREEN8
+
+	EXX
+	LD      HL,0
+	LD      DE,0
+	LD      BC,0
+	EXX
+	
+	LD      HL,0
+	LD      C,0
+	
+	ENABLE_COUNTER
+
+SCR8_POINT:
+	INC     HL
+	LD      A,H
+	CP      192
+	JR      NZ,SCR8_POINT_192
+	LD      H,0
+	INC     C
+SCR8_POINT_192:
+	LD      A,C
+	ADD     A,L
+	LD      C,A
+
+	; this routine requires 
+	; L = X position of the point
+	; H = Y position of the point
+	; C = color of the point
+
+	; ---- OUT98H VERSION ----------------
+	IF VERSION EQ OUT98H     
+	DI
+	PUSH    AF
+	LD      A,H
+	RLCA
+	RLCA
+	AND     3
+	OUT     (099h),A
+	LD      A,080h+14
+	OUT     (099h),A
+	LD      A,L
+	OUT     (099h),A
+	LD      A,H
+	AND     03Fh
+	OR      040h
+	OUT     (099h),A
+	LD      A,C
+	OUT     (098h),A
+	POP     AF
+	EI
+	ENDIF
+
+	; ---- ADVRAM VERSION ----------------
+	IF VERSION EQ ADVRAM
+	PUSH    AF
+	PUSH    HL
+	LD      A,H
+	RLCA
+	RLCA
+	AND     3
+	OUT     (0FEh),A
+	SET     7,H
+	RES     6,H
+	LD      (HL),C
+	POP     HL
+	POP     AF
+	ENDIF
+
+	; ---- VDPCMD VERSION ----------------
+	IF VERSION EQ VDPCMD
+	DI
+	PUSH    AF
+	LD      A,L
+	OUT     (099h),A
+	LD      A,080h+36
+	OUT     (099h),A
+	LD      A,H
+	OUT     (099h),A
+	LD      A,080h+38
+	OUT     (099h),A
+	LD      A,C
+	OUT     (099h),A
+	LD      A,080h+44
+	OUT     (099h),A
+	LD      A,01010000b
+	OUT     (099h),A
+	LD      A,080h+46
+	OUT     (099h),A
+	POP     AF
+	EI
+	ENDIF
+
+
+	EXX
+	INC     C
+	EX      DE,HL
+	ADD     HL,BC
+	EX      DE,HL
+	DEC     C
+	ADC     HL,BC     
+	EXX
+
+	LD      A,(END_TEST)
+	OR      A
+	JP      Z,SCR8_POINT
+
+	DISABLE_COUNTER
+
+	EXX
+	LD      (OBJECTS),DE
+	LD      (OBJECTS+2),HL
+	EXX
+
+	CALL    RESTORE_TEXT
+
+	LD      DE,NUMBER_POINTS
+	LD      C,PRINT
+	CALL    BDOS
+
+	LD      DE,(OBJECTS)
+	LD      HL,(OBJECTS+2)
+	CALL    PRINTDECIMAL
+
+	RET
+
+; -----------------------------------------------------------------------
+; SCREEN 5 GENERIC POINT test
+
+SCR5_GENERIC:
+	; print message
+	LD      DE,SCR5_GEN_MESSAGE
+	CALL    PRINT_HEADER
+
+	; set up screen 5
+	CALL    SCREEN5
+
+	EXX
+	LD      HL,0
+	LD      DE,0
+	LD      BC,0
+	EXX
+	
+	LD      HL,0
+	LD      C,0
+	
+	ENABLE_COUNTER
+
+SCR5_POINT:
+	INC     HL
+	LD      A,H
+	CP      192
+	JR      NZ,SCR5_POINT_192
+	LD      H,0
+	INC     C
+SCR5_POINT_192:
+	LD      A,C
+	ADD     A,L
+	AND     0Fh
+	LD      C,A
+
+	; this routine requires 
+	; L = X position of the point
+	; H = Y position of the point
+	; C = color of the point
+
+	; ---- OUT98H VERSION ----------------
+	IF VERSION EQ OUT98H     
+	DI
+	PUSH    AF
+	PUSH    HL
+	XOR     A
+	RL      H
+	RLA
+	OUT     (099h),A
+	LD      A,080h+14
+	OUT     (099h),A
+	RR      H
+	RR      H
+	RR      L
+	JP      C,SCR5_GEN_OUT_CARRY
+	LD      A,L
+	OUT     (099h),A
+	LD      A,H
+	OUT     (099h),A
+	IN      A,(098h)      
+	AND     0F0h
+	OR      C
+	RRCA
+	RRCA
+	RRCA
+	RRCA
+	PUSH    AF
+	LD      A,L
+	OUT     (099h),A
+	LD      A,H
+	OR      040h
+	OUT     (099h),A
+	POP     AF
+	OUT     (098h),A
+	JP      SCR5_GEN_OUT_EXIT
+SCR5_GEN_OUT_CARRY:
+	LD      A,L
+	OUT     (099h),A
+	LD      A,H
+	OUT     (099h),A
+	IN      A,(098h)      
+	AND     0F0h
+	OR      C
+	PUSH    AF
+	LD      A,L
+	OUT     (099h),A
+	LD      A,H
+	OR      040h
+	OUT     (099h),A
+	POP     AF
+	OUT     (098h),A
+	JP      SCR5_GEN_OUT_EXIT
+SCR5_GEN_OUT_EXIT:
+	POP     HL
+	POP     AF
+	EI
+	ENDIF
+
+	; ---- ADVRAM VERSION ----------------
+	IF VERSION EQ ADVRAM
+	PUSH    AF
+	PUSH    HL
+	XOR     A
+	RL      H
+	RLA
+	OUT     (0FEh),A
+	RR      H
+	SCF
+	RR      H
+	RR      L
+	JP      C,SCR5_GEN_AD_CARRY
+	LD      A,C
+	RLD
+	LD      A,(HL)
+	RRCA
+	RRCA
+	RRCA
+	RRCA
+	JP      SCR5_GEN_AD_EXIT
+SCR5_GEN_AD_CARRY:
+	LD      A,(HL)
+	AND     0F0h
+	OR      C
+SCR5_GEN_AD_EXIT:
+	LD      (HL),A
+	POP     HL
+	POP     AF
+	ENDIF
+
+	; ---- VDPCMD VERSION ----------------
+	IF VERSION EQ VDPCMD
+	DI
+	PUSH    AF
+	LD      A,L
+	OUT     (099h),A
+	LD      A,080h+36
+	OUT     (099h),A
+	LD      A,H
+	OUT     (099h),A
+	LD      A,080h+38
+	OUT     (099h),A
+	LD      A,C
+	OUT     (099h),A
+	LD      A,080h+44
+	OUT     (099h),A
+	LD      A,01010000b
+	OUT     (099h),A
+	LD      A,080h+46
+	OUT     (099h),A
+	POP     AF
+	EI
+	ENDIF
+
+	EXX
+	INC     C
+	EX      DE,HL
+	ADD     HL,BC
+	EX      DE,HL
+	DEC     C
+	ADC     HL,BC     
+	EXX
+
+	LD      A,(END_TEST)
+	OR      A
+	JP      Z,SCR5_POINT
+
+	DISABLE_COUNTER
+
+	EXX
+	LD      (OBJECTS),DE
+	LD      (OBJECTS+2),HL
+	EXX
+
+	CALL    RESTORE_TEXT
+
+	LD      DE,NUMBER_POINTS
+	LD      C,PRINT
+	CALL    BDOS
+
+	LD      DE,(OBJECTS)
+	LD      HL,(OBJECTS+2)
+	CALL    PRINTDECIMAL
+
+	RET
+
+; -----------------------------------------------------------------------
+; CUSTOM_IRQ - custom irq that waits for 10 seconds and then
+;              sets END_TEST to 1 
+
+CUSTOM_IRQ:
+	PUSH    AF
+	PUSH    HL
+	PUSH    BC
+	IN      A,(099h)
+
+	LD      BC,(COUNTER)
+	INC     BC
+	LD      (COUNTER),BC
+	LD      HL,600
+	XOR     A
+	SBC     HL,BC
+	ADC     A,0
+	LD      (END_TEST),A
+
+	POP     BC
+	POP     HL
+	POP     AF
+	EI
+	RET
+
+; -----------------------------------------------------------------------
+; PRINT_HEADER - print the header for a test
+; enter: DE = addr of the message
+
+PRINT_HEADER:
+
+	; print message
+	LD      C,PRINT 
+	CALL    BDOS
+
+	LD      DE,OR_PRESS_ESC
+	LD      C,PRINT
+	CALL    BDOS
+	
+	; wait for a key
+	LD      IX,CHGET
+	CALL    CALLBIOS
+
+	CP      27
+	RET     NZ
+
+	POP     BC
+	RET
+
+; -----------------------------------------------------------------------
+; PRINTDECIMAL - print a 32-bit number in decimal
+; enter: HLDE = number
+; destroy: all
+
+PRINTDECIMAL:
+	; convert to decimal
+	LD      B,7
+	LD      IX,DECIMAL_TABLE
+	LD      IY,DECIMAL_STRING
+
+PRINTDECIMAL_OUTER:
+	PUSH    BC
+	XOR     A
+
+PRINTDECIMAL_INNER:
+	INC     A
+	LD      C,(IX+0)
+	LD      B,(IX+1)
+	EX      DE,HL
+	SBC     HL,BC
+	EX      DE,HL
+	LD      C,(IX+2)
+	LD      B,(IX+3)
+	SBC     HL,BC
+	JR      NC,PRINTDECIMAL_INNER
+
+	LD      C,(IX+0)
+	LD      B,(IX+1)
+	EX      DE,HL
+	ADD     HL,BC
+	EX      DE,HL
+	LD      C,(IX+2)
+	LD      B,(IX+3)
+	ADC     HL,BC
+	ADD     A,'0'-1
+	LD      (IY),A
+	INC     IY
+	LD      BC,4
+	ADD     IX,BC
+	POP     BC
+	DJNZ    PRINTDECIMAL_OUTER
+
+	; skip zeros at beginning
+
+	LD      B,6
+	LD      DE,DECIMAL_STRING
+
+PRINTDECIMAL_SKIP:
+	LD      A,(DE)
+	CP      '0'
+	JR      NZ,PRINTDECIMAL_NOW
+	INC     DE
+	DJNZ    PRINTDECIMAL_SKIP
+
+PRINTDECIMAL_NOW:
+	LD      C,PRINT
+	JP      BDOS
+
+DECIMAL_TABLE:
+	DW      16960
+	DW      15
+	DW      34464
+	DW      1
+	DW      10000
+	DW      0
+	DW      1000
+	DW      0
+	DW      100
+	DW      0
+	DW      10
+	DW      0
+	DW      1
+	DW      0
+
+DECIMAL_STRING:
+	DB      '1234567$'
+
+; -----------------------------------------------------------------------
+; WHEREAMI - find the slot ID of main ram
+; return: A = slot id
+
+WHEREAMI:
+	IN      A,(0A8h)
+	AND     3
+	LD      C,A
+	LD      B,0
+	LD      HL,EXPTBL
+	ADD     HL,BC
+	LD      B,A
+	LD      A,(HL)
+	LD      E,A
+	RLCA
+	SBC     A,A
+	LD      C,A
+	LD      A,E
+	AND     080h
+	LD      E,A
+	INC     HL
+	INC     HL
+	INC     HL
+	INC     HL
+	LD      A,(HL)
+	RLCA
+	RLCA
+	AND     1100b
+	AND     C
+	OR      B
+	OR      E
+	RET
+
+; -----------------------------------------------------------------------
+; CALLBIOS - call a bios routine
+; enter: IX = address
+
+CALLBIOS:
+	LD      (CALLBIOS1),IX
+	RST     030h
+CALLBIOS0:
+	DB      0
+CALLBIOS1:
+	DW      0
+	RET
+
+; -----------------------------------------------------------------------
+; PREPARE - prepare compatibility
+
+PREPARE:
+	LD      A,(EXPTBL)
+	LD      (CALLBIOS0),A
+	RET
+
+; -----------------------------------------------------------------------
+; CALLSUB - call the subrom
+; enter: IX = address 
+
+CALLSUB:
+	LD      IY,(0FAF7h)
+	CALL    001Ch
+	RET
+
+; -----------------------------------------------------------------------
+; SCREEN5 - set up SCREEN 5 using the BIOS
+
+SCREEN5:
+	; change to screen 5
+	LD      IX,CHGMOD
+	LD      A,5
+	CALL    CALLSUB
+
+	; clear SCREEN
+	XOR     A
+	LD      (0F3EAh),A
+	LD      IX,CLSSUB
+	CALL    CALLSUB
+
+	; turn off sprites 
+	LD      A,(RG8SAV)
+	OR      2
+	LD      B,A
+	LD      C,8
+	LD      IX,WRTVDP
+	CALL    CALLSUB
+
+	RET
+
+; -----------------------------------------------------------------------
+; SCREEN8 - set up SCREEN 8 using the BIOS
+
+SCREEN8:
+	; change to screen 8
+	LD      IX,CHGMOD
+	LD      A,8
+	CALL    CALLSUB
+
+	; clear SCREEN
+	XOR     A
+	LD      (0F3EAh),A
+	LD      IX,CLSSUB
+	CALL    CALLSUB
+
+	; turn off sprites 
+	LD      A,(RG8SAV)
+	OR      2
+	LD      B,A
+	LD      C,8
+	LD      IX,WRTVDP
+	CALL    CALLSUB
+
+	RET
+
+; -----------------------------------------------------------------------
+; RESTORE_TEXT - return to text mode
+
+RESTORE_TEXT:
+	; return to text
+	LD      IX,TOTEXT
+	CALL    CALLBIOS
+
+	; clear SCREEN
+	LD      A,1
+	LD      (0F3EAh),A
+	LD      IX,CLSSUB
+	CALL    CALLSUB
+
+	RET
+
+; -----------------------------------------------------------------------
+; Work area
+
+START_MESSAGE:
+	DB      'Video Test 1.0',13,10
+	DB      'Copyright (C) 2000',13,10
+	DB      'by Ricardo Bittencourt',13,10,10
+	DB      'This version was compiled',13,10,'with '
+	
+	IF      VERSION EQ ADVRAM
+	DB      'ADVRAM'
+	ENDIF
+
+	IF      VERSION EQ OUT98H
+	DB      'OUT98H'
+	ENDIF
+
+	IF      VERSION EQ VDPCMD
+	DB      'VDPCMD'
+	ENDIF
+
+	DB      ' option',13,10,'$'
+
+SCR8_GEN_MESSAGE:
+	DB      13,10,10,10,10,'Press ENTER to start the ',13,10
+	DB      'SCREEN 8 GENERIC POINT test',13,10,'$'
+
+SCR5_GEN_MESSAGE:
+	DB      13,10,10,10,10,'Press ENTER to start the ',13,10
+	DB      'SCREEN 5 GENERIC POINT test',13,10,'$'
+
+SCR8_BURST_MESSAGE:
+	DB      13,10,10,10,10,'Press ENTER to start the ',13,10
+	DB      'SCREEN 8 BURST COPY test',13,10,'$'
+
+SCR5_BLOCK_MESSAGE:
+	DB      13,10,10,10,10,'Press ENTER to start the ',13,10
+	DB      'SCREEN 5 8x8 ALIGNED BLOCK COPY test',13,10,'$'
+
+SCR8_BLOCK_MESSAGE:
+	DB      13,10,10,10,10,'Press ENTER to start the ',13,10
+	DB      'SCREEN 8 8x8 ALIGNED BLOCK COPY test',13,10,'$'
+
+SCR8_TPSET_MESSAGE:
+	DB      13,10,10,10,10,'Press ENTER to start the ',13,10
+	DB      'SCREEN 8 8x8 TPSET BLOCK COPY test',13,10,'$'
+
+OR_PRESS_ESC:
+	DB      'or press ESC to skip this test',13,10,'$'
+
+THANKS_MSG:
+	DB      13,10,10,'Thanks for performing these tests',13,10,10
+	DB      'Send the results in your machine to',13,10
+	DB      'ricardo@lsi.usp.br$'
+
+NUMBER_POINTS:
+	DB      'Number of points: $'
+
+NUMBER_LINES:
+	DB      'Number of lines: $'
+
+NUMBER_BLOCKS:
+	DB      'Number of blocks: $'
+
+SAVE_IRQ:       DS      3
+END_TEST:       DB      0
+COUNTER:        DW      0
+OBJECTS:        DS      4
+MAINRAM:        DB      0
+
+ENDOFCODE:
+
+	IF      ENDOFCODE GT 07FFFh
+	.PRINTX . This program won't work with ADVRAM !!
+	ENDIF
+
+; -----------------------------------------------------------------------
+	
+	END     START
+
+
+
+
