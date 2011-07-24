@@ -190,6 +190,10 @@ Name: 1999-10-readwav
 Language: Assembly Z80
 Description: Plays a .wav file on an MSX without additional hardware.
 
+Name: 1999-11-screenconv
+Language: C
+Description: Convert images to mant MSX formats (screens 7,8,10,12).
+
 Name: 1999-11-fractalcomp
 Language: C
 Description: Encoder and decoder for a fractal compression scheme. Quality was
