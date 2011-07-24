@@ -1,0 +1,99 @@
+; -----------------------------------------------------------------------
+;
+;    MSX uncompress for RAMBO PLUS
+;    Copyright (C) 2004 by Ricardo Bittencourt
+;
+;    Project started at 7/2/2004. Last modification was on 17/2/2004.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@700km.com.br
+;        http://www.mundobizarro.tk
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+; 
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+
+INIT32  EQU     0006Fh
+ERAFNK  EQU     000CCh
+DISSCR  EQU     00041h
+ENASCR  EQU     00044h
+CHGET   EQU     0009Fh
+CHPUT   EQU     000A2h
+LDIRMV  EQU     0005Ch
+LDIRVM  EQU     00059h
+CHGCLR  EQU     00062h
+BDRCLR  EQU     0F3EBh
+FILVRM  EQU     00056h
+HKEYI   EQU     0FD9Ah
+HTIMI   EQU     0FD9Fh
+JIFFY   EQU     0FC9Eh
+SETWRT  EQU     00053h
+VDPRD   EQU     00006h
+VDPWR   EQU     00007h
+IRQID   EQU     0002Bh
+GICINI  EQU     00090h
+SNSMAT  EQU     00141h
+WRTPSG  EQU     00093h
+GTSTCK  EQU     000D5h
+GTTRIG  EQU     000D8h
+WRTVRM  EQU     0004Dh
+RDVRM   EQU     0004Ah
+INIGRP  EQU	00072h
+RG1SAV  EQU	0F3E0h
+WRTVDP	EQU	00047h
+BREAKX	EQU	000B7h
+MAPXYC	EQU	00111h
+FETCHC	EQU	00114h
+
+TBUF	EQU	0C846h ;09000h
+
+; -----------------------------------------------------------------------        
+
+        .phase  0BD83h ;-7
+
+
+; -----------------------------------------------------------------------        
+
+START:
+        LD	HL,0B641h ; INKDATA
+        CALL	0AC2Bh ;INITBIT
+        CALL	0ACB5h ;DECOMP_START
+        
+        LD	HL,PAPERDATA
+        CALL	0AC2Bh ;INITBIT
+        CALL	0ACB5h ;DECOMP_START
+        
+	JP	0ACFCh ;ROTATE     
+	
+OPENING:
+	CALL	0A7AAh
+	LD	DE,RICBIT
+	JP	0A7AAh	           
+
+; -----------------------------------------------------------------------        
+
+PAPERDATA:
+	INCLUDE PAPER.INC
+	
+RICBIT:
+	DB	1,088h,0Bh	
+	DB	'Opening'
+	DB	1,060h,0Ch	
+	DB	'RicBit Cyberknight'
+	DB	0
+
+; -----------------------------------------------------------------------        
+ENDOFCODE:
+
+	END     START
+
+

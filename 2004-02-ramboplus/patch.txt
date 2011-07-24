@@ -1,0 +1,78 @@
+/* border color */ 
+
+7776 
+#XC  @STOP
+
+/* patch a LDIRMV not needed anymore */
+
+7791
+#XCD #X10 #XAC @STOP
+
+779D
+#X21 @STOP
+
+6C10
+@INCLUDE RAMBO.COM
+@STOP
+
+7D83
+@INCLUDE RAMBO2.COM
+@STOP
+
+/* design */
+69FA
+#X10 #XB @STOP
+
+/* CCS */
+6A03
+#X18 #XC @STOP
+
+/* new credits */
+6764
+#X98 #XBD @STOP
+
+/* compress main tiles color table */
+
+0E2B
+#XC3 #X7C #X89 @STOP
+
+497C
+@INCLUDE RAMBO3.COM
+@STOP
+
+/* remove copy protection */
+6736
+#0 #0 #0 @STOP
+
+1C
+#XF @STOP
+
+4F
+#X31 #X80 #XF3 #0 @STOP
+
+/* di 
+   jp 4e2e */
+10
+#XF3 #XC3 #X2E #X4E 
+@STOP
+
+/* ld sp, F380 
+   ld a,C9 
+   ld (hkeyi),a 
+   ld (htimi),a 
+   jp 4014 */
+E2E
+#X31 #X80 #XF3 #X3E #XC9 #X32 #X9A #XFD #X32 #X9F #XFD #XC3 #X14 #X40
+@STOP
+
+/* new sprite logo */
+
+77A1
+#X7E #X89 @STOP 
+
+/* cheat mode */
+5D56
+#XC3 #X84 #X89 #0 @STOP
+
+1A9
+#XC3 #X81 #X89 #0 #0 #0 @STOP

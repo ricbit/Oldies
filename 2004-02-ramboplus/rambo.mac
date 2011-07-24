@@ -1,0 +1,364 @@
+; -----------------------------------------------------------------------
+;
+;    MSX uncompress for RAMBO PLUS
+;    Copyright (C) 2004 by Ricardo Bittencourt
+;
+;    Project started at 7/2/2004. Last modification was on 17/2/2004.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@700km.com.br
+;        http://www.mundobizarro.tk
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+; 
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+
+INIT32  EQU     0006Fh
+ERAFNK  EQU     000CCh
+DISSCR  EQU     00041h
+ENASCR  EQU     00044h
+CHGET   EQU     0009Fh
+CHPUT   EQU     000A2h
+LDIRMV  EQU     0005Ch
+LDIRVM  EQU     00059h
+CHGCLR  EQU     00062h
+BDRCLR  EQU     0F3EBh
+FILVRM  EQU     00056h
+HKEYI   EQU     0FD9Ah
+HTIMI   EQU     0FD9Fh
+JIFFY   EQU     0FC9Eh
+SETWRT  EQU     00053h
+VDPRD   EQU     00006h
+VDPWR   EQU     00007h
+IRQID   EQU     0002Bh
+GICINI  EQU     00090h
+SNSMAT  EQU     00141h
+WRTPSG  EQU     00093h
+GTSTCK  EQU     000D5h
+GTTRIG  EQU     000D8h
+WRTVRM  EQU     0004Dh
+RDVRM   EQU     0004Ah
+INIGRP  EQU	00072h
+RG1SAV  EQU	0F3E0h
+WRTVDP	EQU	00047h
+BREAKX	EQU	000B7h
+MAPXYC	EQU	00111h
+FETCHC	EQU	00114h
+
+TBUF	EQU	0C846h ;09000h
+
+; -----------------------------------------------------------------------        
+
+        .phase  0AC10h ;-7
+
+        ;header for .BIN file
+        ;DB      0FEh
+        ;DW      0AC10h
+        ;DW      ENDOFCODE-1
+        ;DW      START
+
+; -----------------------------------------------------------------------        
+
+START:
+        ;CALL    INIGRP
+        ;LD	HL,2000h
+        ;LD	BC,1800h
+        ;LD	A,01Fh
+        ;CALL	FILVRM
+        
+        ; actually starts here
+	LD	HL,QUADDATA
+	CALL	INITBIT
+        
+        LD	HL,0
+        LD	DE,4040h
+        CALL	QUADTREE
+        LD	H,E
+        CALL	QUADTREE
+        LD	H,80h
+        CALL	QUADTREE
+        
+        JP	0BD83h
+
+        ;LD	HL,INKDATA
+        ;CALL	INITBIT
+        ;CALL	DECOMP_START
+        
+        ;LD	HL,PAPERDATA
+        ;CALL	INITBIT
+        ;CALL	DECOMP_START
+        
+	;CALL	ROTATE        
+        
+        ;CALL    CHGET
+        ;CALL    INIT32
+        ;RET
+
+; -----------------------------------------------------------------------        
+
+INITBIT:
+	PUSH	HL
+        EXX
+        LD	BC,1FFh
+        POP	HL
+        DEC	HL
+        LD	DE,0
+        EXX
+        RET
+        
+; -----------------------------------------------------------------------        
+; enter QUADTREE
+; H = y
+; L = x/4
+; D = dy
+; E = dx/4
+
+QUADTREE:
+	PUSH	HL
+	PUSH	DE
+	CALL	GETBIT
+	JR	NC,QUADTREE_SPLIT
+
+	; check for a 4x1 stripe
+	LD	A,D
+	OR	E
+	DEC	A
+	JR	NZ,QUADTREE_EXIT
+	
+	CALL	GETBIT
+	SBC	A,A
+	AND	15
+	LD	C,A
+	JR	QUADTREE_DRAW
+
+QUADTREE_SPLIT:
+	; check for a 4x1 stripe
+	LD	A,D
+	OR	E
+	DEC	A
+	JR	NZ,QUADTREE_REC
+	
+	LD	B,3
+	CALL	LOADBIT
+	LD	A,D
+	LD	C,D
+
+;	super optimized block
+	SUB	7
+	DEC	D
+	SUB	D
+	JR	NC,QUADTREE_GET
+	RR	D 
+	RL	C
+	JR	QUADTREE_DRAW
+
+QUADTREE_GET:
+	CALL	GETBIT
+	RL	C	
+	; fall through
+
+QUADTREE_DRAW:
+	LD	B,L
+	
+	; we have H=y L=x/4
+	; MAPXYC entry: BC=x DE=y
+	PUSH	BC
+	LD	E,H
+	LD	D,0
+	LD	H,D
+	ADD	HL,HL
+	ADD	HL,HL
+	LD	B,H
+	LD	C,L
+	CALL	MAPXYC
+	CALL	FETCHC
+	POP	BC
+
+	;
+	LD	A,C
+	RR	B
+	JR	C,QUADTREE_DRAWNOW
+	RLCA
+	RLCA
+	RLCA
+	RLCA
+QUADTREE_DRAWNOW:
+	LD	C,A
+	CALL	RDVRM
+	OR	C
+	CALL	WRTVRM	
+	JR	QUADTREE_EXIT
+
+	; split between four quadrants
+QUADTREE_REC:
+	SRL	D
+	SRL	E
+	CALL	QUADTREE
+	PUSH	HL
+	LD	A,H
+	ADD	A,D
+	LD	H,A
+	CALL	QUADTREE
+	POP	HL
+
+	LD	A,L
+	ADD	A,E
+	LD	L,A
+	CALL	QUADTREE
+
+	LD	A,H
+	ADD	A,D
+	LD	H,A
+	CALL	QUADTREE
+
+QUADTREE_EXIT:	
+	POP	DE
+	POP	HL
+	RET
+
+
+; -----------------------------------------------------------------------        
+
+GETBIT:
+	EXX
+	RRC	B
+	ADC	HL,DE
+	LD	A,(HL)
+	AND	B
+	ADD	A,C
+	EXX
+	RET
+
+; -----------------------------------------------------------------------        
+
+DECOMP_START:
+        LD	HL,TBUF
+DECOMP:
+	CALL	GETBIT
+	JR	NC,DECOMP_LZW
+	; fall through
+	
+; -----------------------------------------------------------------------        
+
+	LD	B,4
+	CALL	LOADBIT
+	LD	C,D
+	
+	LD	B,7
+	CALL	LOADBIT
+	JR	NZ,DECOMP_NOFIX
+	SET	7,D
+DECOMP_NOFIX:	
+	LD	B,D
+	
+DECOMP_RLE:
+	LD	A,C
+	RLD
+	INC	HL
+	DJNZ	DECOMP_RLE
+
+	JR	DECOMP
+	
+; -----------------------------------------------------------------------        
+
+DECOMP_LZW:	
+	LD	B,8
+	CALL	LOADBIT
+	LD	E,D
+	RET	Z
+
+	LD	B,5
+	CALL	LOADBIT
+	LD	C,D
+	LD	D,B
+	
+	PUSH	HL
+	SBC	HL,DE
+	EX	DE,HL
+	POP	HL
+DECOMP_LINNER:
+	LD	A,(DE)
+	RLD
+	INC	DE
+	INC	HL
+	DEC	C
+	JR	NZ,DECOMP_LINNER
+	
+	JR 	DECOMP
+	
+; -----------------------------------------------------------------------        
+
+LOADBIT:
+	LD	D,0
+LOADBIT_LOOP:
+	CALL	GETBIT
+	RL	D
+	DJNZ	LOADBIT_LOOP
+	RET
+
+; -----------------------------------------------------------------------        
+
+ROTATE:
+	LD	DE,TBUF
+	LD	HL,2000h
+	
+	LD	B,32
+ROTATE_STRIPE:	
+	PUSH	BC
+	
+	LD	B,24
+ROTATE_OUTER:
+
+	PUSH	BC
+	CALL	SETWRT
+	LD	B,8
+ROTATE_INNER:	
+	LD	A,(VDPWR)
+	LD	C,A
+	LD	A,(DE)
+	OUT	(C),A
+	INC	DE
+	DJNZ	ROTATE_INNER
+
+	INC	H
+
+	POP	BC
+	DJNZ	ROTATE_OUTER	
+
+	LD	BC,8-24*32*8
+	ADD	HL,BC
+
+	POP	BC
+	DJNZ	ROTATE_STRIPE	
+	RET
+	
+; -----------------------------------------------------------------------        
+
+QUADDATA:
+	INCLUDE QUAD.INC
+
+; -----------------------------------------------------------------------        
+
+INKDATA:
+	INCLUDE INK.INC
+
+; -----------------------------------------------------------------------        
+
+;PAPERDATA:
+;	INCLUDE PAPER.INC
+
+; -----------------------------------------------------------------------        
+ENDOFCODE:
+
+	END     START
+
+

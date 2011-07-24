@@ -1,0 +1,388 @@
+; -----------------------------------------------------------------------
+;
+;    MSX uncompress for RAMBO PLUS
+;    Copyright (C) 2004 by Ricardo Bittencourt
+;
+;    Project started at 7/2/2004. Last modification was on 17/2/2004.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@700km.com.br
+;        http://www.mundobizarro.tk
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+; 
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+
+INIT32  EQU     0006Fh
+ERAFNK  EQU     000CCh
+DISSCR  EQU     00041h
+ENASCR  EQU     00044h
+CHGET   EQU     0009Fh
+CHPUT   EQU     000A2h
+LDIRMV  EQU     0005Ch
+LDIRVM  EQU     00059h
+CHGCLR  EQU     00062h
+BDRCLR  EQU     0F3EBh
+FILVRM  EQU     00056h
+HKEYI   EQU     0FD9Ah
+HTIMI   EQU     0FD9Fh
+JIFFY   EQU     0FC9Eh
+SETWRT  EQU     00053h
+VDPRD   EQU     00006h
+VDPWR   EQU     00007h
+IRQID   EQU     0002Bh
+GICINI  EQU     00090h
+SNSMAT  EQU     00141h
+WRTPSG  EQU     00093h
+GTSTCK  EQU     000D5h
+GTTRIG  EQU     000D8h
+WRTVRM  EQU     0004Dh
+RDVRM   EQU     0004Ah
+INIGRP  EQU	00072h
+RG1SAV  EQU	0F3E0h
+WRTVDP	EQU	00047h
+BREAKX	EQU	000B7h
+MAPXYC	EQU	00111h
+FETCHC	EQU	00114h
+GRPPAT	EQU	0F3CFH
+GRPATR	EQU	0F3CDH
+
+INITBIT EQU	0AC2Bh
+LOADBIT	EQU	0ACF2h
+GETBIT	EQU	0ACABh
+CHEAT	EQU	0FCA4h
+
+; -----------------------------------------------------------------------        
+
+        .phase  0897Ch ;-7
+
+
+; -----------------------------------------------------------------------        
+
+START:
+	JR	REAL_START
+
+RUN_LOGO:
+	JP	RUN_LOGO_START	
+	
+RUN_CHEAT1:
+	JP	CHEAT_1	
+		
+RUN_CHEAT2:
+	JP	CHEAT_2
+		
+REAL_START:
+	LD	HL,CDATA
+	CALL	INITBIT
+	LD	HL,2000h
+	EX	AF,AF'
+	XOR	A
+	EX	AF,AF'
+
+DECOMP:
+	CALL	GETBIT
+	JR	NC,DECOMP_LZW
+	; fall through
+	
+; -----------------------------------------------------------------------        
+
+	LD	B,8
+	CALL	LOADBIT
+	LD	C,D
+	
+	LD	B,6
+	CALL	LOADBIT
+	LD	B,D
+	
+DECOMP_RLE:
+	LD	A,C
+	CALL	WRTVRM_COMBO
+	DJNZ	DECOMP_RLE
+
+	JR	DECOMP
+	
+; -----------------------------------------------------------------------        
+
+DECOMP_LZW:	
+	LD	B,7
+	CALL	LOADBIT
+	LD	E,D
+
+	LD	B,6
+	CALL	LOADBIT
+	RET	Z
+	LD	C,D
+	LD	D,B
+	
+	PUSH	HL
+	SBC	HL,DE
+	EX	DE,HL
+	POP	HL
+DECOMP_LINNER:
+	EX	DE,HL
+	CALL	RDVRM
+	EX	DE,HL
+	PUSH	DE
+	;
+	CALL	WRTVRM_COMBO
+	;
+	POP	DE
+	INC	DE
+	DEC	C
+	JR	NZ,DECOMP_LINNER
+	
+	JR 	DECOMP
+
+WRTVRM_COMBO:
+	CALL	WRTVRM
+	EX	AF,AF'
+	OR	A
+	JR	NZ,WRTVRM_SINGLE
+	EX	AF,AF'
+	LD	DE,800h
+	ADD	HL,DE
+	CALL	WRTVRM
+	ADD	HL,DE
+	CALL	WRTVRM
+	LD	DE,-1000h+1
+	ADD	HL,DE
+	RET
+	
+WRTVRM_SINGLE:
+	EX	AF,AF'
+	CALL	WRTVRM
+	INC	HL
+	RET
+
+; -----------------------------------------------------------------------        
+
+RUN_LOGO_START:
+  	; sprite zoom off 
+  	LD	BC,0E201h
+  	CALL	WRTVDP
+  	
+  	; hide letters with sprites
+  	LD	HL,03FE0h
+  	LD	A,0FFh
+  	LD	BC,32
+  	CALL	FILVRM
+  	
+  	LD	HL,HIDE_ATTR
+  	LD	DE,1B60h
+  	LD	BC,32
+  	CALL	LDIRMV
+  	
+  	; clear cheat
+  	XOR	A
+  	LD	(CHEAT),A
+  	
+  	; letra B = x23 y12
+  	LD	DE,LETRA_B
+  	LD	HL,24*8+13*32*8
+  	CALL	LETRA
+
+  	LD	DE,LETRA_O
+  	LD	HL,28*8+17*32*8
+  	CALL	LETRA
+
+	; copy sprite pattern table
+	LD	HL,LOGO_PATT
+	CALL	INITBIT
+	LD	HL,(GRPPAT)
+	EX	AF,AF'
+	LD	A,H
+	EX	AF,AF'
+	CALL	DECOMP
+
+	; copy all letters, delay between each one	
+	LD	BC,8*4
+	EXX	
+	LD	B,5
+	LD	HL,LOGO_SIZE
+LOGO_OUTER:	
+	EXX
+	LD	DE,(GRPATR)
+	LD	HL,LOGO_ATTR
+	PUSH	BC
+	CALL	LDIRMV
+	CALL	INSTALL_CHEAT
+	
+	LD	BC,0A000h
+LOGO_INNER:
+	DEC	BC	
+	LD	A,B
+	OR	C
+	JR	NZ,LOGO_INNER
+	POP	BC
+	
+	EXX
+	LD	A,(HL)
+	INC	HL
+	EXX
+	ADD	A,C	
+	LD	C,A
+	LD	A,B
+	ADC	A,0
+	LD	B,A
+	EXX
+	DJNZ	LOGO_OUTER
+	RET
+  
+; -----------------------------------------------------------------------        
+
+INSTALL_CHEAT:
+	LD	A,4
+	CALL	SNSMAT
+	AND	32
+	RET	NZ
+	LD	A,1
+	LD	(CHEAT),A
+	RET
+
+; -----------------------------------------------------------------------        
+
+LETRA:
+  	LD	B,5
+LETRA_OUTER:  	
+  	PUSH	BC
+  	LD	B,32
+LETRA_INNER:
+	LD	A,(DE)
+	OR	A
+	JR	Z,LETRA_EXIT
+	CALL	WRTVRM
+	SET 	5,H
+	LD	A,06Ch
+	CALL	WRTVRM
+	RES	5,H
+LETRA_EXIT:
+	INC	DE
+	INC	HL
+  	DJNZ	LETRA_INNER
+  	LD	BC,256-32
+  	ADD	HL,BC
+	POP	BC
+	DJNZ	LETRA_OUTER
+	RET
+; -----------------------------------------------------------------------        
+
+CHEAT_1:
+	PUSH	AF
+	LD	A,(CHEAT)
+	OR	A
+	JR	NZ,CHEAT1_OUT
+	POP	AF
+	JP	Z,4260h
+	JP	M,4260h
+	JP	41AFh
+	 
+CHEAT1_OUT:
+	POP	AF
+	JP	41AFh
+ 
+; -----------------------------------------------------------------------        
+ 
+CHEAT_2:
+	PUSH	AF
+	LD	A,(CHEAT)
+	OR	A
+	JR	NZ,CHEAT2_OUT
+	POP	AF
+	DEC	(HL)
+	CALL	6288h
+	JP	9D5Ah
+	 
+CHEAT2_OUT:
+	POP	AF
+	CALL	6288h
+	JP	9D5Ah
+ 
+; -----------------------------------------------------------------------        
+
+ 
+CDATA:
+	INCLUDE	CDATA.INC
+
+LOGO_PATT:
+	INCLUDE LOGO.INC
+
+I DEFL 0
+	
+SPRITE MACRO Y,X,COLOR
+  DB Y,X,I,COLOR
+  I DEFL I+4
+ENDM	
+
+SY DEFL 3+3+3+1
+SX DEFL 05Dh
+
+LETRA_FULL MACRO 
+  SPRITE SY,SX,9
+  SPRITE SY,SX+16,9
+  SPRITE SY+16,SX,9
+  SPRITE SY+16,SX+16,9
+  SPRITE SY,SX,6
+  SPRITE SY,SX+16,6
+  SPRITE SY+16,SX,6
+  SPRITE SY+16,SX+16,6
+  SY DEFL SY+020h
+  SX DEFL SX+020h
+ENDM
+
+LETRA_OUT MACRO 
+  SPRITE SY,SX,9
+  SPRITE SY,SX+16,9
+  SPRITE SY+16,SX,9
+  SPRITE SY+16,SX+16,9
+  I  DEFL I+16	
+  SY DEFL SY+020h
+  SX DEFL SX+020h
+ENDM
+
+LETRA_HIDE MACRO 
+  DB SY,SX,256-4,12
+  DB SY,SX+16,256-4,12
+  DB SY+16,SX,256-4,12
+  DB SY+16,SX+16,256-4,12
+  SY DEFL SY+020h
+  SX DEFL SX+020h
+ENDM
+
+LOGO_ATTR:	
+	REPT 3
+	LETRA_FULL
+	ENDM  
+	LETRA_OUT	  
+	LETRA_OUT	  
+
+LOGO_SIZE:
+	DB 32,32,16,16
+
+SY DEFL 3+3+3+1+3*020h
+SX DEFL 05Dh+3*020h
+
+HIDE_ATTR:
+	LETRA_HIDE
+	LETRA_HIDE
+
+LETRA_B:
+	INCLUDE LETRAB.INC
+	
+LETRA_O:
+	INCLUDE LETRAO.INC
+	
+; -----------------------------------------------------------------------        
+ENDOFCODE:
+
+	END     START
+
+

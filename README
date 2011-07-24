@@ -112,7 +112,7 @@ operator[] to simulate linear memory arrays in DOS using the XMS driver.
 
 Name: 1996-06-psgplayer
 Language: C++
-Description: My first emulator! This one emulates the PSG chip from MSX, it
+Description: My first emulator. This one emulates the PSG chip from MSX, it
 could play MSX tunes on the PC by mapping the PSG registers on the FM
 registers of the SoundBlaster. Of course this method had a very low sound
 quality when compared to the original.
@@ -237,6 +237,12 @@ Name: 2003-11-eternalflame
 Language: Assembly Z80
 Description: This is a remake of 1995-10-firedemo, this time running on MSX2
 with a binary of only 256 bytes.
+
+Name: 2004-02-ramboplus
+Language: Assembly Z80
+Description: Patch to insert a new opening screen on the game Rambo. In order
+to fit the new screen on the original 32kb of the game, I had to compress
+the image using quadtrees and a mix of RLE and LZ.
 
 Name: 2004-04-girlsgarden
 Language: Assembly Z80
