@@ -210,6 +210,10 @@ Name: 2000-05-ameba
 Language: C
 Description: Artificial life simulator, to watch evolution in real time.
 
+Name: 2000-05-tetrinet
+Language: Assembly Z80
+Description: Multiplayer Tetrinet implementation for MSX, using only 4kb.
+
 Name: 2001-11-shalom
 Language: C, Assembly Z80
 Description: Translation of the game Shalom from japanese to portuguese.
