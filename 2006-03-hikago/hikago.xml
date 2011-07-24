@@ -1,0 +1,336 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+
+<translation>
+
+  <game>hikago.gba</game>
+  
+  <addrlog>log.txt</addrlog>
+
+  <graphic>
+    <addr>7e8948</addr>
+    <width>8</width>
+    <height>4</height>
+    <name>freeplay</name>
+    <palette index="4">menu.act</palette>
+  </graphic>
+
+  <graphic>
+    <addr>7e8da8</addr>
+    <width>8</width>
+    <height>4</height>
+    <name>story</name>
+    <palette index="4">menu.act</palette>
+  </graphic>
+
+  <graphic>
+    <addr>7e9208</addr>
+    <width>8</width>
+    <height>4</height>
+    <name>multiplayer</name>
+    <palette index="4">menu.act</palette>
+  </graphic>
+
+  <graphic>
+    <addr>7e9668</addr>
+    <width>8</width>
+    <height>4</height>
+    <name>archive</name>
+    <palette index="4">menu.act</palette>
+  </graphic>
+
+  <graphic>
+    <addr>7e9ac8</addr>
+    <width>8</width>
+    <height>4</height>
+    <name>exit</name>
+    <palette index="4">menu.act</palette>
+  </graphic>
+
+  <graphic>
+    <addr>7ea388</addr>
+    <width>8</width>
+    <height>4</height>
+    <name>home</name>
+    <palette index="4">menu.act</palette>
+  </graphic>
+
+  <graphic>
+    <addr>7ea7e8</addr>
+    <width>8</width>
+    <height>4</height>
+    <name>school</name>
+    <palette index="4">menu.act</palette>
+  </graphic>
+
+  <graphic>
+    <addr>7eac48</addr>
+    <width>8</width>
+    <height>4</height>
+    <name>hikaru_house</name>
+    <palette index="4">menu.act</palette>
+  </graphic>
+
+  <graphic>
+    <addr>7eb968</addr>
+    <width>8</width>
+    <height>4</height>
+    <name>downtown</name>
+    <palette index="4">menu.act</palette>
+  </graphic>
+
+  <graphic>
+    <addr>4fff04</addr>
+    <width>8</width>
+    <height>8</height>
+    <name>rankup1</name>
+    <palette index="13">menu.act</palette>
+  </graphic>
+  
+  <graphic>
+    <addr>4ffb04</addr>
+    <width>4</width>
+    <height>8</height>
+    <name>rankup2</name>
+    <palette index="13">menu.act</palette>
+  </graphic>
+  
+  <text>
+     <pointer>2cd2ac</pointer>
+     <data>Whom do you want to play with?</data>
+  </text>
+
+  <text>
+     <pointer>2cd200</pointer>
+  </text>
+
+  <text>
+     <pointer>2cd21c</pointer>
+     <data>Yes</data>
+  </text>
+
+  <text>
+     <pointer>2cd220</pointer>
+     <data>No</data>
+  </text>
+
+  <text>
+    <pointer>270BB0</pointer>
+    <data>Teacher "Attention, everyone. Today we welcome an exchange student.</data>
+  </text>
+  
+  <text>
+     <pointer>2cd1d0</pointer>
+     <data>Ishikawa "Welcome.</data>
+  </text>
+
+  <text>
+    <pointer>270BC0</pointer>
+    <data>His name is @NAME  Please, everyone, be friendly with him.</data>
+  </text>
+  
+  <text>
+    <pointer>270C00</pointer>
+    <data>Hikaru "Yo, @NAME I am Hikaru. Pleased to meet you!</data>
+  </text>
+  
+  <text>
+    <pointer>270C24</pointer>
+    <data>Feel free to ask me anything you don't understand.</data>
+  </text>
+  
+  <text>
+    <pointer>270C68</pointer>
+    <data>What? You're asking who is this strange guy by my side? You can see him!</data>
+  </text>
+  
+  <text>
+    <pointer>270CD0</pointer>
+    <data>Sai "Hikaru! This kid... can he see me?</data>
+  </text>
+  
+  <text>
+    <pointer>270D38</pointer>
+    <data>Hikaru "He is Sai. He is a kind of ghost.</data>
+  </text>
+  
+  <text>
+    <pointer>270D5C</pointer>
+    <data>Don't worry, he likes Go, he's not an evil spirit.</data>
+  </text>
+  
+  <text>
+    <pointer>270D98</pointer>
+    <data>Well, at least I think he isn't...</data>
+  </text>
+  
+  <text>
+    <pointer>270E00</pointer>
+    <data>Sai: "Don't be silly, Hikaru.</data>
+  </text>
+  
+  <text>
+    <pointer>270E24</pointer>
+    <data>Perhaps this kid has a special gift just like you.</data>
+  </text>
+  
+  <text>
+    <pointer>270E48</pointer>
+    <data>@NAME you play Go, of course, don't you?</data>
+  </text>
+  
+  <text>
+    <pointer>270E8C</pointer>
+    <data>...you can't play Go? Really?</data>
+  </text>
+  
+  <text>
+    <pointer>270EB0</pointer>
+    <data>Hikaru, what shall we do?</data>
+  </text>
+  
+  <text>
+    <pointer>270F28</pointer>
+    <data>Hikaru "He said he can't play Go, let's leave him alone.</data>
+  </text>
+  <text>
+    <pointer>270F4C</pointer>
+    <data>I know how you feel, Sai always forces me to play Go with him.</data>
+  </text>
+  <text>
+    <pointer>270F88</pointer>
+    <data>However, even if it's somewhat difficult, Go can be very fun!</data>
+  </text>
+  <text>
+    <pointer>270FAC</pointer>
+    <data>That's it! You're going to play with us! Right?</data>
+  </text>
+  <text>
+    <pointer>271014</pointer>
+    <data>Sai "Right!</data>
+  </text>
+  <text>
+    <pointer>27108C</pointer>
+    <data>Hikaru "When you have some free time, go to my house and we can play!</data>
+  </text>
+  <text>
+    <pointer>2D3680</pointer>
+    <data>Are you sure you want to completely erase your data?</data>
+  </text>
+  <text>
+    <pointer>2D36D4</pointer>
+    <data>Data erased.</data>
+  </text>
+  
+  <text>
+    <pointer>2CD390</pointer>
+    <data>Akari-chan?</data>
+  </text>
+  <text>
+    <pointer>2CD49C</pointer>
+    <data>Another person? Ok, please choose again.</data>
+  </text>
+  <text>
+    <pointer>2CD3A0</pointer>
+    <data>Tsutsui-kun?</data>
+  </text>
+  <text>
+    <pointer>2CD4F4</pointer>
+    <data>Are you finished today? Please come again!</data>
+  </text>
+  <text>
+    <pointer>2CD468</pointer>
+    <data>Ok! Good luck.</data>
+  </text>
+  <text>
+    <pointer>315588</pointer>
+    <data>Akari "Well, good luck!</data>
+  </text>
+  <text>
+    <pointer>315A24</pointer>
+    <data>Akari "This is a fuseki that Tsutsui taught me.</data>
+  </text>
+  <text>
+    <pointer>31592C</pointer>
+  </text>
+  <text>
+    <pointer>3159B0</pointer>
+  </text>
+  <text>
+    <pointer>315A44</pointer>
+  </text>
+  <text>
+    <pointer>315A94</pointer>
+    <data>Akari "I have no choice but to play here.</data>
+  </text>
+  <text>
+    <pointer>315898</pointer>
+  </text>
+  <text>
+    <pointer>315ACC</pointer>
+    <data>Akari "Shall we finish?</data>
+  </text>
+  <text>
+    <pointer>315648</pointer>
+    <data>Akari "I will leave this game. There no point in insisting.</data>
+  </text>
+  <text>
+    <pointer>2CD2DC</pointer>
+    <data>Whom do you want to play next?</data>
+  </text>
+
+  <text>
+    <pointer>271460</pointer>
+    <data>Hikaru " @NAME , you came.</data>
+  </text>
+  
+  <text>
+    <pointer>271484</pointer>
+    <data>Now, Sai will teach you Go carefully.</data>
+  </text>
+  
+  <text>
+    <pointer>2714EC</pointer>
+    <data>Sai "First, allow me a proper introduction.</data>
+  </text>
+  
+  <text>
+    <pointer>271510</pointer>
+    <data>I am Fujiwara no Sai. I was the Go instructor of the Emperor, in the Heian era.</data>
+  </text>
+  
+  <text>
+    <pointer>27154C</pointer>
+    <data>However, I was betrayed, and left this world without mastering my Go ability.</data>
+  </text>  
+  
+  <text>
+    <pointer>271570</pointer>
+    <data>I turned into a wandering spirit, until I found Hikaru and returned to this world</data>
+  </text>
+  
+  <text>
+    <pointer>2715AC</pointer>
+  </text>
+  <text>
+    <pointer>2715D0</pointer>
+  </text>
+  <text>
+    <pointer>27160C</pointer>
+  </text>
+  <text>
+    <pointer>271FA8</pointer>
+  </text>
+  <text>
+    <pointer>271FE4</pointer>
+  </text>
+  <text>
+    <pointer>272008</pointer>
+  </text>
+  <text>
+    <pointer>27204C</pointer>
+  </text>
+  <text>
+    <pointer>282E8C</pointer>
+  </text>
+
+</translation>

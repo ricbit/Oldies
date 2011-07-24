@@ -292,6 +292,11 @@ Name: 2005-05-fpgapong
 Language: VHDL
 Description: A pong clone for the Digilent FPGA.
 
+Name: 2006-03-hikago
+Language: Java
+Description: Translation of the GBA game Hikaru no Go from japanese to english.
+I still want to get back to this project someday.
+
 Name: 2006-08-nurikabe
 Language: C++
 Description: Nurikabe solver using human-based reasoning.
