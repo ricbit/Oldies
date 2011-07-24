@@ -325,3 +325,7 @@ I still want to get back to this project someday.
 Name: 2006-08-nurikabe
 Language: C++
 Description: Nurikabe solver using human-based reasoning.
+
+Name: 2006-12-bignumfac
+Language: C++
+Description: Bignum factorial using template metaprogramming.
