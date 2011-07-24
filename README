@@ -308,6 +308,11 @@ Name: 2005-05-fpgapong
 Language: VHDL
 Description: A pong clone for the Digilent FPGA.
 
+Name: 2005-09-gibi
+Language: C
+Description: This was supposed to grow to a .cbr reader for Nintendo DS,
+but in the end I found the ds screen resolution to be too low for this.
+
 Name: 2005-11-graphosds
 Language: C
 Description: An MSX graphics editor running on the Nintendo DS.
