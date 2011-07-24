@@ -1,0 +1,552 @@
+; -----------------------------------------------------------------------
+;
+;    Canyon fighter 1.0
+;    Copyright (C) 2003 by Ricardo Bittencourt
+;
+;    Project started at 2002.3.5. Last modification was on 2002.3.5.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@700km.com.br
+;        http://www.mundobizarro.tk
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+; 
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+
+INIT32  EQU     0006Fh
+ERAFNK  EQU     000CCh
+DISSCR  EQU     00041h
+ENASCR  EQU     00044h
+CHGET   EQU     0009Fh
+LDIRMV  EQU     0005Ch
+LDIRVM  EQU     00059h
+CHGCLR  EQU     00062h
+BDRCLR  EQU     0F3EBh
+FILVRM  EQU     00056h
+HKEYI   EQU     0FD9Ah
+HTIMI   EQU     0FD9Fh
+JIFFY   EQU     0FC9Eh
+SETWRT  EQU     00053h
+VDPRD   EQU     00006h
+VDPWR   EQU     00007h
+IRQID   EQU     0002Bh
+GICINI  EQU     00090h
+SNSMAT  EQU     00141h
+WRTPSG  EQU     00093h
+GTSTCK  EQU     000D5h
+GTTRIG  EQU     000D8h
+WRTVRM  EQU     0004Dh
+CHGMOD	EQU	000D1h
+SETPLT  EQU     0014Dh
+WRTVDP  EQU     0012Dh
+
+MAXTILE EQU 8
+
+; -----------------------------------------------------------------------        
+
+        .phase  09000h-7
+
+	; header for .BIN file
+	DB      0FEh
+        DW      09000h
+	DW      ENDOFCODE-1
+        DW      START
+
+; -----------------------------------------------------------------------
+; ALIGN - align the code in 100h bytes boundaries
+
+ALIGN           MACRO
+LOCAL VOID
+
+VOID:
+		DS      256*(HIGH (VOID+255))-VOID
+
+		ENDM
+
+; -----------------------------------------------------------------------        
+
+GAMESPEED       EQU     50
+
+; -----------------------------------------------------------------------        
+
+INITIAL         DEFL    0D000h
+
+RESERVE         MACRO   LABEL_NAME,N
+
+LABEL_NAME      EQU     INITIAL
+_&LABEL_NAME    EQU     INITIAL-0D000h
+INITIAL         DEFL    INITIAL+N
+
+		ENDM
+
+; -----------------------------------------------------------------------        
+
+RESERVE         SAVE_HOOK,5
+
+; -----------------------------------------------------------------------        
+
+START:
+	; stop the drive
+	LD      B,120
+STOP_DRIVE:
+	PUSH    BC
+	CALL    HTIMI
+	POP     BC
+	DJNZ    STOP_DRIVE
+
+; ----------------------------------------------------------------------- 
+
+	; init the SCREEN 4, with black border
+        LD      A,08h
+	LD      (BDRCLR),A
+        LD      IX,CHGMOD
+	LD	A,4
+        CALL    SUBROM
+
+        ; set up palette
+        LD      HL,PALETTE
+        LD      D,0
+        LD      B,10
+        LD      IX,SETPLT
+PALETTE_LOOP:
+        LD      A,(HL)
+        INC     HL
+        LD      E,(HL)
+        INC     HL
+        CALL    SUBROM
+        INC     D
+        DJNZ    PALETTE_LOOP
+
+        ; set up name table
+        LD      HL,NAMETABLE
+        LD      DE,01800h
+        LD      BC,32*24
+        CALL    LDIRMV
+
+        ; set up colors for the river
+        LD      HL,02000h+(128-24)*8
+        LD      BC,24*8
+        LD      A,09Ah
+        CALL    FILVRM
+
+        ; init secret mode
+        LD      IX,WRTVDP
+        LD      C,4
+        LD      B,0
+        CALL    SUBROM
+        LD      C,3
+        LD      B,08Fh
+        CALL    SUBROM
+
+; ----------------------------------------------------------------------- 
+
+	; save the old interrupt handler
+	DI
+	LD      HL,HKEYI
+	LD      DE,SAVE_HOOK
+	LD      BC,5
+	LDIR
+
+	; install the new interrupt handler
+	LD      HL,LOW (IRQ_HANDLER)*256+0C3h
+	LD      (HKEYI),HL
+	LD      HL,0C9h*256+HIGH (IRQ_HANDLER)
+	LD      (HKEYI+2),HL
+
+; ----------------------------------------------------------------------- 
+
+MAIN_LOOP:
+        EI
+        LD      A,7
+        CALL    SNSMAT
+        AND     4 ; ESC
+        JR      NZ,MAIN_LOOP
+
+; ----------------------------------------------------------------------- 
+
+EXIT_GAME:
+	; restore original IRQ handler
+	DI
+	LD      HL,SAVE_HOOK
+	LD      DE,HKEYI
+	LD      BC,5
+	LDIR
+
+        ; stop the music and exit
+	CALL    GICINI
+        JP      INIT32
+
+; ----------------------------------------------------------------------- 
+
+SUBROM:
+	LD      IY,(0FAF7h)
+        JP      001Ch
+
+; ----------------------------------------------------------------------- 
+
+IRQ_HANDLER:
+	LD      A,(VDPRD)
+	INC     A
+	LD      C,A
+	IN      A,(C)
+	AND     A
+	RET     P
+
+        LD      HL,104*8
+        CALL    SETWRT
+
+        CALL    DRAW_RIVER
+
+        LD      HL,(104+128)*8
+        CALL    SETWRT
+
+        CALL    DRAW_RIVER
+
+        LD      HL,0
+        CALL    SETWRT
+
+        LD      IX,PARATABLE
+        LD      IY,PATTERN
+        LD      A,HIGH(DIRECTABLE)
+        CALL    TILESCROLL
+
+        LD      HL,02000H
+        CALL    SETWRT
+
+        LD      IX,PARATABLE
+        LD      IY,COLOR
+        LD      A,HIGH(DIRECTABLE)
+        CALL    TILESCROLL
+
+        LD      HL,128*8
+        CALL    SETWRT
+
+        LD      IX,PARATABLE
+        LD      IY,PATTERN
+        LD      A,HIGH(INVERTABLE)
+        CALL    TILESCROLL
+
+        ; fall through
+
+; -----------------------------------------------------------------------
+
+        LD      B,MAXTILE
+        LD      IX,PARATABLE
+PARAINC:
+        LD      C,(IX)
+        LD      A,(IX+2)
+        LD      D,(IX+1)
+        ;OR      A
+        ;SBC     A,D
+        SUB     D
+        CP      C
+        JR      C,PARAINC_GO
+        LD      A,C
+        DEC     A
+PARAINC_GO:
+        LD      (IX+2),A
+
+        INC     IX
+        INC     IX
+        INC     IX
+        DJNZ    PARAINC
+
+	RET
+
+; -----------------------------------------------------------------------
+
+TILESCROLL:
+        LD      B,MAXTILE
+TILESCROLL_OUT:
+        PUSH    BC
+
+        LD      B,(IX)
+        LD      C,B
+        PUSH    AF
+        PUSH    BC
+        CALL    MINITILE
+        POP     BC
+        POP     AF
+
+        LD      B,0
+        ADD     IY,BC
+
+        INC     IX
+        INC     IX
+        INC     IX
+        POP     BC
+        DJNZ    TILESCROLL_OUT
+        RET
+
+; -----------------------------------------------------------------------
+
+MINITILE:
+        EX      AF,AF'
+        LD      A,(IX+0)
+        CP      24
+        JP      Z,MINITILE24
+        CP      32
+        JP      Z,MINITILE32
+        EX      AF,AF'
+        RET
+
+; -----------------------------------------------------------------------
+
+DOTILE MACRO X,Y
+
+TILE&Y&_&X:
+        LD      BC,X
+        PUSH    IY
+        POP     HL
+        ADD     HL,BC
+
+        I       DEFL X
+        N       DEFL 0
+        REPT    Y
+          LD      E,(HL)
+          LD      A,(DE)
+          OUT     (098h),A
+          N       DEFL N+1
+          IF      NOT (N EQ Y)
+            IF      I EQ (Y-1)
+              I     DEFL 0
+              PUSH  IY
+              POP   HL
+            ELSE
+              I     DEFL I+1
+              INC   HL
+            ENDIF
+          ENDIF
+        ENDM
+        RET
+
+ENDM
+
+; -----------------------------------------------------------------------
+
+TILEDW MACRO X,Y
+        DW      TILE&Y&_&X
+ENDM
+
+
+; -----------------------------------------------------------------------
+
+FULLTILE MACRO X
+
+MINITILE&X:
+        ; old minitile
+        EX      AF,AF'
+        LD      L,(IX+2)
+        LD      H,0
+        ADD     HL,HL
+        LD      DE,TILETABLE&X
+        ADD     HL,DE
+        LD      E,(HL)
+        INC     HL
+        LD      D,(HL)
+
+        EX      DE,HL
+        LD      D,A
+        JP      (HL)
+
+        J DEFL 0
+        REPT X
+          DOTILE %J,%X
+          J DEFL J+1
+        ENDM
+
+TILETABLE&X:
+        I       DEFL    0
+        REPT    X
+          TILEDW  %I,%X
+          I       DEFL I+1
+        ENDM
+
+ENDM
+
+; -----------------------------------------------------------------------
+
+TILE24: FULLTILE 24
+TILE32: FULLTILE 32
+
+; -----------------------------------------------------------------------
+
+DRAW_RIVER:
+
+        REPT    192
+        LD      A,0Fh
+        OUT     (098H),A
+        ENDM
+        RET
+
+; -----------------------------------------------------------------------
+
+RAND_GENERIC:
+        PUSH    HL
+        LD      A,C
+        LD      L,A
+        LD      B,8
+RAND_GENERIC_LOOP:
+        SRL     A
+        OR      L
+        LD      L,A
+        DJNZ    RAND_GENERIC_LOOP
+        LD      B,L
+        POP     HL
+        ; fall through
+
+; -----------------------------------------------------------------------
+
+RAND_RANGED:
+        CALL    RAND
+        AND     B
+        CP      C
+        RET     C
+        JR      RAND_RANGED
+
+; -----------------------------------------------------------------------
+; choose a random number in the set [0,127] with uniform distribution
+
+RAND:
+	PUSH    HL
+	LD      HL,(JIFFY)
+	ADD     HL,HL
+	SBC     A,A
+	AND     083h
+	XOR     L
+	LD      L,A
+	LD      (JIFFY),HL
+	AND     07Fh
+	POP     HL
+	RET
+
+
+; -----------------------------------------------------------------------        
+; tile data
+
+INCLUDE PATTERN.INC
+INCLUDE COLOR.INC
+
+; -----------------------------------------------------------------------
+; palette data
+
+RGB MACRO R,G,B
+
+        DB      R*16+B,G
+
+ENDM
+
+PALETTE:
+
+        RGB 7,7,6
+        RGB 4,3,2
+        RGB 5,4,3
+        RGB 6,5,4
+        RGB 3,2,2
+        RGB 7,6,6
+        RGB 5,5,5
+        RGB 3,3,3
+        RGB 0,0,0
+        RGB 0,0,3
+
+PARATABLE:
+        DB      24,3,0,24,3,0,32,3,0,32,3,0,32,2,0,32,2,0,24,1,0,24,1,0
+
+
+NAMETABLE:
+        I DEFL 0
+        J DEFL 0
+        K DEFL 0
+        K2 DEFL 0
+        R DEFL (128-24)
+        REPT 24
+
+        DB      I
+        DB      I+3
+        DB      J+6
+        DB      J+4+6
+        DB      K+8+6
+        DB      K+8+6+4
+        DB      K2+8+6+8
+        DB      K2+8+6+8+3
+
+        REPT  7
+        DB      255
+        ENDM
+
+        DB      R
+        DB      R+128
+
+        REPT  7
+        DB      255
+        ENDM
+
+        DB      K2+8+6+8+3+128
+        DB      K2+8+6+8+128
+        DB      K+8+6+4+128
+        DB      K+8+6+128
+        DB      J+4+6+128
+        DB      J+6+128
+        DB      I+3+128
+        DB      I+128
+
+        I DEFL I+1
+        IF I GT 2
+        I DEFL 0
+        ENDIF
+
+        J DEFL J+1
+        IF J GT 3
+        J DEFL 0
+        ENDIF
+
+        K DEFL K+1
+        IF K GT 3
+        K DEFL 0
+        ENDIF
+
+        K2 DEFL K2+1
+        IF K2 GT 2
+        K2 DEFL 0
+        ENDIF
+
+        R DEFL R+1
+
+        ENDM
+
+
+ALIGN
+
+INCLUDE INVERT.INC
+
+DIRECTABLE:
+        I DEFL 0
+        REPT 256
+        DB      I
+        I DEFL I+1
+        ENDM
+
+ENDOFCODE:
+
+	IF      ENDOFCODE GT 0CFFFh
+	.PRINTX . Larger than 4kb !!! .
+        ENDIF                            
+
+	IF      INITIAL GT 0DE60h
+	.PRINTX . Invading system area !!! .
+	ENDIF
+
+	END     START
+
+
+
+
