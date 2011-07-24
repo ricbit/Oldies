@@ -280,6 +280,10 @@ Language: C
 Description: Particle demo, implements the same effect seen on the Star Wars
 Episode 3 DVD menu.
 
+Name: 2005-05-fpgapong
+Language: VHDL
+Description: A pong clone for the Digilent FPGA.
+
 Name: 2006-08-nurikabe
 Language: C++
 Description: Nurikabe solver using human-based reasoning.
