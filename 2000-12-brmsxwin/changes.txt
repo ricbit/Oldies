@@ -1,0 +1,83 @@
+2003.01.28
+- sprite priorities
+- color 0 sprite
+- directinput keyboard
+
+2003.01.29
+- fixed bug on z80 fetch cycle
+
+2003.01.30
+- support to EC bit
+- improved irq
+
+2003.01.31
+- support to entire keyboard
+- fixed sprites entering from top of screen
+
+(3.0.5)
+2003.01.31
+- support to lost surfaces under DX7
+
+2003.02.01
+- support to tv-border
+- support to real border on screen 2
+
+2003.02.02
+- fixed bug in transparent sprites
+- added sprite viewer in fudebug
+
+(3.0.6)
+2003.02.03
+- anti alias in tv-border
+
+(3.0.7)
+2003.02.04
+- fixed minor bug in tv-border
+- support to color in screen 0
+- support to color in screen 1
+- using improved palette from databook
+- added about window 
+
+(3.0.8)
+2003.02.05
+- moved init code from OnChange to constructor
+- added suport to scanlines
+
+(3.0.9)
+2003.02.05
+- support to 8x8 sprites
+
+2003.02.08
+- percentual value on scanline window
+
+2003.02.14
+- keyboard configuration window
+
+(3.0.10)
+2003.02.14
+- date/time in about window
+
+2003.02.15
+- support to many different rom types
+- support to deselect key in key-config
+
+(3.0.10.XYZ)
+2003.02.17
+- added preliminary joypad window, disabled
+- changed the creation of forms
+- placed the windows message parser inside the brmsx engine
+- changed the internal images to jpegs
+
+(3.0.11)
+2003.02.18
+- placed the windows message parser inside the keyboard window
+- tweaked the keyboard timer
+- added switch "-slow" for slow machines
+- disable tv border through gui
+- black scanlines are not drawn, 50% speed increase
+- fixed the exact point of vertical interrupts, fix Zanac and Rally-X
+
+(3.0.12)
+2003.02.18
+- fixed a out of bounds bug in render32
+- fixed various bugs with black scanline cache

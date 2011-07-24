@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.06.00"/>
+    <PROJECT value="brmsx.exe"/>
+    <OBJFILES value="brmsx.obj brmsx_main.obj timer.obj brmsx_z80.obj brmsx_vdp.obj 
+      fudebug_window.obj brmsx_engine.obj tvborder.obj runvdp.obj 
+      about_window.obj scanline_window.obj keyboard_window.obj keymap.obj 
+      msxrom.obj joystick_window.obj joypad_jpg.obj keyboard_jpg.obj 
+      mount_window.obj"/>
+    <RESFILES value="brmsx.res"/>
+    <IDLFILES value=""/>
+    <IDLGENFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES) brmsx_main.dfm fudebug_window.dfm about_window.dfm 
+      scanline_window.dfm keyboard_window.dfm joystick_window.dfm mount_window.dfm"/>
+    <LIBFILES value="..\dx8sdk\ddraw.lib ..\dx8sdk\dxguid.lib ..\dx8sdk\dinput.lib 
+      ..\dx8sdk\c_dinput.lib"/>
+    <LIBRARIES value="bcb2kaxserver.lib indy.lib dbxcds.lib dclocx.lib soaprtl.lib bcbie.lib 
+      nmfast.lib dbexpress.lib inetdbxpress.lib inetdbbde.lib bcbsmp.lib 
+      dsnapcon.lib dsnapcrba.lib visualdbclx.lib teeqr.lib dss.lib tee.lib 
+      teedb.lib teeui.lib qrpt.lib bdecds.lib cds.lib ibxpress.lib vcldbx.lib 
+      bdertl.lib adortl.lib vcldb.lib vclx.lib vcl.lib rtl.lib"/>
+    <SPARELIBS value="rtl.lib vcl.lib vclx.lib vcldb.lib adortl.lib bdertl.lib vcldbx.lib 
+      ibxpress.lib cds.lib bdecds.lib qrpt.lib teeui.lib teedb.lib tee.lib 
+      dss.lib teeqr.lib visualdbclx.lib dsnapcrba.lib dsnapcon.lib bcbsmp.lib 
+      inetdbbde.lib inetdbxpress.lib dbexpress.lib nmfast.lib bcbie.lib 
+      soaprtl.lib dclocx.lib dbxcds.lib indy.lib bcb2kaxserver.lib"/>
+    <PACKAGES value="rtl.bpi vcl.bpi vclx.bpi vcljpg.bpi bcbsmp.bpi qrpt.bpi dbrtl.bpi 
+      vcldb.bpi bdertl.bpi ibsmp.bpi vcldbx.bpi teeui.bpi teedb.bpi tee.bpi 
+      nmfast.bpi dclocx.bpi"/>
+    <PATHCPP value=".;"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="ilink32"/>
+    <USERDEFINES value=""/>
+    <SYSDEFINES value="NO_STRICT"/>
+    <MAINSOURCE value="brmsx.cpp"/>
+    <INCLUDEPATH value="&quot;C:\Arquivos de programas\Borland\CBuilder6\Projects&quot;;C:\progs\dx7sdk\mssdk\include;$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="$(BCB)\Projects\Lib;sendmail;&quot;C:\Arquivos de programas\Borland\CBuilder6\Projects&quot;;$(BCB)\lib\obj;$(BCB)\lib"/>
+    <WARNINGS value="-w-par -w-8027 -w-8026"/>
+    <WARNOPTSTR value=""/>
+    <OTHERFILES value=""/>
+  </MACROS>
+  <OPTIONS>
+    <IDLCFLAGS value="-I&quot;C:\Arquivos de programas\Borland\CBuilder6\Projects&quot; 
+      -IC:\progs\dx7sdk\mssdk\include -I$(BCB)\include -I$(BCB)\include\vcl 
+      -src_suffix cpp -boa"/>
+    <CFLAG1 value="-O2 -Vx -Ve -X- -a8 -6 -b- -k- -vi -c -tW -tWM"/>
+    <PFLAGS value="-$Y- -$L- -$D- -$A8 -v -JPHNE -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/ml /mv32 /m4 /kh32768 /w2 /zn /la /z /x /n /c"/>
+    <LFLAGS value="-D&quot;&quot; -aa -Tpe -GD -s -Gn -M"/>
+    <OTHERFILES value=""/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0w32.obj sysinit.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cp32mt.lib"/>
+    <OTHERFILES value=""/>
+  </LINKER>
+  <FILELIST>
+      <FILE FILENAME="brmsx.cpp" FORMNAME="" UNITNAME="brmsx" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="brmsx.res" FORMNAME="" UNITNAME="brmsx" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="brmsx_main.cpp" FORMNAME="main_window" UNITNAME="brmsx_main" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="timer.cpp" FORMNAME="" UNITNAME="timer" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="brmsx_z80.asm" FORMNAME="" UNITNAME="brmsx_z80" CONTAINERID="Tasm" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="brmsx_vdp.cpp" FORMNAME="" UNITNAME="brmsx_vdp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="fudebug_window.cpp" FORMNAME="Fudebug" UNITNAME="fudebug_window" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="brmsx_engine.cpp" FORMNAME="" UNITNAME="brmsx_engine" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="tvborder.c" FORMNAME="" UNITNAME="tvborder" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="runvdp.asm" FORMNAME="" UNITNAME="runvdp" CONTAINERID="Tasm" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\dx8sdk\ddraw.lib" FORMNAME="" UNITNAME="ddraw.lib" CONTAINERID="LibTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\dx8sdk\dxguid.lib" FORMNAME="" UNITNAME="dxguid.lib" CONTAINERID="LibTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\dx8sdk\dinput.lib" FORMNAME="" UNITNAME="dinput.lib" CONTAINERID="LibTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\dx8sdk\c_dinput.lib" FORMNAME="" UNITNAME="c_dinput.lib" CONTAINERID="LibTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="about_window.cpp" FORMNAME="About" UNITNAME="about_window" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="scanline_window.cpp" FORMNAME="Scanline" UNITNAME="scanline_window" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="keyboard_window.cpp" FORMNAME="Keyboard" UNITNAME="keyboard_window" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="keymap.c" FORMNAME="" UNITNAME="keymap" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="msxrom.c" FORMNAME="" UNITNAME="msxrom" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="joystick_window.cpp" FORMNAME="Joystick" UNITNAME="joystick_window" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="joypad_jpg.c" FORMNAME="" UNITNAME="joypad_jpg" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="keyboard_jpg.c" FORMNAME="" UNITNAME="keyboard_jpg" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="mount_window.cpp" FORMNAME="Mount" UNITNAME="mount_window" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+  </FILELIST>
+  <BUILDTOOLS>
+  </BUILDTOOLS>
+
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=1
+MajorVer=3
+MinorVer=0
+Release=15
+Build=36
+Debug=1
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1046
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=Ricardo Bittencourt
+FileDescription=BrMSX for Windows
+FileVersion=3.0.15.36
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=BrMSX
+ProductVersion=1.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=11
+Item0=C:\Arquivos de programas\Borland\CBuilder6\Projects;C:\progs\dx7sdk\mssdk\include;$(BCB)\include;$(BCB)\include\vcl
+Item1=sendmail;C:\Arquivos de programas\Borland\CBuilder6\Projects;C:\progs\dx7sdk\mssdk\include;$(BCB)\include;$(BCB)\include\vcl
+Item2=C:\progs\dx7sdk\mssdk\include;$(BCB)\include;$(BCB)\include\vcl
+Item3=C:\progs\dx7sdk\mssdk\lib\Borland;$(BCB)\include;$(BCB)\include\vcl
+Item4=$(BCB)\include;$(BCB)\include\vcl
+Item5=..\..\Arquivos de programas\Borland\CBuilder4\Projects;..\dx7sdk\mssdk\include;$(BCB)\include;$(BCB)\include\vcl
+Item6=..\dx7sdk\mssdk\include;$(BCB)\include;$(BCB)\include\vcl
+Item7=\progs\dx7sdk\mssdk\include;$(BCB)\include;$(BCB)\include\vcl
+Item8=..\..\dx7sdk\mssdk\include;$(BCB)\include;$(BCB)\include\vcl
+Item9=..\..\..\dx7sdk\mssdk\include;$(BCB)\include;$(BCB)\include\vcl
+Item10=\progs\dx7sdk\mssdk\include;..\..\..\..\progs\bdx7\src\dx7test;$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=5
+Item0=$(BCB)\Projects\Lib;sendmail;C:\Arquivos de programas\Borland\CBuilder6\Projects;$(BCB)\lib\obj;$(BCB)\lib
+Item1=C:\Arquivos de programas\Borland\CBuilder6\Projects;$(BCB)\lib\obj;$(BCB)\lib
+Item2=$(BCB)\lib\obj;$(BCB)\lib
+Item3=..\..\Arquivos de programas\Borland\CBuilder4\Projects;$(BCB)\lib\obj;$(BCB)\lib
+Item4=..\..\..\..\progs\bdx7\src\dx7test;$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=1
+Item0=_DEBUG
+
+[HistoryLists\hlRunParameters]
+Count=1
+Item0=-gdi
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+Launcher=
+UseLauncher=0
+DebugCWD=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteLauncher=
+RemoteCWD=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[CORBA]
+AddServerUnit=1
+AddClientUnit=1
+PrecompiledHeaders=1
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+  </IDEOPTIONS>
+</PROJECT>

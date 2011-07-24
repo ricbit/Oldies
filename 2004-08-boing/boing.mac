@@ -1,0 +1,1103 @@
+; -----------------------------------------------------------------------
+;
+;    Revenge of the Boing Ball 1.0
+;    Copyright (C) 2004 by Ricardo Bittencourt
+;
+;    Project started at 30/8/2004. Last modification was on 12/10/2004.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@700km.com.br
+;        http://www.mundobizarro.tk
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+;
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+
+INIT32  EQU     0006Fh
+ERAFNK  EQU     000CCh
+DISSCR  EQU     00041h
+ENASCR  EQU     00044h
+CHGET   EQU     0009Fh
+LDIRMV  EQU     0005Ch
+LDIRVM  EQU     00059h
+CHGCLR  EQU     00062h
+BDRCLR  EQU     0F3EBh
+FILVRM  EQU     00056h
+HKEYI   EQU     0FD9Ah
+HTIMI   EQU     0FD9Fh
+JIFFY   EQU     0FC9Eh
+SETWRT  EQU     00053h
+VDPRD   EQU     00006h
+VDPWR   EQU     00007h
+IRQID   EQU     0002Bh
+GICINI  EQU     00090h
+SNSMAT  EQU     00141h
+WRTPSG  EQU     00093h
+GTSTCK  EQU     000D5h
+GTTRIG  EQU     000D8h
+WRTVRM  EQU     0004Dh
+RDVRM   EQU     0004Ah
+INIGRP  EQU	00072h
+RG1SAV  EQU	0F3E0h
+WRTVDP	EQU	00047h
+BREAKX	EQU	000B7h
+RDSLT	EQU	0000Ch
+CHGCPU	EQU	00180h
+CALSLT	EQU	0001Ch
+SLTROM	EQU	0FCC1h
+RG1SAV	EQU	0F3E0h
+
+LINES		EQU	88
+COLUMNS 	EQU	88
+TOTAL_SPRITES 	EQU	8
+
+
+; -----------------------------------------------------------------------
+; ALIGN - align the code in 100h bytes boundaries
+
+ALIGN           MACRO
+LOCAL VOID
+
+VOID:
+		DS      256*(HIGH (VOID+255))-VOID
+
+		ENDM
+
+; -----------------------------------------------------------------------        
+
+        .phase  04000h
+
+        ;header for .ROM file
+        DB	41h,42h
+        DW      START
+        DW	0,0,0,0,0,0
+        
+; -----------------------------------------------------------------------        
+
+INITIAL         DEFL    08000h
+
+RESERVE         MACRO   LABEL_NAME,N
+
+LABEL_NAME      EQU     INITIAL
+_&LABEL_NAME    EQU     INITIAL-0D000h
+INITIAL         DEFL    INITIAL+N
+
+		ENDM
+
+; -----------------------------------------------------------------------        
+
+RESERVE 	VIDEODATA,2*LINES*COLUMNS/8
+RESERVE		ANGLEDATA,80*COLUMNS
+RESERVE		BLITDATA,(LINES/8)*(COLUMNS/8)
+RESERVE		NAMEDATA,32*24
+RESERVE		ROTATE,1
+RESERVE		BALLXMINOR,1
+RESERVE		BALLXMAJOR,1
+RESERVE		BALLYMINOR,1
+RESERVE		BALLYMAJOR,1
+RESERVE		REALX,1
+RESERVE		REALY,1
+RESERVE		YCOUNTER,1
+RESERVE 	XDIRECTION,1
+RESERVE		BUFFERNUMBER,1
+RESERVE		FLIP_NOW,1
+RESERVE		SAVE_HOOK,5
+; these five must be in sequence
+RESERVE		PATTERN_BUFFER,2
+RESERVE		COLOR_BUFFER,2
+RESERVE		NAME_BUFFER,2
+RESERVE		SPRITE_ATTR_BUFFER,2
+RESERVE		SPRITE_PATT_BUFFER,2
+
+; -----------------------------------------------------------------------        
+
+START:
+        ;CALL    TURBOR
+	CALL	INIGRP
+	CALL	DISSCR
+
+	; set 16x16 sprites
+	LD	A,(RG1SAV)
+	OR	2
+	LD	B,A
+	LD	C,1
+	CALL	WRTVDP
+	
+	; enable secret mode (1-bank color)
+	LD	B,10011111b
+	LD	C,3
+	CALL	WRTVDP
+	
+	; enable secret mode (1-bank pattern)
+	LD	B,0
+	LD	C,4
+	CALL	WRTVDP
+	
+	; border color = black
+	LD	B,1
+	LD	C,7
+	CALL	WRTVDP
+	
+	; init sprite patterns
+	LD	HL,SPRITE
+	LD	DE,3800h
+	LD	BC,32*TOTAL_SPRITES
+	CALL	LDIRMV
+	LD	HL,SPRITE
+	LD	DE,3000h
+	LD	BC,32*TOTAL_SPRITES
+	CALL	LDIRMV
+	
+	; init box pattern
+	LD	HL,BOXPATTERN
+	LD	DE,252*8
+	LD	BC,8*4
+	CALL	LDIRMV
+
+	; init box color
+	LD	A,0D0h
+	LD	HL,02000h+252*8
+	LD	BC,8*3
+	CALL	FILVRM
+
+	LD	A,0DEh
+	LD	HL,02000h+255*8
+	LD	BC,8*4
+	CALL	FILVRM
+
+	; init ball position	
+	XOR	A
+	LD	(ROTATE),A
+	LD	(BALLXMINOR),A
+	LD	(BALLXMAJOR),A
+	LD	(BALLYMINOR),A
+	LD	(BALLYMAJOR),A
+	LD	(BUFFERNUMBER),A
+	LD	(FLIP_NOW),A
+	LD	(XDIRECTION),A
+	LD	(YCOUNTER),A
+	
+	LD	A,30
+	LD	(REALX),A
+
+
+	LD	HL,IRQ_HANDLER
+	CALL	SET_IRQ
+	EI
+	
+; -----------------------------------------------------------------------
+
+PRECALC:
+	LD	HL,CIRCLE
+	LD	DE,ANGLEDATA
+	LD	B,80
+	EXX
+	LD	HL,0
+	LD	DE,799 ; 819 ;(256*256/80)
+	EXX
+PRECALC_OUTER:
+	EXX
+	LD	B,HIGH(ACOS)
+	LD	C,H
+	LD	A,(BC)
+	ADD	HL,DE
+	PUSH	HL
+	PUSH	DE
+	EXX
+	RLCA
+	RLCA
+	RLCA
+	SBC	A,A
+	AND	20h
+	LD	C,A
+	
+	PUSH	BC	
+	PUSH	DE
+	INC	HL
+	INC	HL
+	LD	B,(HL)
+	; 
+	
+	;
+	INC	HL
+	LD	A,(HL)
+	EXX
+	LD	C,A
+	EXX
+	INC	HL
+	LD	A,(HL)
+	EXX
+	LD	B,A
+
+	
+	LD	HL,0
+	LD	D,HIGH(ACOS)
+	EXX	
+	INC	HL
+	PUSH	HL
+PRECALC_INNER:	
+	EXX	
+	ADD	HL,BC
+	LD	E,H
+	LD	A,(DE)
+	EXX
+	ADD	A,C
+	LD	(DE),A
+	INC	DE
+	
+	DJNZ	PRECALC_INNER
+	POP	HL
+	POP	DE
+	LD	BC,COLUMNS
+	EX	DE,HL
+	ADD	HL,BC
+	EX	DE,HL
+	POP	BC
+	
+	EXX
+	POP	DE
+	POP	HL
+	EXX
+	DJNZ	PRECALC_OUTER
+
+; -----------------------------------------------------------------------
+
+DRAW:
+	CALL	SET_VRAM_POINTERS
+
+	; erase the videodata
+	LD	HL,VIDEODATA
+	LD	DE,VIDEODATA+1
+	LD	BC,2*LINES*(COLUMNS/8)-1
+	LD	(HL),0
+	LDIR
+
+	LD	HL,CIRCLE
+	LD	DE,VIDEODATA
+	
+	; shift the ball down (up to 7 pixels)
+	LD	A,(BALLYMINOR)
+	OR	A
+	LD	BC,2*COLUMNS/8
+	JR	Z,DRAW_DOWNSKIP
+	EX	DE,HL
+DRAW_DOWNLOOP:
+	ADD	HL,BC
+	DEC	A
+	JR	NZ,DRAW_DOWNLOOP
+	EX	DE,HL
+DRAW_DOWNSKIP:
+	
+	; begin rendering engine
+	; enter DE = VIDEODATA (ajusted to y-minor)
+	;       HL = CIRCLE
+	LD	B,80
+	EXX
+	LD	HL,ANGLEDATA
+	EXX
+	EX	DE,HL
+	
+DRAW_OUTER:
+	; HL  = VIDEODATA (ajusted to y-minor)
+	; HL' = ANGLEDATA
+	; DE  = CIRCLE
+	; BC  = line counter
+	PUSH	BC	
+	PUSH	HL
+
+	; read x major position
+	LD	A,(DE)
+	ADD	A,A 
+	ADD	A,L
+	LD	L,A
+	LD	A,H
+	ADC	A,0
+	LD	H,A
+	
+	INC	DE
+	LD	A,(DE)
+	LD	C,A
+	
+	; shift the ball to the right up to 7 pixels
+	LD	A,(BALLXMINOR)
+	OR	A
+	JR	Z,DRAW_SHIFTSKIP
+	LD	B,A
+DRAW_SHIFTLOOP:	
+	RRC	C
+	JR	NC,DRAW_SHIFTNEXT
+	INC	HL
+	INC	HL 
+DRAW_SHIFTNEXT:	
+	DJNZ	DRAW_SHIFTLOOP
+
+DRAW_SHIFTSKIP:	
+	
+	INC	DE
+	LD	A,(DE)
+	LD	B,A
+	;
+	;
+	INC	DE
+	INC	DE
+	
+	EXX
+	PUSH	HL ; old ANGLEDATA
+	LD	BC,COLUMNS
+	EXX
+	
+	INC	DE
+	PUSH	DE ; next CIRCLE
+	LD	D,0
+	LD	A,(ROTATE)
+	LD	E,A
+DRAW_INNER:	
+	LD	A,E
+	EXX	
+	ADD	A,(HL)
+	INC	HL
+	RLCA
+	RLCA
+	RLCA
+	EXX
+	RL	D
+	
+	RRC	C
+	JR	NC,DRAW_NEXT
+
+	LD	(HL),D
+	INC	HL
+	LD	(HL),255
+	INC	HL
+	
+	LD	D,0
+DRAW_NEXT:	
+	DJNZ	DRAW_INNER
+	
+	LD	A,D
+	BIT	7,C
+	JR	NZ,DRAW_FINISHED
+	
+DRAW_FINISH:	
+	RLA
+	RRC	C
+	JR	NC,DRAW_FINISH
+
+DRAW_FINISHED:	
+	POP	DE
+
+	; adjust ANGLEDATA to next line
+	EXX
+	POP	HL
+	ADD	HL,BC
+	EXX
+	
+	LD	(HL),A
+	INC	HL
+	LD	(HL),255
+	POP	HL
+	LD	BC,2*COLUMNS/8  
+	ADD	HL,BC
+	POP	BC
+	DJNZ	DRAW_OUTER
+
+; -----------------------------------------------------------------------
+
+	; copy from the ball from memory to vram patterns
+	; also eval the dirty buffer (BLITDATA)
+BLIT:
+	LD	B,COLUMNS/8 
+	LD	HL,(PATTERN_BUFFER)
+	CALL	SETWRT
+	LD	DE,VIDEODATA
+	EXX
+	LD	DE,BLITDATA
+	LD	A,7
+	LD	B,A
+	EXX
+BLIT_OUTER:
+	PUSH	BC
+	PUSH	HL
+	
+	LD	B,LINES/8
+	EX	DE,HL
+	LD	DE,-1+2*COLUMNS/8
+BLIT_INNER:
+	XOR	A
+	EX	AF,AF'
+	PUSH	BC
+	REPT	8		
+	INC	HL
+	LD	A,(HL)
+	CP	1
+	LD	C,A
+	RRA
+	AND	128
+	LD	B,A
+	EXX
+	LD	A,B
+	INC	A
+	AND	7
+	LD	B,A
+	EXX
+	OR	C
+	CP	1
+	SBC	A,A
+	OR	B
+	LD	B,A
+	
+	DEC	HL
+	LD	A,(HL)
+	OR	B
+	OUT	(098h),A
+	INC	HL
+	EX	AF,AF'
+	OR	(HL)
+	ADD	HL,DE
+	EX	AF,AF'
+	ENDM
+	POP	BC
+	EXX
+	EX	AF,AF'
+	LD	(DE),A
+	INC	DE
+	EXX
+	
+	;DJNZ	BLIT_INNER
+	DEC	B
+	JP 	NZ,BLIT_INNER
+
+	LD	DE,2*(1-(COLUMNS/8)*LINES)
+	ADD	HL,DE
+	EX	DE,HL
+	POP	HL
+	POP	BC
+	DEC	B
+	JP	NZ,BLIT_OUTER
+	;DJNZ	BLIT_OUTER
+
+; -----------------------------------------------------------------------
+
+BLIT_NAME:
+	
+	; draw the outside purple/gray box	
+	LD	HL,NAMEDATA
+	LD	C,23
+BLIT_NAME_OUTER:
+	LD	B,31
+BLIT_NAME_INNER:	
+	LD	(HL),255
+	INC	HL
+	DJNZ	BLIT_NAME_INNER
+	LD	(HL),252	
+	INC	HL
+	DEC	C
+	JR	NZ,BLIT_NAME_OUTER
+	LD	B,31
+BLIT_NAME_BOX:	
+	LD	(HL),253
+	INC	HL
+	DJNZ	BLIT_NAME_BOX
+	LD	(HL),254
+	
+	
+	; place ball inside box
+	LD	HL,NAMEDATA
+	LD	A,(BALLXMAJOR)
+	LD	C,A
+	LD	B,0
+	ADD	HL,BC
+	LD	A,(BALLYMAJOR)
+	LD	C,A
+	LD	B,0
+	REPT	32
+	ADD	HL,BC
+	ENDM
+	EXX
+	LD	HL,BLITDATA
+	LD	DE,COLUMNS/8
+	LD	BC,1-(LINES/8)*(COLUMNS/8)
+	EXX
+	
+	LD	C,COLUMNS/8
+	LD	DE,32-COLUMNS/8
+	LD	A,(BUFFERNUMBER)
+	RRA
+	SBC	A,A
+	AND	(88/8)*(88/8)
+BLIT_NAME_DOUTER:
+	LD	B,LINES/8
+BLIT_NAME_DINNER:
+	EXX
+	BIT	0,(HL)
+	PUSH	AF
+	ADD	HL,DE
+	POP	AF
+	EXX
+	JR	Z,BLIT_SKIP
+	LD	(HL),A
+BLIT_SKIP:	
+	INC	HL
+	ADD	A,LINES/8
+	DJNZ	BLIT_NAME_DINNER
+	EXX
+	ADD	HL,BC
+	EXX
+	ADD	A,1-(LINES/8)*(COLUMNS/8)
+	DEC	C
+	ADD	HL,DE
+	JR	NZ,BLIT_NAME_DOUTER
+	
+	; blit to vram
+	LD	HL,NAMEDATA
+	LD	DE,(NAME_BUFFER)
+	LD	BC,32*24
+	CALL	LDIRMV	
+
+; -----------------------------------------------------------------------
+
+	; blit color
+BLIT_COLOR:
+	LD	B,COLUMNS/8 
+	LD	HL,(COLOR_BUFFER)
+	CALL	SETWRT
+	LD	DE,VIDEODATA+1
+BLIT_OUTER2:
+	PUSH	BC
+	PUSH	HL
+	
+	LD	B,88/8
+	EX	DE,HL
+	LD	DE,2*(COLUMNS/8)
+BLIT_INNER2:
+	LD	C,8
+BLITSKIP:	
+	LD	A,(HL)
+	OR	A
+	LD	A,08Fh
+	JR	NZ,BLITME
+	LD	A,0DEh
+BLITME:	
+	OUT	(098h),A
+	ADD	HL,DE
+	DEC 	C
+	JR	NZ,BLITSKIP
+	DJNZ	BLIT_INNER2
+
+	LD	DE,2*(1-(88/8)*88)
+	ADD	HL,DE
+	EX	DE,HL
+	POP	HL
+	POP	BC
+	DJNZ	BLIT_OUTER2
+
+; -----------------------------------------------------------------------
+
+BLIT_SPRITE:
+        ; blit moving pattern
+        LD	BC,32*TOTAL_SPRITES
+        LD	HL,(SPRITE_PATT_BUFFER)
+        ADD	HL,BC
+        CALL	SETWRT
+        
+        LD	HL,SPRITE
+        LD	C,TOTAL_SPRITES
+        EXX
+        LD	HL,SPRITEATTR
+        EXX
+BLIT_SPRPATT_OUTER:        
+        EXX
+        EX	AF,AF'
+        LD	A,(BALLYMINOR)
+        ADD	A,(HL)
+        AND	7
+        EX	AF,AF'
+        INC 	HL
+        LD	A,(BALLXMINOR)
+        ADD	A,(HL)
+        AND	7
+        LD	E,A
+        LD	A,8
+        SUB	E
+        AND	7
+        INC	HL
+        INC	HL
+        INC	HL
+        
+        REPT 4+8
+        INC	HL
+        ENDM
+        EXX
+
+        LD	B,32
+	LD	D,128
+	OR	A
+	JR	Z,BLIT_SPRPATT_LOOP
+BLIT_SPRPATT_ROT:	
+	RRC	D
+	DEC	A
+	JR	NZ,BLIT_SPRPATT_ROT
+BLIT_SPRPATT_LOOP:
+	EX	AF,AF'
+	INC	A
+	AND	7
+	JR	NZ,BLIT_SPRATTR_VERT
+	EX	AF,AF'
+	LD	A,255
+	JR	BLIT_SPRATTR2_VERT
+BLIT_SPRATTR_VERT:
+	EX	AF,AF'
+	LD	A,D		
+BLIT_SPRATTR2_VERT:	
+	;
+	;LD	A,D
+	AND	(HL)
+	INC	HL
+	OUT	(098h),A        
+        DJNZ	BLIT_SPRPATT_LOOP
+        DEC	C
+        JR	NZ,BLIT_SPRPATT_OUTER
+        
+        ; blit static pattern for side 2
+        LD	HL,SPRITE+TOTAL_SPRITES*32
+        LD	B,0 ; 32*total_sprites
+BLIT_SIDE2_LOOP:
+	LD	A,(HL)
+	;INC	DE
+	AND	0FFh
+	INC	HL
+	OUT	(098h),A        
+        DJNZ	BLIT_SIDE2_LOOP
+        
+	; second time
+        LD	HL,SPRITE+TOTAL_SPRITES*32
+        LD	C,TOTAL_SPRITES
+        EXX
+        LD	HL,SPRITEATTR+8
+        EXX
+BLIT2_SPRPATT_OUTER:        
+        EXX        
+        EX	AF,AF'
+        LD	A,(BALLYMINOR)
+        ADD	A,(HL)
+        AND	7
+        EX	AF,AF'
+        INC 	HL
+        LD	A,(BALLXMINOR)
+        ADD	A,(HL)
+        AND	7
+        LD	E,A
+        LD	A,8
+        SUB	E
+        AND	7
+        INC	HL
+        INC	HL
+        INC	HL
+        
+        REPT 4+8
+        INC	HL
+        ENDM
+        EXX
+
+        LD	B,32
+	LD	D,128
+	OR	A
+	JR	Z,BLIT2_SPRPATT_LOOP
+BLIT2_SPRPATT_ROT:	
+	RRC	D
+	DEC	A
+	JR	NZ,BLIT2_SPRPATT_ROT
+BLIT2_SPRPATT_LOOP:
+	EX	AF,AF'
+	INC	A
+	AND	7
+	JR	NZ,BLIT2_SPRATTR_VERT
+	EX	AF,AF'
+	LD	A,255
+	JR	BLIT2_SPRATTR2_VERT
+BLIT2_SPRATTR_VERT:
+	EX	AF,AF'
+	LD	A,D		
+BLIT2_SPRATTR2_VERT:	
+	;LD	A,D
+	AND	(HL)
+	INC	HL
+	OUT	(098h),A        
+        DJNZ	BLIT2_SPRPATT_LOOP
+        DEC	C
+        JR	NZ,BLIT2_SPRPATT_OUTER
+        
+
+	; blit the sprite attributes
+	LD	HL,(SPRITE_ATTR_BUFFER)
+	CALL	SETWRT
+	LD	B,TOTAL_SPRITES*4
+	LD	HL,SPRITEATTR
+	LD	A,(BALLXMAJOR)
+	RLCA
+	RLCA
+	RLCA
+	LD	C,A
+	LD	A,(BALLXMINOR)
+	ADD	A,C
+	LD	C,A
+BLIT_SPRITE_LOOP:	
+	LD 	A,(BALLYMINOR)
+	ADD	A,(HL)
+	LD	E,A
+	LD	A,(BALLYMAJOR)
+	RLCA
+	RLCA
+	RLCA
+	ADD	A,E
+	OUT	(098h),A
+	INC	HL
+	LD	E,(HL)
+	LD	A,E
+	RLCA
+	SBC	A,A
+	LD	D,A
+	ADD	A,D
+	LD	A,E
+	ADD	A,C
+	LD	E,A
+	LD	A,D
+	ADC	A,0
+	LD	D,A
+	LD	A,E
+	BIT	7,D
+	JR	Z,BLIT_SPRITE_XPOS
+	ADD	A,32
+BLIT_SPRITE_XPOS:	
+	OUT	(098h),A
+	PUSH	HL
+	POP	HL
+	INC	HL
+	LD	A,(HL)
+	OUT	(098h),A
+	PUSH	HL
+	POP	HL
+	INC	HL
+	LD	A,(HL)
+	BIT	7,D
+	JR	Z,BLIT_SPRITE_NOEC
+	OR	128
+BLIT_SPRITE_NOEC:	
+	OUT	(098h),A
+	PUSH	HL
+	POP	HL
+	INC	HL
+	DJNZ	BLIT_SPRITE_LOOP
+
+; -----------------------------------------------------------------------
+	
+	LD	A,1
+	LD	(FLIP_NOW),A
+	
+WAIT_FOR_FLIP:
+	LD	A,(FLIP_NOW)
+	OR	A
+	JR	NZ,WAIT_FOR_FLIP	
+		
+; -----------------------------------------------------------------------
+
+NEXT_FRAME:
+	LD	A,(XDIRECTION)
+	OR	A
+	JR	NZ,NEXT_2
+
+	LD	A,(ROTATE)
+	SUB	10
+	LD	(ROTATE),A
+	JR	NEXT_NEXT
+NEXT_2:
+	LD	A,(ROTATE)
+	ADD	A,10
+	LD	(ROTATE),A
+NEXT_NEXT:	
+	;
+	LD	A,(REALX)
+	AND	7
+	LD	(BALLXMINOR),A
+	
+	LD	A,(REALX)
+	RRCA
+	RRCA
+	RRCA
+	AND	01Fh
+	LD	(BALLXMAJOR),A
+	;
+
+	;
+	LD	A,(REALY)
+	AND	7
+	LD	(BALLYMINOR),A
+	
+	LD	A,(REALY)
+	RRCA
+	RRCA
+	RRCA
+	AND	01Fh
+	LD	(BALLYMAJOR),A
+	;
+	
+	LD	A,(BUFFERNUMBER)
+	XOR	1
+	LD	(BUFFERNUMBER),A
+
+	JP	DRAW
+
+; -----------------------------------------------------------------------        
+
+FLIP:
+
+	CALL	ENASCR
+	
+	LD	A,(BUFFERNUMBER)
+	OR	A
+	JR	NZ,SET_VDP_1
+	
+	; B data byte C register	
+	LD	BC,6*256+2 ; name
+	CALL	WRTVDP
+	LD	BC,20h*256+5 ; sprite attr
+	CALL	WRTVDP
+	LD	BC,7*256+6 ; sprite patt
+	CALL	WRTVDP
+	
+	XOR	A
+	LD	(FLIP_NOW),A
+	RET
+		
+SET_VDP_1:
+	; B data byte C register	
+	LD	BC,7*256+2 ; name
+	CALL	WRTVDP
+	LD	BC,21h*256+5 ; sprite attr
+	CALL	WRTVDP
+	LD	BC,6*256+6 ; sprite patt
+	CALL	WRTVDP
+
+	XOR	A
+	LD	(FLIP_NOW),A
+	RET
+
+; -----------------------------------------------------------------------        
+
+SET_VRAM_POINTERS:
+	LD	A,(BUFFERNUMBER)
+	OR	A
+	JR	NZ,SET_VRAM_1
+	
+	LD	HL,POINTER_SET_0
+	JR	SET_VRAM_GO
+	
+SET_VRAM_1:
+	LD	HL,POINTER_SET_1
+	
+SET_VRAM_GO:
+	LD	DE,PATTERN_BUFFER
+	LD	BC,5*2
+	LDIR
+	RET
+
+; -----------------------------------------------------------------------
+
+; video memory map
+
+; 0000-07FF patterns 1,2
+; 1000-107F sprite attribute 1
+; 1080-10FF sprite attribute 2
+; 1800-1BFF name 1
+; 1C00-1FFF name 2
+; 2000-27FF color 1,2
+; 3000-37FF sprite pattern 2
+; 3800-3FFF sprite pattern 1
+
+POINTER_SET_0:
+	DW	0
+	DW	02000h
+	DW	01800h
+	DW	01000h
+	DW	03800h
+	
+POINTER_SET_1:
+	DW	(88/8)*(88/8)*8
+	DW	02000h+(88/8)*(88/8)*8
+	DW	01C00h
+	DW	01080h
+	DW	03000h
+
+; -----------------------------------------------------------------------        
+
+IRQ_HANDLER:
+	LD      A,(VDPRD)
+	INC     A
+	LD      C,A
+	IN      A,(C)
+	AND     A
+	RET     P
+	
+	LD	A,(FLIP_NOW)
+	OR	A
+	CALL	NZ,FLIP
+
+	LD	A,(XDIRECTION)
+	OR	A
+	JR	NZ,X_LEFT
+	
+	LD	A,(REALX)
+	INC	A
+	LD	(REALX),A
+	CP	255-94
+	JR 	C,YUPDATE
+	DEC	A
+	LD	(REALX),A
+	LD	A,1
+	LD	(XDIRECTION),A
+	JR	YUPDATE	
+	
+X_LEFT:
+	LD	A,(REALX)
+	DEC	A
+	LD	(REALX),A
+	JR 	NZ,YUPDATE
+	INC	A
+	LD	(REALX),A
+	LD	A,0
+	LD	(XDIRECTION),A
+
+YUPDATE:
+	LD	A,(YCOUNTER)
+	INC	A
+	CP	60
+	JR	C,YUPDATE_CONTINUE
+	XOR	A
+YUPDATE_CONTINUE:
+	LD	(YCOUNTER),A
+	LD	C,A
+	LD	B,0
+	LD	HL,PARABOLA
+	ADD	HL,BC
+	LD	A,(HL)
+	LD	(REALY),A	
+	RET	
+
+; -----------------------------------------------------------------------        
+; enable R800 or lock the machine
+
+TURBOR:
+	LD	A,(2Dh)
+	CP	3
+LOCK_MACHINE:	
+	JR	C,LOCK_MACHINE
+	
+	LD	A,128+2
+	JP	CHGCPU
+
+; -----------------------------------------------------------------------        
+; set the interrupt handler, enter HL=irq address
+
+SET_IRQ:
+	; save the old interrupt handler
+	DI
+	EXX
+	LD      HL,HKEYI
+	LD      DE,SAVE_HOOK
+	LD      BC,5
+	LDIR
+	EXX
+
+	; install the new interrupt handler
+	LD	A,0C3h
+	LD	(HKEYI),A
+	LD	(HKEYI+1),HL
+	LD	A,0C9h
+	LD	(HKEYI+3),A
+	RET
+
+; -----------------------------------------------------------------------        
+
+INCLUDE CIRCLE.INC
+INCLUDE SPRITE.INC
+INCLUDE PARAB.INC
+
+	I	DEFL 0
+
+ATTR	MACRO 	X,Y,X2
+
+	DB	Y-1,X,(I+TOTAL_SPRITES)*4,13
+	DB	Y-1,X,(I)*4,14
+	DB	Y-1,X2+2,(I)*4+TOTAL_SPRITES*12,13
+	DB	Y-1,X2+2,(I)*4+TOTAL_SPRITES*8,14
+	I	DEFL I+1
+
+	ENDM
+
+SPRITEATTR:
+	ATTR	16,78,48
+	ATTR	10,72,54
+	ATTR	-1,60,-1+80-16+2
+	ATTR	-6,44,-6+80-4
+	ATTR	-6,28,-6+80-4
+	ATTR	-5,12,-6+80-4-1
+	ATTR	5,4,5+40+16-2
+	ATTR	16,0,16+30+1
+
+BOXPATTERN:
+	DB	128
+	DB	128
+	DB	128
+	DB	128
+	DB	128
+	DB	128
+	DB	128
+	DB	128
+	
+	DB	255
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+
+	DB	128
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+
+	DB	255
+	DB	128
+	DB	128
+	DB	128
+	DB	128
+	DB	128
+	DB	128
+	DB	128
+	
+ALIGN 
+INCLUDE ACOS.INC
+
+; -----------------------------------------------------------------------        
+
+ENDOFCODE:
+	DS	08000h-ENDOFCODE
+
+	END     START
+
+

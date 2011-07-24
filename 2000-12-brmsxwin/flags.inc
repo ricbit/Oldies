@@ -1,0 +1,7 @@
+SIGN_FLAG       equ     10000000b
+ZERO_FLAG       equ     01000000b
+HALF_FLAG       equ     00010000b
+PARITY_FLAG     equ     00000100b
+OVERFLOW_FLAG   equ     00000100b
+SUBTRACT_FLAG   equ     00000010b
+CARRY_FLAG      equ     00000001b

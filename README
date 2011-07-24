@@ -214,6 +214,10 @@ Name: 2000-05-tetrinet
 Language: Assembly Z80
 Description: Multiplayer Tetrinet implementation for MSX, using only 4kb.
 
+Name: 2000-12-brmsxwin
+Language: C++, Assembly Z80
+Description: A port of BrMSX to Windows, focusing on user-friendly UI.
+
 Name: 2001-11-shalom
 Language: C, Assembly Z80
 Description: Translation of the game Shalom from japanese to portuguese.
