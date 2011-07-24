@@ -308,6 +308,10 @@ Name: 2005-05-fpgapong
 Language: VHDL
 Description: A pong clone for the Digilent FPGA.
 
+Name: 2005-11-graphosds
+Language: C
+Description: An MSX graphics editor running on the Nintendo DS.
+
 Name: 2006-03-hikago
 Language: Java
 Description: Translation of the GBA game Hikaru no Go from japanese to english.
