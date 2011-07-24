@@ -254,6 +254,11 @@ Language: Assembly Z80
 Description: Patch to convert the SG1000 game N-Sub to MSX. Improves on the
 original game adding a new opening screen.
 
+Name: 2004-06-sic
+Language: Assembly Z80
+Description: Patch to convert the Colecovision game Space Invaders Collection
+to MSX.
+
 Name: 2004-08-modplayer
 Language: Java
 Description: MOD Player written in java.

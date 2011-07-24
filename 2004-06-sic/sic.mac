@@ -1,0 +1,482 @@
+; -----------------------------------------------------------------------        
+;
+;    Coleco Loader
+;    Copyright (C) 2004 by Ricardo Bittencourt
+;
+;    Project started at 22/6/2004. Last modification was on 7/10/2004.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@700km.com.br
+;        http://www.700km.com.br/mundobizarro
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+;
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+	ORG     0100h
+	
+; notes on porting coleco games to msx	
+	
+; coleco video is the same as msx
+; just swap BE for 98, and BF por 99
+
+; coleco sound is done on i/o port F0
+; remove it and change to a call to PUT_F0
+; I implemented only the functionality needed for SIC,
+; other games may require a more precise emulation
+
+; coleco player input has two modes of operation, both read from FCh
+; if you previously output to i/o port 80h, then input is done on keyboard-mode
+; if you previously output to i/o port C0h, then input is done on joystick-mode
+; joystick is fully emulated in this code, 
+; keyboard is not finished yet
+
+; coleco bios is preloaded at address 0; cartridge starts at 8000h
+
+; coleco uses NMI as time interrupt, this must be changed to IM 1 in msx
+
+; -----------------------------------------------------------------------
+
+START:
+        JP      LOADER
+
+COLECO_DATA:
+        INCLUDE COLECO.INC
+
+LOADER:
+        DI
+
+        LD      HL,COLECO_DATA
+        LD      DE,0
+        LD      BC,8192
+        LDIR
+        
+        LD	HL,GAME_DATA+32766
+        LD	DE,0FFFEh
+        LD	BC,32767
+        LDDR
+        
+        LD	A,0C3h
+        LD	(038h),A
+        LD	HL,66h
+        LD	(039h),HL
+        
+        CALL	INIT_SOUND
+        
+        JP      0A9CAh
+
+; -----------------------------------------------------------------------
+
+GET_C0FC_AND_B:
+	PUSH	BC
+	PUSH	HL
+	PUSH	DE
+	; keyboard player 1
+	IN	A,(0AAh)
+	AND	0F0h
+	OR	8
+	OUT	(0AAh),A
+	IN	A,(0A9h)
+	LD	HL,KEYCONVERT_C0
+	LD	B,0
+	LD	C,A
+	ADD	HL,BC
+	LD	E,(HL)
+	
+	; joystick player 1
+	LD	A,15
+	OUT	(0A0h),A
+	IN 	A,(0A2h)
+	AND	10111111b
+	OUT	(0A1h),A
+	LD	A,14
+	OUT	(0A0h),A
+	IN	A,(0A2h)
+	LD	HL,JOYCONVERT_C0
+	LD	B,0
+	LD	C,A
+	ADD	HL,BC
+	LD	A,E
+	AND	(HL)
+
+	POP	DE
+	POP	HL
+	POP	BC
+	AND	B
+	RET
+
+; -----------------------------------------------------------------------
+
+GET_80FC_LD_B_A:
+	PUSH	BC
+	PUSH	HL
+	PUSH	DE
+	; keyboard player 1
+	IN	A,(0AAh)
+	AND	0F0h
+	LD	D,A
+	OUT	(0AAh),A
+	IN	A,(0A9h)
+	LD	HL,KEYCONVERT_80
+	LD	B,0
+	LD	C,A
+	ADD	HL,BC
+	LD	A,0FFh
+	XOR	(HL)
+	LD	E,A
+	
+	LD	A,D
+	OR	7
+	OUT	(0AAh),A
+	IN	A,(0A9h)
+	LD	HL,KEYCONVERT_80B
+	LD	B,0
+	LD	C,A
+	ADD	HL,BC
+	LD	A,E
+	XOR	(HL)
+
+	POP	DE
+	POP	HL
+	POP	BC
+	LD	B,A
+	RET
+
+; -----------------------------------------------------------------------
+; player 1 and player 2 use same joysticks/keyboard
+
+GET_C0FF_AND_C:
+	PUSH	BC
+	PUSH	HL
+	PUSH	DE
+	
+	; keyboard player 1
+	IN	A,(0AAh)
+	AND	0F0h
+	OR	8
+	OUT	(0AAh),A
+	IN	A,(0A9h)
+	LD	HL,KEYCONVERT_C0
+	LD	B,0
+	LD	C,A
+	ADD	HL,BC
+	LD	E,(HL)
+	
+	; joystick player 1
+	LD	A,15
+	OUT	(0A0h),A
+	IN 	A,(0A2h)
+	AND	10111111b
+	OUT	(0A1h),A
+	LD	A,14
+	OUT	(0A0h),A
+	IN	A,(0A2h)
+	LD	HL,JOYCONVERT_C0
+	LD	B,0
+	LD	C,A
+	ADD	HL,BC
+	LD	A,E
+	AND	(HL)
+
+	POP	DE
+	POP	HL
+	POP	BC
+	AND	C
+	RET
+
+; -----------------------------------------------------------------------
+
+INIT_SOUND:
+	PUSH	BC
+	PUSH	DE
+	LD	A,7
+	OUT	(0A0h),A
+	IN	A,(0A2h)
+	AND	11011100b
+	OR	00011100b
+	OUT	(0A1h),A
+	LD	BC,03A1h
+	LD	E,0
+	LD	A,8
+INIT_SOUND_LOOP:	
+	OUT	(0A0h),A
+	OUT	(C),E
+	INC	A
+	DJNZ	INIT_SOUND_LOOP
+	
+	POP	DE
+	POP	BC
+	RET
+	
+; -----------------------------------------------------------------------
+
+FILLER:	DS 02200h-FILLER
+        
+; -----------------------------------------------------------------------
+
+J2200: 	JP	GET_C0FC_AND_B
+J2203:	JP	GET_C0FF_AND_C
+J2206:	JP	GET_80FC_LD_B_A
+J2209:	JP	PUT_F0
+J220C:	JP	PUT_F0_INC_DE
+J220F:	JP	PUT_F0_XOR_A
+
+; -----------------------------------------------------------------------
+
+PUT_F0_INC_DE:
+	CALL	PUT_F0
+	INC	DE
+	RET
+
+; -----------------------------------------------------------------------
+	
+PUT_F0_XOR_A:
+	CALL	PUT_F0
+	XOR	A
+	RET
+	
+; -----------------------------------------------------------------------
+
+PUT_F0:
+	PUSH	AF
+	PUSH	HL
+	PUSH	BC
+	
+	OR	A
+	JP	P,SOUND_DATA
+	
+	LD	(LATCH),A
+	BIT	4,A
+	JR	NZ,VOLUME
+	
+	; select low bits of frequency for tone channels
+	LD	B,A
+	RLCA
+	RLCA
+	RLCA
+	RLCA
+	AND	6
+	PUSH	AF
+	CALL	LOAD_FREQ_TABLE
+	LD	A,(HL)
+	AND	0F0h
+	LD	C,A
+	LD	A,B
+	AND	0Fh
+	OR	C
+	LD	(HL),A
+	POP	AF
+	
+FREQ_DATA:	
+	CP	6
+	JP	Z,FREQ_NOISE
+	CP	4
+	JR	Z,FREQ_JOINT
+	OUT	(0A0h),A
+	PUSH	AF
+	CALL	LOAD_FREQ_TABLE
+	LD	A,(HL)
+	OUT	(0A1h),A
+	INC	HL
+	POP	AF
+	INC	A
+	OUT	(0A0h),A
+	LD	A,(HL)
+	OUT	(0A1h),A
+	
+	JP	SOUND_EXIT
+	
+	; select volume for tone channels
+VOLUME:
+	LD	B,A
+VOLUME_DATA:	
+	RLCA
+	RLCA
+	RLCA
+	AND	3
+	LD	C,A
+	ADD	A,LOW(VOL0)
+	LD	L,A
+	LD	A,HIGH(VOL0)
+	ADC	A,0
+	LD	H,A
+	LD	A,B
+	AND	0Fh
+	XOR	0Fh
+	LD	(HL),A
+	
+	LD	A,C
+	CP	3
+	JR	Z,VOLUME_NOISE
+	CP	2
+	JR	Z,SOUND_EXIT ; tone 2 not used
+	ADD	A,8
+	OUT	(0A0h),A
+	LD	A,(HL)
+	OUT	(0A1h),A
+	JR	SOUND_EXIT
+
+FREQ_JOINT:
+	PUSH	AF
+	CALL	LOAD_FREQ_TABLE
+	LD	A,6
+	OUT	(0A0h),A
+	INC	HL
+	LD	A,(HL)
+	AND	0Fh
+	JR	NZ,SOUND_SATURATE
+	DEC	HL
+	LD	A,(HL)
+	AND	11100000b
+	JR	NZ,SOUND_SATURATE
+	LD	A,(HL)
+	OUT	(0A1h),A
+	POP	AF
+	JR	SOUND_EXIT
+	
+SOUND_SATURATE:
+	LD	A,0FFh
+	OUT	(0A1h),A
+	POP	AF
+	JR	SOUND_EXIT	
+	
+SOUND_DATA:
+	LD	HL,LATCH
+	BIT	4,(HL)
+	JR	Z,HIGH_FREQ
+	
+	LD	B,A
+	LD	A,(LATCH)
+	JR	VOLUME_DATA
+
+	; select high bits of frequency for tone channels
+HIGH_FREQ:
+	LD	B,A
+	LD	A,(HL)
+	RLCA
+	RLCA
+	RLCA
+	RLCA
+	AND	6
+	PUSH	AF	
+	CALL	LOAD_FREQ_TABLE
+	LD	A,B
+	RLCA
+	RLCA
+	RLCA
+	RLCA
+	LD	B,A
+	AND	0F0h
+	LD	C,A	
+	LD	A,(HL)
+	AND	0Fh
+	OR	C
+	LD	(HL),A
+	INC	HL
+	LD	A,B
+	AND	3
+	LD	C,A
+	LD	A,(HL)
+	AND	11111100b
+	OR	C
+	LD	(HL),A
+	POP	AF
+	JP	FREQ_DATA
+
+VOLUME_NOISE:	
+	LD	A,10
+	OUT	(0A0h),A
+	LD	A,(HL)
+	OUT	(0A1h),A
+	JR	SOUND_EXIT
+
+FREQ_NOISE:
+	; not implemented yet
+
+SOUND_EXIT:
+	POP	BC
+	POP	HL
+	POP	AF	
+	RET
+
+; -----------------------------------------------------------------------
+
+LOAD_FREQ_TABLE:
+	ADD	A,LOW(FREQ0)
+	LD	L,A
+	LD	A,HIGH(FREQ0)
+	ADC	A,0
+	LD	H,A
+	RET
+	
+; -----------------------------------------------------------------------
+
+FREQ0:	DW	0
+FREQ1:	DW	0
+FREQ2:	DW	0
+FREQN:	DW	0
+
+VOL0:	DB	0
+VOL1:	DB	0
+VOL2:	DB	0
+VOLN:	DB	0
+
+LATCH:	DB	0
+
+; -----------------------------------------------------------------------
+
+KEYCONVERT_C0:
+	I DEFL 0
+	REPT 256
+	DB ((I AND 16) SHR 1) OR ((I AND 32) SHR 5) OR ((I AND 64) SHR 4) OR ((I AND 128) SHR 6) OR ((I AND 1) SHL 6) OR 0B0h
+	I DEFL I+1
+	ENDM
+
+JOYCONVERT_C0:
+	I DEFL 0
+	REPT 256
+	DB ((I AND 1) SHL 0) OR ((I AND 2) SHL 1) OR ((I AND 4) SHL 1) OR ((I AND 8) SHR 2) OR ((I AND 16) SHL 2) OR 0B0h
+	I DEFL I+1
+	ENDM
+
+KEYCONVERT_80:
+	; coleco 6 mapped in msx 2
+	; coleco 9 mapped in msx 1
+	I DEFL 0
+	REPT 256
+	I6 DEFL ((((I AND 4) SHR 2) XOR 1)*(NOT 0111b)) AND 0Fh
+	I9 DEFL ((((I AND 2) SHR 1) XOR 1)*(NOT 1101b)) AND 0Fh 
+	DB (NOT (0FFh XOR I6 XOR I9)) AND 0Fh
+	I DEFL I+1
+	ENDM
+	
+KEYCONVERT_80B:
+	; coleco star mapped in msx enter
+	; coleco number mapped in msx select
+	I DEFL 0
+	REPT 256
+	ISTAR DEFL ((((I AND 128) SHR 7) XOR 1)*(NOT 1001b)) AND 0Fh
+	INUMBER DEFL ((((I AND 64) SHR 6) XOR 1)*(NOT 0110b)) AND 0Fh
+	DB (NOT (0FFh XOR ISTAR XOR INUMBER)) AND 0Fh
+	I DEFL I+1
+	ENDM
+	
+
+DUMMY2: DS      256*(HIGH (DUMMY2+255))-DUMMY2
+	
+GAME_DATA:
+
+ENDOFCODE:
+
+	END     START
+
+
+
