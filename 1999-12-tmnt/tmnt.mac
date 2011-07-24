@@ -1,0 +1,1332 @@
+; -----------------------------------------------------------------------
+;
+;    TMNT 1.0
+;    Copyright (C) 1999 by Ricardo Bittencourt
+;
+;    Project started at 18/12/1999. Last modification was on 23/12/1999.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@lsi.usp.br
+;        http://www.lsi.usp.br/~ricardo
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+; 
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+	ORG     0100h
+         
+BDOS     EQU     00005h
+OPEN     EQU     0000Fh
+CLOSE    EQU     00010h
+RDSEQ    EQU     00014h
+PRINT    EQU     00009h
+DTA      EQU     00080h
+INIMLT   EQU     00075h
+INIT32   EQU     0006Fh
+INITXT   EQU     0006Ch
+INIGRP   EQU     00072h
+FILVRM   EQU     00056h
+LDIRMV   EQU     0005Ch
+CLRSPR   EQU     00069h
+PRTCHR   EQU     00002h
+ENASLT   EQU     00024h
+RSLREG   EQU     00138h
+TOTEXT   EQU     000D2h
+BDRCLR   EQU     0F3EBh
+CHGCLR   EQU     00062h
+DISSCR   EQU     00041h
+ENASCR   EQU     00044h
+EXPTBL   EQU     0FCC1h
+RG1SAV   EQU     0F3E0h
+RDBLK    EQU     00027h
+SETDTA   EQU     0001Ah
+CHGET    EQU     0009Fh
+RDSLT    EQU     0000Ch
+SNSMAT   EQU     00141h
+CLIKSW   EQU     0F3DBh
+GETPNT   EQU     0F3FAh
+PUTPNT   EQU     0F3F8h
+HKEYI    EQU     0FD9Fh
+
+CHGMOD   EQU     000D1h
+CLSSUB   EQU     00115h
+WRTVDP   EQU     0012Dh
+RG8SAV   EQU     0FFE7h
+RG25SAV  EQU     0FFFAh
+
+BG_SIZE  EQU     20736
+
+ALIGNF  DEFL    0
+
+; -----------------------------------------------------------------------
+; ALIGN - align the code in 100h bytes boundaries
+
+ALIGNX          MACRO  X
+
+VOID&X:
+		DS      256*(HIGH (VOID&X+255))-VOID&X
+
+		ENDM
+
+ALIGN           MACRO
+
+		ALIGNX  %ALIGNF
+		ALIGNF  DEFL    ALIGNF+1
+
+		ENDM
+
+; -----------------------------------------------------------------------
+; CUSTOM_SNSMAT - read a keyboard line through the PPI I/O ports
+
+CUSTOM_SNSMAT   MACRO   LINE
+
+	IN      A,(0AAh)
+	AND     0F0h
+	OR      LINE
+	OUT     (0AAh),A
+	IN      A,(0A9h)
+
+		ENDM
+	
+; -----------------------------------------------------------------------
+
+START:
+	; prepare compatibility
+
+	CALL    PREPARE
+
+        ; set up screen 11
+        CALL    SCREEN11
+
+	; turn off the keyboard click
+	XOR     A
+	LD      (CLIKSW),A
+
+        CALL    READ_TILES
+
+        ; install new irq handler
+        DI
+        LD      A,(038h)
+        LD      (OLD_IRQ),A
+        LD      HL,(039h)
+        LD      (OLD_IRQ+1),HL
+        LD      A,0C3h
+        LD      (038h),A
+        LD      HL,IRQ_HANDLER
+        LD      (039h),HL
+        EI
+
+        LD      IX,ENASCR
+        CALL    CALLBIOS
+
+MAIN_LOOP:
+        CALL    MOVE_SPRITE
+
+        CALL    RENDER
+
+	; read line 7 [ ret slct bs stop tab esc f5 f4 ]
+	CUSTOM_SNSMAT   7
+        AND     4
+        JR      NZ,MAIN_LOOP
+
+; -----------------------------------------------------------------------
+
+EXIT_NOW:
+	; exit the program
+
+	; clear keyboard buffer
+	LD      HL,(GETPNT)
+	LD      (PUTPNT),HL
+
+        ; install old irq handler
+        DI
+        LD      A,(OLD_IRQ)
+        LD      (038h),A
+        LD      HL,(OLD_IRQ+1)
+        LD      (039h),HL
+        EI
+
+	; return to text mode
+	LD      IX,TOTEXT
+	CALL    CALLBIOS
+
+	; return to dos
+	JP      0
+
+; -----------------------------------------------------------------------
+
+MOVE_SPRITE:
+        ; update sprite only if it moved
+        LD      A,(SHAPE_X)
+        LD      HL,LSHAPE_X
+        CP      (HL)
+        JR      NZ,MOVE_SPRITE_NOW
+
+        LD      A,(SHAPE_Y)
+        INC     HL
+        CP      (HL)
+        RET     Z
+
+MOVE_SPRITE_NOW:
+        ; erase sprite from previous position
+        LD      C,1
+        CALL    MARK_SPRITE
+
+        ; update X coord of sprite
+        LD      A,(SHAPE_X)
+        LD      (LSHAPE_X),A
+        RRCA
+        RRCA
+        RRCA
+        AND     01Fh
+        LD      (LSHAPE_X8),A
+
+        ; update Y coord of sprite
+        LD      A,(SHAPE_Y)
+        LD      (LSHAPE_Y),A
+        RRCA
+        RRCA
+        RRCA
+        AND     01Fh
+        LD      (LSHAPE_Y8),A
+
+        ; draw sprite in new position
+        LD      C,3
+        CALL    MARK_SPRITE
+
+        RET
+
+MARK_SPRITE:
+        ; eval Y coord of sprite
+        LD      A,(LSHAPE_Y8)
+        CP      24
+        RET     NC
+        RRCA
+        RRCA
+        RRCA
+        LD      H,A
+        AND     0E0h
+        LD      L,A
+        XOR     H
+        LD      H,A
+
+        ; eval X coord of sprite
+        LD      A,(LSHAPE_X8)
+        LD      E,A
+        LD      D,0
+        ADD     HL,DE
+        ADD     HL,HL
+        ADD     HL,HL
+        ADD     HL,HL
+        LD      DE,NAME_TABLE+4
+        ADD     HL,DE
+
+        EX      AF,AF'
+        LD      A,(LSHAPE_Y8)
+        EX      AF,AF'
+        LD      A,(LSHAPE_DY8)
+        LD      B,A
+        LD      IX,02D06h ;MASK
+MARK_OUTER_0:
+        PUSH    BC
+        PUSH    HL
+
+        LD      A,(LSHAPE_DX8)
+        LD      B,A
+        LD      A,(LSHAPE_X8)
+        ADD     A,B
+        LD      B,A
+        LD      A,(LSHAPE_X8)
+        LD      DE,8
+MARK_INNER_0:
+        BIT     0,(IX)
+        JR      Z,MARK_SKIP
+
+        ; check if block is outside the right border
+        CP      32
+        JR      NC,MARK_SKIP
+
+        LD      (HL),C
+MARK_SKIP:
+        ADD     HL,DE
+        INC     IX
+
+        INC     A
+        CP      B
+        JR      NZ,MARK_INNER_0
+
+        POP     HL
+        POP     BC
+        INC     H
+        EX      AF,AF'
+        INC     A
+        CP      24
+        RET     NC
+        EX      AF,AF'
+        DJNZ    MARK_OUTER_0
+        RET
+
+; -----------------------------------------------------------------------
+
+RENDER:
+        ; draw fps counter digit 1
+        LD      A,(FPS+1)
+        AND     0Fh
+        LD      L,A
+        LD      H,0
+        ADD     HL,HL
+        ADD     HL,HL
+        ADD     HL,HL
+        ADD     HL,HL
+        ADD     HL,HL
+        ADD     HL,HL
+        LD      BC,NUMBERS
+        ADD     HL,BC
+        LD      (NAME_TABLE+765*8),HL
+        LD      A,1
+        LD      (NAME_TABLE+765*8+4),A
+        XOR     A
+        LD      (NAME_TABLE+765*8+7),A
+
+        ; draw fps counter digit 2
+        LD      A,(FPS)
+        RRCA
+        RRCA
+        RRCA
+        RRCA
+        AND     0Fh
+        LD      L,A
+        LD      H,0
+        ADD     HL,HL
+        ADD     HL,HL
+        ADD     HL,HL
+        ADD     HL,HL
+        ADD     HL,HL
+        ADD     HL,HL
+        LD      BC,NUMBERS
+        ADD     HL,BC
+        LD      (NAME_TABLE+766*8),HL
+        LD      A,1
+        LD      (NAME_TABLE+766*8+4),A
+        XOR     A
+        LD      (NAME_TABLE+766*8+7),A
+
+        ; draw fps counter digit 3
+        LD      A,(FPS)
+        AND     0Fh
+        LD      L,A
+        LD      H,0
+        ADD     HL,HL
+        ADD     HL,HL
+        ADD     HL,HL
+        ADD     HL,HL
+        ADD     HL,HL
+        ADD     HL,HL
+        LD      BC,NUMBERS
+        ADD     HL,BC
+        LD      (NAME_TABLE+767*8),HL
+        LD      A,1
+        LD      (NAME_TABLE+767*8+4),A
+        XOR     A
+        LD      (NAME_TABLE+767*8+7),A
+
+        ; start from vram page 0
+        XOR     A
+        LD      (VRAM_PAGE),A
+
+        ; load start of name table
+        LD      IX,NAME_TABLE
+        LD      IY,LSHAPE_X
+
+        ; 3 vram pages
+        LD      B,3
+
+RENDER_OUTER:
+        ; set up the higher addresses
+        DI
+        LD      A,(VRAM_PAGE)
+        OUT     (099h),A
+        INC     A
+        LD      (VRAM_PAGE),A
+        LD      A,080h+14
+        OUT     (099h),A
+        EI
+
+        PUSH    BC
+        LD      B,0
+
+RENDER_INNER:
+        ; draw a tile, only if dirty
+        BIT     0,(IX+4)
+        CALL    NZ,RENDER_TILE
+
+        ; increment pointer to next tile
+        LD      DE,8
+        ADD     IX,DE
+        DJNZ    RENDER_INNER
+
+        POP     BC
+        DJNZ    RENDER_OUTER
+
+        ; increment fps counter
+        DI
+        LD      A,(TOTAL_FRAMES)
+        INC     A
+        DAA
+        LD      (TOTAL_FRAMES),A
+        LD      A,(TOTAL_FRAMES+1)
+        ADC     A,0
+        LD      (TOTAL_FRAMES+1),A
+        EI
+        
+        RET
+
+; -----------------------------------------------------------------------
+
+RENDER_TILE:
+        DI
+
+        ; load tile pattern address
+        LD      E,(IX+0)
+        LD      D,(IX+1)
+
+        ; load X,Y coordinates of tile
+        LD      L,(IX+2)
+        LD      H,(IX+3)
+
+        ; setup subline
+        LD      A,1
+        LD      (SUBLINE),A
+
+        ; check if tile is background only
+        BIT     1,(IX+4)
+        JR      Z,RENDER_TILE_BGONLY
+
+        PUSH    BC
+        ; draw the 8 lines of tile
+        REPT    8
+        CALL    DRAW_LINE
+        INC     H
+        LD      A,L
+        SUB     8
+        LD      L,A
+        ENDM
+        POP     BC
+
+        ; wash the tile
+        RES     0,(IX+4)
+
+        EI
+        RET
+
+; -----------------------------------------------------------------------
+
+RENDER_TILE_BGONLY:
+        PUSH    BC
+
+        ; prefetch subline
+        LD      A,(SUBLINE)
+
+        EX      DE,HL
+
+        LD      B,D
+        LD      C,E
+
+        LD      D,A
+        LD      E,(IX+7)
+
+
+        ; draw the 8 lines of tile
+        REPT    8
+        CALL    DRAW_LINE_BGONLY
+        ENDM
+
+        ; mark the entire tile as bgonly
+        LD      (IX+7),255
+
+        ; wash the tile
+        RES     0,(IX+4)
+
+        POP     BC
+        EI
+        RET
+
+; -----------------------------------------------------------------------
+
+DRAW_LINE_BGONLY:
+        LD      A,D
+        AND     E
+        JR      Z,DRAW_SUBLINE_BGONLY
+
+        RLC     D
+
+        LD      A,L
+        ADD     A,8
+        LD      L,A
+
+        INC     B
+
+        RET     
+
+DRAW_SUBLINE_BGONLY:
+        ; load vram address
+        LD      A,C
+        OUT     (099h),A
+        LD      A,B
+        AND     03Fh
+        ADD     A,040h
+        OUT     (099h),A
+
+        ; this line has only backgrounds
+        PUSH    BC
+        LD      C,098h
+        REPT    8
+        OUTI
+        ENDM
+        POP     BC
+
+        INC     B
+
+        RET
+
+; -----------------------------------------------------------------------
+
+PIXEL_SPRITE MACRO I
+        ; check for transparent sprite
+        EXX
+        LD      A,(DE)
+        BIT     0,A
+        JR      NZ,PIXEL_TRANSP&I
+
+        ; draw sprite pixel
+        INC     DE
+        EXX
+        LD      B,A
+        LD      A,(DE)
+        AND     7
+        OR      B
+        OUT     (098h),A
+        INC     DE
+        INC     L
+        JR      PIXEL_END&I
+PIXEL_SHADOW&I:
+        INC     DE
+        EXX
+        LD      A,(DE)
+        LD      B,HIGH (SHADOW_TABLE)
+        LD      C,A
+        LD      A,(BC)
+        OUT     (098h),A
+        INC     DE
+        INC     L
+        JR      PIXEL_END&I
+PIXEL_TRANSP&I:
+        BIT     7,A
+        JR      NZ,PIXEL_SHADOW&I
+        INC     DE
+        EXX
+        LD      A,(DE)
+        OUT     (098h),A
+        INC     DE
+        INC     L
+PIXEL_END&I:
+
+        ENDM
+
+; -----------------------------------------------------------------------
+
+PIXEL_SPRITE_BG MACRO I
+        ; check for transparent sprite
+        EXX
+        LD      A,(DE)
+        BIT     0,A
+        JR      NZ,PSBG_TRANSP&I
+
+        ; draw sprite pixel
+        INC     DE
+        EXX
+        LD      B,A
+        LD      A,(DE)
+        AND     7
+        OR      B
+        OUT     (098h),A
+        INC     DE
+        INC     L
+        JR      PSBG_END&I
+PSBG_SHADOW&I:
+        INC     DE
+        EXX
+        LD      A,(DE)
+        LD      B,HIGH (SHADOW_TABLE)
+        LD      C,A
+        LD      A,(BC)
+        OUT     (098h),A
+        INC     DE
+        INC     L
+        JR      PSBG_END&I
+PSBG_TRANSP&I:
+        BIT     7,A
+        JR      NZ,PSBG_SHADOW&I
+        LD      A,(DE)
+        SRL     A
+        INC     DE
+        EXX
+        ADD     A,L
+        EXX
+        SUB     H
+        CP      8
+        JP      NC,PBG_DIE&I
+        EXX
+        LD      A,(DE)
+        OUT     (098h),A
+        INC     DE
+        INC     L
+PSBG_END&I:
+
+        ENDM
+
+; -----------------------------------------------------------------------
+
+PIXEL_FULL MACRO I
+        ; check if inside sprite borders
+        LD      A,L
+        EXX
+        SUB     C
+        JR      C,PF_TRANSP&I
+        CP      B
+        JP      NC,PF_TRANSP&I
+
+        ; check for transparent sprite
+        LD      A,(DE)
+        BIT     0,A
+        JR      NZ,PF_ZERO&I
+
+        ; draw sprite pixel
+        INC     DE
+        EXX
+        LD      B,A
+        LD      A,(DE)
+        AND     7
+        OR      B
+        OUT     (098h),A
+        INC     DE
+        INC     L
+        JR      PF_END&I
+
+PF_SHADOW&I:
+        INC     DE
+        EXX
+        LD      A,(DE)
+        LD      B,HIGH (SHADOW_TABLE)
+        LD      C,A
+        LD      A,(BC)
+        OUT     (098h),A
+        INC     DE
+        INC     L
+        JR      PF_END&I
+
+        ; draw bg pixel
+PF_ZERO&I:
+        BIT     7,A
+        JR      NZ,PF_SHADOW&I
+PF_TRANSP&I:
+        INC     DE
+        EXX
+        LD      A,(DE)
+        OUT     (098h),A
+        INC     DE
+        INC     L
+PF_END&I:
+        ENDM
+
+; -----------------------------------------------------------------------
+
+PIXEL_FULL_BG MACRO I
+PBG_START&I:
+        ; check if inside sprite borders
+        LD      A,L
+        EXX
+        SUB     C
+        JR      C,PBG_TRANSP&I
+        CP      B
+        JP      NC,PBG_DIE&I
+
+        ; check for transparent sprite
+        LD      A,(DE)
+        BIT     0,A
+        JR      NZ,PBG_ZERO&I
+
+        ; draw sprite pixel
+        INC     DE
+        EXX
+        LD      B,A
+        LD      A,(DE)
+        AND     7
+        OR      B
+        OUT     (098h),A
+        INC     DE
+        INC     L
+        JR      PBG_END&I
+PBG_SHADOW&I:
+        INC     DE
+        EXX
+        LD      A,(DE)
+        LD      B,HIGH (SHADOW_TABLE)
+        LD      C,A
+        LD      A,(BC)
+        OUT     (098h),A
+        INC     DE
+        INC     L
+        JR      PBG_END&I
+PBG_ZERO&I:
+        BIT     7,A
+        JR      NZ,PBG_SHADOW&I
+        LD      A,(DE)
+        SRL     A
+        INC     DE
+        EXX
+        ADD     A,L
+        EXX
+        SUB     H
+        CP      8
+        JP      NC,PBG_DIE&I
+        EXX
+        LD      A,(DE)
+        OUT     (098h),A
+        INC     DE
+        INC     L
+        JR      PBG_END&I
+        ; draw bg pixel
+PBG_TRANSP&I:
+        INC     DE
+        EXX
+        LD      A,(DE)
+        OUT     (098h),A
+        INC     DE
+        INC     L
+PBG_END&I:
+        ENDM
+
+; -----------------------------------------------------------------------
+
+DRAW_LINE:
+        ; reject sprites out of Y coordinates
+        LD      A,H
+        SUB     (IY+1)
+        JP      C,LINE_BG
+        CP      (IY+3)
+        JP      NC,LINE_BG
+
+        ; evaluate Y offset into sprite pattern and
+        ; evaluate X coordinates of sprite
+        EXX
+        LD      L,A
+        LD      H,0
+        ADD     HL,HL
+        ADD     HL,HL
+        LD      DE,(02D04h) ;START_END
+        ADD     HL,DE
+
+        LD      E,(HL)
+        INC     HL
+        LD      D,(HL)
+        INC     HL
+
+        LD      A,(HL)
+        ADD     A,(IY+0)
+        LD      C,A
+        INC     HL
+        LD      B,(HL)
+
+        ; evaluate offset X into sprite pattern
+        EXX
+        LD      A,L
+        EXX
+        SUB     C
+        LD      L,A
+        RLCA
+        SBC     A,A
+        LD      H,A
+        ADD     HL,DE
+        EX      DE,HL
+        EXX
+
+        ; check if tile is sprite only
+        LD      A,L
+        EXX
+        SUB     C
+        JP      C,LINE_MIXED_LEFT
+        CP      B
+        JP      NC,LINE_BG_EXX
+        ADD     A,8
+        SUB     B
+        JP      C,LINE_SPRITE
+
+        JP      LINE_MIXED
+
+; -----------------------------------------------------------------------
+
+LINE_MIXED_LEFT:
+        ADD     A,8
+        CP      0
+        JP      M,LINE_BG_EXX
+
+        LD      A,(SUBLINE)
+        AND     (IX+7)
+        ;JP      Z,LINE_MIXED
+        JP      LINE_MIXED
+
+        LD      A,C
+        EXX
+        OUT     (099h),A
+        LD      A,H
+        AND     03Fh
+        ADD     A,040h
+        OUT     (099h),A
+
+        EXX
+        LD      A,C
+        EXX
+        SUB     L
+        LD      (PATCH_1+1),A
+PATCH_1:
+        LD      A,(PBG_START)
+        LD      (PATCH_2+1),A
+PATCH_2:
+        JP      PBG_INC&0
+
+ALIGN
+        IRP     I,<0,1,2,3,4,5,6,7>
+PBG_INC&I:
+        LD      A,L
+        EXX
+        LD      H,A
+        LD      A,C
+        REPT    I
+          INC     DE
+          INC     DE
+        ENDM
+        EXX
+        LD      L,A
+        REPT    I
+          INC     DE
+        ENDM
+        JP      PBG_START&I
+        ENDM
+
+LINE_MIXED:
+        EXX
+
+        ; load vram address
+        LD      A,L
+        OUT     (099h),A
+        LD      A,H
+        AND     03Fh
+        ADD     A,040h
+        OUT     (099h),A
+
+        LD      A,(SUBLINE)
+        AND     (IX+7)
+        JP      NZ,PIXEL_FULL_BGP
+
+        IRP     I,<0,1,2,3,4,5,6,7>
+        PIXEL_FULL I
+        ENDM
+
+        JP      SUBLINE_SET_SPR
+
+        ; if the subline was a bgonly
+        ; then you can end before finishing
+
+PIXEL_FULL_BGP:
+        LD      A,L
+        EXX
+        LD      H,A
+        EXX
+        IRP     I,<0,1,2,3,4,5,6,7>
+        PIXEL_FULL_BG I
+        ENDM
+
+        JP      SUBLINE_SET_SPR
+
+        IRP     I,<0,1,2,3,4,5,6,7>
+PBG_DIE&I:
+        EXX
+        REPT    8-I
+          INC     DE
+        ENDM
+        IF      (8-I) LT 4
+          REPT    8-I
+            INC     L
+          ENDM
+        ELSE
+          LD      A,8-I
+          ADD     A,L
+          LD      L,A
+        ENDIF
+        JP      SUBLINE_SET_SPR
+        ENDM
+
+; -----------------------------------------------------------------------
+
+        ; this line has only backgrounds
+LINE_BG_EXX:
+        EXX
+LINE_BG:
+        LD      A,(SUBLINE)
+        AND     (IX+7)
+        JR      NZ,LINE_BG_SKIP
+
+        ; load vram address
+        LD      A,L
+        OUT     (099h),A
+        LD      A,H
+        AND     03Fh
+        ADD     A,040h
+        OUT     (099h),A
+
+        REPT    8
+        LD      A,(DE)
+        OUT     (098h),A
+        INC     DE
+        INC     L
+        ENDM
+        JP      SUBLINE_SET_BG
+
+LINE_BG_SKIP:
+        REPT    8
+        INC     DE
+        ENDM
+        LD      A,L
+        ADD     A,8
+        LD      L,A
+
+        JP      SUBLINE_SET_BG
+
+; -----------------------------------------------------------------------
+
+        ; this line is sprites only
+LINE_SPRITE:
+        EXX
+
+        LD      A,(SUBLINE)
+        AND     (IX+7)
+        JP      NZ,LINE_SPRITE_BG
+
+        ; load vram address
+        LD      A,L
+        OUT     (099h),A
+        LD      A,H
+        AND     03Fh
+        ADD     A,040h
+        OUT     (099h),A
+
+        IRP     I,<0,1,2,3,4,5,6,7>
+        PIXEL_SPRITE I
+        ENDM
+
+        EXX
+        EX      DE,HL
+        LD      BC,-16
+        ADD     HL,BC
+        LD      A,(HL)
+        AND     A
+        JP      NZ,SUBLINE_SET_SPR_EXX
+        INC     HL
+        LD      A,(HL)
+        CP      8
+        JP      C,SUBLINE_SET_SPR_EXX
+        JP      SUBLINE_SET_BG_EXX
+
+LINE_SPRITE_BG:
+        EXX
+        LD      A,(DE)
+        EXX
+        AND     A
+        JR      NZ,LINE_SPRITE_BG_GO
+
+        EXX
+        INC     DE
+        LD      A,(DE)
+        DEC     DE
+        EXX
+        CP      8
+        JR      C,LINE_SPRITE_BG_GO
+
+        REPT    8
+        INC     DE
+        ENDM
+        LD      A,L
+        ADD     A,8
+        LD      L,A
+
+        JP      SUBLINE_SET_BG
+
+LINE_SPRITE_BG_GO:
+        ; load vram address
+        LD      A,L
+        OUT     (099h),A
+        LD      A,H
+        AND     03Fh
+        ADD     A,040h
+        OUT     (099h),A
+
+        LD      A,L
+        EXX
+        LD      H,A
+        EXX
+
+        IRP     I,<0,1,2,3,4,5,6,7>
+        PIXEL_SPRITE_BG I
+        ENDM
+        JP      SUBLINE_SET_SPR
+
+; -----------------------------------------------------------------------
+
+SUBLINE_SET_SPR:
+        ; update subline information
+        EXX
+SUBLINE_SET_SPR_EXX:
+        LD      HL,SUBLINE
+        LD      A,(HL)
+        CPL
+        AND     (IX+7)
+        LD      (IX+7),A
+        RLC     (HL)
+        EXX
+        RET
+
+; -----------------------------------------------------------------------
+
+SUBLINE_SET_BG:
+        ; update subline information
+        EXX
+SUBLINE_SET_BG_EXX:
+        LD      HL,SUBLINE
+        LD      A,(HL)
+        OR      (IX+7)
+        LD      (IX+7),A
+        RLC     (HL)
+        EXX
+        RET
+
+; -----------------------------------------------------------------------
+
+IRQ_HANDLER:
+        PUSH    AF
+        PUSH    HL
+        IN      A,(099h)
+
+        LD      A,(IRQ_RTC)
+        INC     A
+        LD      (IRQ_RTC),A
+        CP      60
+        JR      NZ,IRQ_HANDLER_CONTINUE
+
+        LD      HL,(TOTAL_FRAMES)
+        LD      (FPS),HL
+        XOR     A
+        LD      (IRQ_RTC),A
+        LD      L,A
+        LD      H,A
+        LD      (TOTAL_FRAMES),HL
+
+IRQ_HANDLER_CONTINUE:
+
+	; read line 8 [ right down up left del ins home space ]
+	CUSTOM_SNSMAT   8
+	LD      (KEYLINE_8),A
+
+        AND     128
+        JR      NZ,CHECK_LEFT
+
+        LD      A,(SHAPE_X)
+        INC     A
+        LD      (SHAPE_X),A
+
+CHECK_LEFT:
+        LD      A,(KEYLINE_8)
+        AND     16
+        JR      NZ,CHECK_UP
+
+        LD      A,(SHAPE_X)
+        DEC     A
+        LD      (SHAPE_X),A
+
+CHECK_UP:
+        LD      A,(KEYLINE_8)
+        AND     32
+        JR      NZ,CHECK_DOWN
+
+        LD      A,(SHAPE_Y)
+        DEC     A
+        LD      (SHAPE_Y),A
+
+CHECK_DOWN:
+        LD      A,(KEYLINE_8)
+        AND     64
+        JR      NZ,CHECK_EXIT
+
+        LD      A,(SHAPE_Y)
+        INC     A
+        LD      (SHAPE_Y),A
+
+CHECK_EXIT:
+        POP     HL
+        POP     AF
+        EI
+        RET
+
+; -----------------------------------------------------------------------
+
+READ_TILES:
+
+	; open the file
+	LD      C,OPEN  
+        LD      DE,FCB
+	CALL    BDOS
+
+        ; set the DTA
+        LD      HL,1
+        LD      (FCBSIZE),HL
+        LD      DE,04000h
+	LD      C,SETDTA
+	CALL    BDOS
+
+        ; read 0C007h bytes from the file
+	LD      C,RDBLK
+        LD      DE,FCB
+        LD      HL,BG_SIZE
+	CALL    BDOS
+
+        ; close the file
+        LD      C,CLOSE
+        LD      DE,FCB
+	CALL    BDOS
+
+	RET
+
+; -----------------------------------------------------------------------
+; CALLBIOS - call a bios routine
+; enter: IX = address
+
+CALLBIOS:
+	LD      (CALLBIOS1),IX
+	RST     030h
+CALLBIOS0:
+	DB      0
+CALLBIOS1:
+	DW      0
+	RET
+
+; -----------------------------------------------------------------------
+; PREPARE - prepare compatibility
+
+PREPARE:
+	LD      A,(EXPTBL)
+	LD      (CALLBIOS0),A
+	RET
+
+; -----------------------------------------------------------------------
+; PRINTHEX - print a byte in hexadecimal format
+; enter: A = byte
+
+PRINTHEX:
+	PUSH    AF
+	RRCA
+	RRCA
+	RRCA
+	RRCA
+	AND     0Fh
+	CALL    PRINTDIG
+	POP     AF
+	AND     0Fh
+PRINTDIG:
+	CP      10
+	JR      C,PRINTDIG0
+	ADD     A,'A'-10
+	JR      PRINTDIG1
+PRINTDIG0:
+	ADD     A,'0'
+PRINTDIG1:
+	LD      C,PRTCHR
+	LD      E,A
+	CALL    BDOS
+	RET
+
+; -----------------------------------------------------------------------
+; CALLSUB - call the subrom
+; enter: IX = address 
+
+CALLSUB:
+	LD      IY,(0FAF7h)
+	CALL    001Ch
+	RET
+
+; -----------------------------------------------------------------------
+; SCREEN11 - set up SCREEN 11 using the BIOS
+
+SCREEN11:
+        ; change to screen 8
+        LD      IX,CHGMOD
+        LD      A,8
+	CALL    CALLSUB
+
+	; clear SCREEN
+        LD      IX,CLSSUB
+	CALL    CALLSUB
+
+        ; set up SCREEN 11
+        LD      A,(RG25SAV)
+        OR      00011000b
+        LD      B,A
+        LD      C,25
+        LD      IX,WRTVDP
+        CALL    CALLSUB
+
+        ; turn off sprites && set color 0 as opaque
+        LD      A,(RG8SAV)
+        OR      2+32
+	LD      B,A
+        LD      C,8
+        LD      IX,WRTVDP
+	CALL    CALLSUB
+
+        ; init the palette
+        DI  
+        XOR     A
+        OUT     (099h),A
+        LD      A,16+080h
+        OUT     (099h),A
+        LD      HL,PALETTE
+        LD      B,16*2
+        LD      C,09Ah
+        OTIR
+
+	RET
+
+; -----------------------------------------------------------------------
+; Work Area
+
+FCB:
+	DB      0               ; 0: drive number
+        DB      'CAR     '      ; 1: file name
+        DB      'Z10'           ; 9: file extension
+FCB_FILLER_START:
+	DB      0,0             ; 12: reserved
+FCBSIZE:
+	DB      0,0             ; 14: size of random access register
+	DB      0,0,0,0         ; 16: file length
+	DB      0,0             ; 20: date
+	DB      0,0             ; 22: time
+	DB      0,0,0,0,0,0,0,0 ; 24: reserved
+	DB      0               ; 32: reserved
+	DB      0,0,0,0         ; 33: current random access register
+FCB_FILLER_END:
+
+; higher bits of vram page
+VRAM_PAGE:      DB      0
+
+; old irq handler
+OLD_IRQ:        DB      0,0,0
+
+; counter: incremented on each IRQ (60Hz)
+IRQ_RTC:        DB      0
+
+; increment on every frame rendered
+TOTAL_FRAMES:   DW      0
+
+; fps counter
+FPS:            DW      0
+
+; shape position
+SHAPE_X:        DB      98
+SHAPE_Y:        DB      100
+SHAPE_DX:       DB      32;72
+SHAPE_DY:       DB      59;55
+
+LSHAPE_X:       DB      0
+LSHAPE_Y:       DB      0
+LSHAPE_DX:      DB      32;72
+LSHAPE_DY:      DB      59;55
+LSHAPE_X8:      DB      0
+LSHAPE_Y8:      DB      0
+LSHAPE_DX8:     DB      5;9+1
+LSHAPE_DY8:     DB      9;7+1
+
+; save the ppi keyline 8
+KEYLINE_8:      DB      0FFh
+
+; position of subline inside a tile
+SUBLINE:        DB      0
+
+ALIGN
+        
+NAME_TABLE:
+        INCLUDE TILES.INC
+
+NUMBERS:
+        INCLUDE NUMBERS.INC
+
+COLOR   MACRO R,G,B
+
+        DB      R*16+B
+        DB      G
+
+        ENDM                
+
+PALETTE:
+  COLOR 0 0 0 
+  COLOR 5 7 0 
+  COLOR 2 4 0 
+  COLOR 0 6 7 
+  COLOR 4 4 6 
+  COLOR 7 5 0 
+  COLOR 4 3 0 
+  COLOR 7 7 7 
+  COLOR 3 3 3 
+  COLOR 7 3 1 
+  COLOR 7 6 0 
+  COLOR 7 7 3 
+  COLOR 7 7 6 
+  COLOR 7 5 4 
+  COLOR 7 0 5 
+  COLOR 5 0 5
+
+ALIGN
+PBG_START:
+        IRP     I,<0,1,2,3,4,5,6,7>
+        DB      LOW (PBG_INC&I)
+        ENDM
+
+ALIGN
+SHADOW_TABLE:
+        I DEFL 0
+        REPT    256
+        DB      (I AND 7) OR ((I SHR 1) AND 0F0h)
+        I DEFL I+1
+        ENDM
+
+
+ENDOFCODE:
+        DS      02D00h-ENDOFCODE
+
+        INCLUDE FULSHAPE.INC
+
+        IF      ENDOFCODE GT 02D00h
+	.PRINTX . You must implement the megaram support !!! .
+	ENDIF
+
+	END     START
+
+
+
+

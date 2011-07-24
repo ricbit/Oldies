@@ -199,6 +199,10 @@ Language: C
 Description: Encoder and decoder for a fractal compression scheme. Quality was
 nice but it took a long, long time to encode an image.
 
+Name: 1999-12-tmnt
+Language: Assembly Z80
+Description: RGB sprite engine for MSX2+ in screen 10.
+
 Name: 2000-01-3dtictactoe
 Language: Java
 Description: 3D tic tac toe as a java applet. This game differs from classic
