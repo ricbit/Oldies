@@ -263,6 +263,10 @@ Language: Assembly Z80
 Description: Patch to convert the Colecovision game Space Invaders Collection
 to MSX.
 
+Name: 2004-06-ttf
+Language: Assembly Z80
+Description: True type font renderer for MSX.
+
 Name: 2004-08-modplayer
 Language: Java
 Description: MOD Player written in java.

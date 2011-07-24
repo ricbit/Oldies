@@ -1,0 +1,1432 @@
+; -----------------------------------------------------------------------
+;
+;    TTF 1.0
+;    Copyright (C) 1999 by Ricardo Bittencourt
+;
+;    Project started at 18/12/1999. Last modification was on 23/12/1999.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@lsi.usp.br
+;        http://www.lsi.usp.br/~ricardo
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+; 	Comments
+;		Felipe Sanches
+;	
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+	ORG     0100h
+	 
+BDOS     EQU     00005h
+OPEN     EQU     0000Fh
+CLOSE    EQU     00010h
+RDSEQ    EQU     00014h
+PRINT    EQU     00009h
+DTA      EQU     00080h
+INIMLT   EQU     00075h
+INIT32   EQU     0006Fh
+INITXT   EQU     0006Ch
+INIGRP   EQU     00072h
+FILVRM   EQU     00056h
+LDIRMV   EQU     0005Ch
+CLRSPR   EQU     00069h
+PRTCHR   EQU     00002h
+ENASLT   EQU     00024h
+RSLREG   EQU     00138h
+TOTEXT   EQU     000D2h
+BDRCLR   EQU     0F3EBh
+CHGCLR   EQU     00062h
+DISSCR   EQU     00041h
+ENASCR   EQU     00044h
+EXPTBL   EQU     0FCC1h
+RG1SAV   EQU     0F3E0h
+RDBLK    EQU     00027h
+SETDTA   EQU     0001Ah
+CHGET    EQU     0009Fh
+RDSLT    EQU     0000Ch
+SNSMAT   EQU     00141h
+CLIKSW   EQU     0F3DBh
+GETPNT   EQU     0F3FAh
+PUTPNT   EQU     0F3F8h
+HKEYI    EQU     0FD9Fh
+SETWRT   EQU     00053H
+
+CHGMOD   EQU     000D1h
+CLSSUB   EQU     00115h
+WRTVDP   EQU     0012Dh
+RG8SAV   EQU     0FFE7h
+RG25SAV  EQU     0FFFAh
+JIFFY    EQU     0FC9Eh
+
+
+BG_SIZE  EQU     20736
+
+
+PRECALC         EQU     0B000h
+RENDERSPACE     EQU     0C000h
+RENDERSPACE2    EQU     0C100h
+
+ALIGNF  DEFL    0
+
+; -----------------------------------------------------------------------
+; ALIGN - align the code in 100h bytes boundaries
+
+ALIGNX          MACRO  X
+
+VOID&X:
+		DS      256*(HIGH (VOID&X+255))-VOID&X
+
+		ENDM
+
+ALIGN           MACRO
+
+		ALIGNX  %ALIGNF
+		ALIGNF  DEFL    ALIGNF+1
+
+		ENDM
+
+; -----------------------------------------------------------------------
+
+START:
+	; prepare compatibility
+
+	CALL    PREPARE
+
+
+	; set up screen 11
+	CALL    SCREEN11
+
+	LD      IX,ENASCR
+	CALL    CALLBIOS
+
+	LD      IX,CHAR38
+
+START_DRAW:
+	LD      HL,(JIFFY)
+	LD      (OLDJIFFY),HL
+
+; -----------------------------------------------------------------------
+
+	LD      HL,(GYMAX)
+	LD      DE,(GYMIN)
+	OR      A
+	SBC     HL,DE
+	REPT    7
+	SRA     H
+	RR      L
+	ENDM
+	LD      (TYINC),HL
+	LD      DE,(GYMAX)
+	LD      (TY),DE
+
+	LD      HL,(GXMAX)
+	LD      DE,(GXMIN)
+	OR      A
+	SBC     HL,DE
+	LD      (GXMAX_GXMIN),HL
+	REPT    7
+	SRA     H
+	RR      L
+	ENDM
+	LD      (TXINC),HL
+	LD      (TX),DE
+
+        LD      IY,PRECALC
+        PUSH    IX
+
+        ; precalc values for lines
+	LD      B,(IX+0)
+	INC     IX
+	LD      A,B
+	OR      A
+        JR      Z,PRELINE_SKIP
+PRELINE_LOOP:
+	PUSH    BC
+        CALL    PRECALC_LINE
+	LD      BC,8
+	ADD     IX,BC
+        LD      BC,12
+        ADD     IY,BC
+	POP     BC
+        DJNZ    PRELINE_LOOP
+PRELINE_SKIP:
+
+        ; precalc values for splines
+	LD      B,(IX+0)
+	INC     IX
+	LD      A,B
+	OR      A
+        JR      Z,PRESPLINE_SKIP
+PRESPLINE_LOOP:
+	PUSH    BC
+        CALL    PRECALC_SPLINE
+	LD      BC,12
+	ADD     IX,BC
+        LD      BC,12
+        ADD     IY,BC
+	POP     BC
+        DJNZ    PRESPLINE_LOOP
+PRESPLINE_SKIP:
+
+
+        POP     IX
+
+	XOR     A
+	LD      (CURLINE),A
+OUTER_LOOP:
+	PUSH    IX
+	LD      HL,RENDERSPACE
+	XOR     A
+	REPT    128
+	LD      (HL),A
+	INC     L
+	ENDM
+
+        LD      IY,PRECALC
+	; draw lines of the characters
+	LD      B,(IX+0)
+	INC     IX
+	LD      A,B
+	OR      A
+	JR      Z,LINE_SKIP
+LINE_LOOP:
+	PUSH    BC
+	CALL    DRAW_LINE
+	LD      BC,8
+	ADD     IX,BC
+        LD      BC,12
+        ADD     IY,BC
+	POP     BC
+	DJNZ    LINE_LOOP
+LINE_SKIP:
+
+	; draw splines of the characters
+	LD      B,(IX+0)
+	INC     IX
+	LD      A,B
+	OR      A
+	JR      Z,SPLINE_SKIP
+SPLINE_LOOP:
+	PUSH    BC
+	CALL    DRAW_SPLINE
+	LD      BC,12
+	ADD     IX,BC
+        LD      BC,12
+        ADD     IY,BC
+	POP     BC
+	DJNZ    SPLINE_LOOP
+SPLINE_SKIP:
+	; draw points of the characters
+	LD      B,(IX+0)
+	INC     IX
+	LD      A,B
+	OR      A
+	JR      Z,POINT_SKIP
+POINT_LOOP:
+	PUSH    BC
+	CALL    DRAW_POINT
+	LD      BC,5
+	ADD     IX,BC
+        POP     BC
+	DJNZ    LINE_LOOP
+POINT_SKIP:
+
+        DI
+        XOR     A
+        OUT     (099H),A
+        LD      A,(CURLINE)
+        AND     63
+        OR      64
+        OUT     (099H),A
+
+        LD      A,(CURLINE)
+        RLCA
+        RLCA
+        AND     3
+        OUT     (099H),A
+        LD      A,08Eh
+        OUT     (099h),A
+
+        LD      HL,RENDERSPACE
+        LD      B,1 ;???
+        XOR     A
+        REPT    128
+        ADD     A,(HL)
+        CP      B
+        LD      C,A
+        SBC     A,A
+        OUT     (098H),A
+        LD      A,C
+        INC     L
+        ENDM
+        EI
+
+	LD      BC,(TYINC)
+	LD      HL,(TY)
+	OR      A
+	SBC     HL,BC
+	LD      (TY),HL
+
+	POP     IX
+
+	LD      A,(CURLINE)
+	INC     A
+	LD      (CURLINE),A
+	CP      128
+	JP      NZ,OUTER_LOOP
+
+; -----------------------------------------------------------------------
+
+EXIT_NOW:
+	LD      HL,(JIFFY)
+	LD      (NEWJIFFY),HL
+	
+	LD      IX,CHGET
+	CALL    CALLBIOS
+
+	CP      27
+	JR      Z,EXIT_REALLY
+
+	SUB     021H
+	LD      L,A
+	LD      H,0
+	ADD     HL,HL
+	LD      BC,TTF_TABLE
+	ADD     HL,BC
+	LD      E,(HL)
+	INC     HL
+	LD      D,(HL)
+	PUSH    DE
+	POP     IX
+	JP      START_DRAW
+
+
+EXIT_REALLY:
+	; exit the program
+
+	; return to text mode
+	LD      IX,TOTEXT
+	CALL    CALLBIOS
+
+	LD      HL,(NEWJIFFY)
+	LD      DE,(OLDJIFFY)
+	OR      A
+	SBC     HL,DE
+	PUSH    HL
+	LD      A,H
+	CALL    PRINTHEX
+	POP     HL
+	LD      A,L
+	CALL    PRINTHEX
+
+	; return to dos
+	JP      0
+
+
+; -----------------------------------------------------------------------
+
+DRAW_POINT:
+	;DE = Y
+	LD	E,(IX+2)
+	LD	D,(IX+3)
+	LD	HL,(TY)
+	SBC	HL,DE
+	RET	NZ
+	
+	;DE = X
+	LD	L,(IX+0)
+	LD	H,(IX+1)
+	
+	;A = (x-gxmin)/(gxmax-gxmin)
+	LD	DE,(GXMIN)
+	SBC	HL,DE
+	
+	LD	DE,(GXMAX_GXMIN)
+	
+	EXX
+	LD	HL,0
+	LD	DE,0
+	EXX
+	CALL	DIV7BIT
+	LD	C,A
+	LD	A,(IX+4)
+	OR	A
+	JR	Z,POINT_DEC
+	JP	POINT_INC
+POINT_DEC:
+	LD	A,C
+	JP	DRAW_DEC
+
+POINT_INC:
+	LD A,C
+	JP	DRAW_INC
+	
+DRAW_LINE:
+	
+	; DE = P0Y
+	LD      E,(IX+2)
+	LD      D,(IX+3)
+        LD      B,(IY+5)
+        BIT     7,B
+	; jump if P1Y < P0Y
+        JP      NZ,DRAW_LINE_P0Y
+
+	; here, P1Y >= P0Y
+	LD      HL,(TY)
+	OR      A
+	; HL = TY - P0Y
+	SBC     HL,DE
+			;return if TY < P0Y (because current horizontal 
+			;line doesn't cross the (p0x,p0y)-(p1x,p1y) line)
+	RET     M
+
+	;DE = TY-P0Y
+        LD      D,H
+        LD      E,L
+	OR      A
+        ; BC = (P1Y-P0Y)
+	LD      C,(IY+4)
+	SBC     HL,BC	; HL = (TY-P0Y)-(P1Y-P0Y) = TY-P1Y
+			;return if TY >= P1Y (because current horizontal 
+			;line doesn't cross the (p0x,p0y)-(p1x,p1y) line)
+	RET     P
+
+	; HL = P1X-P0X
+        LD      L,(IY+10)
+        LD      H,(IY+11)
+	CALL    MUL	; HL'HL = (P1X-P0X)*(TY-P0Y)
+	
+	
+        ; The following instructions make a 32bit ADD:
+	;  HL'HL = (P1X-P0X)*(TY-P0Y) + (P0X-GXMIN)*(P1Y-P0Y)
+	; In order to optimize the code,
+	;  DE'DE = (P1Y-P0Y)*(GXMAX-GXMIN)
+	;   is done simultaneously.  
+	LD      E,(IY+0)
+        LD      D,(IY+1)
+        ADD     HL,DE	
+        LD      E,(IY+6)	
+        LD      D,(IY+7)
+        EXX
+        LD      E,(IY+2)
+        LD      D,(IY+3)
+        ADC     HL,DE
+        LD      E,(IY+8)
+        LD      D,(IY+9)
+        EXX
+
+	CALL    DIV7BIT
+	;A=[(P1X-P0X)*(TY-P0Y)+(P0X-GXMIN)*(P1Y-P0Y)] / [(P1Y-P0Y)*(GXMAX-GXMIN)]
+	;So, here A contains the x coordinate of the intersection 
+	
+
+DRAW_DEC:
+        LD      H,HIGH(RENDERSPACE)
+        LD      L,A
+        DEC     (HL)
+        RET
+	
+
+DRAW_LINE_P0Y:
+	; here, P0Y > P1Y
+	LD      HL,(TY)
+	OR      A
+	;HL = TY - P0Y
+	SBC     HL,DE
+        ; JUMP IF TY==POY 
+        jr      z,lineskip
+			; return if TY > P0Y because current horizontal 
+			;line doesn't cross the (p0x,p0y)-(p1x,p1y) line)
+	RET     P
+lineskip:
+        ;DE = TY - P0Y
+        LD      D,H
+        LD      E,L
+
+	OR      A
+        ; BC = P1Y - P0Y
+        LD      C,(IY+4)
+	; HL = TY - P1Y
+	SBC     HL,BC
+			;return if TY <= P1Y because current horizontal 
+			;line doesn't cross the (p0x,p0y)-(p1x,p1y) line)
+	RET     M
+	ret     z
+	;*************************
+        LD      L,(IY+10)
+        LD      H,(IY+11)
+	CALL    MUL
+
+        LD      E,(IY+0)
+        LD      D,(IY+1)
+	ADD     HL,DE
+	EXX
+        LD      E,(IY+2)
+        LD      D,(IY+3)
+        ADC     HL,DE
+        EXX
+
+        LD      DE,0
+        EX      DE,HL
+        OR      A
+        SBC     HL,DE
+        LD      E,(IY+6)
+        LD      D,(IY+7)
+        EXX
+        LD      DE,0
+        EX      DE,HL
+        SBC     HL,DE
+        LD      E,(IY+8)
+        LD      D,(IY+9)
+        EXX
+
+        CALL    DIV7BIT
+
+DRAW_INC:
+        LD      H,HIGH(RENDERSPACE)
+        LD      L,A
+        INC     (HL)
+        RET
+
+; -----------------------------------------------------------------------
+
+PRECALC_LINE:
+        ; DE = P0Y
+	LD      E,(IX+2)
+	LD      D,(IX+3)
+
+        ; HL = P1Y
+	LD      L,(IX+6)
+	LD      H,(IX+7)
+	OR      A
+	SBC     HL,DE
+
+        ; HL = P1Y-P0Y
+        LD      (IY+4),L
+        LD      (IY+5),H
+        LD      B,H
+        LD      C,L
+	
+	; HL = P0X
+        LD      L,(IX+0)
+        LD      H,(IX+1)
+        LD      DE,(GXMIN)
+        OR      A
+
+        ; HL = P0X - GXMIN
+	SBC     HL,DE
+        
+	; DE = P1Y - P0Y
+	LD      D,B
+        LD      E,C
+
+	;HL'HL= (P0X - GXMIN)*(P1Y - P0Y) 
+        CALL    MUL
+        LD      (IY+0),L
+        LD      (IY+1),H
+        EXX
+        LD      (IY+2),L
+        LD      (IY+3),H
+
+        ; DE = P0X
+        LD      E,(IX+0)
+	LD      D,(IX+1)
+
+        ; HL = P1X
+	LD      L,(IX+4)
+	LD      H,(IX+5)
+	OR      A
+	; HL = P1X-P0X
+	SBC     HL,DE
+        LD      (IY+10),L
+        LD      (IY+11),H
+        
+	; HL = P1Y-P0Y
+	LD      L,(IY+4)
+        LD      H,(IY+5)
+        
+	BIT     7,H
+        JR      Z,PRECALC_LINE_NZ
+        LD      DE,0
+        EX      DE,HL
+        OR      A
+        SBC     HL,DE
+PRECALC_LINE_NZ:
+
+        LD      DE,(GXMAX_GXMIN)
+        
+	;HL'HL = ABS( (P1Y-P0Y)*(GXMAX-GXMIN) )
+	CALL    MUL
+        LD      (IY+6),L
+        LD      (IY+7),H
+        EXX
+        LD      (IY+8),L
+        LD      (IY+9),H
+
+
+        RET
+
+; -----------------------------------------------------------------------
+
+DRAW_SPLINE:
+        ; check upper bounding box
+	LD      E,(IX+10)
+	LD      D,(IX+11)
+	LD      (P2Y),DE
+
+        LD      HL,(TY)
+        LD      B,H
+        LD      C,L
+        OR      A
+        SBC     HL,DE
+        LD      A,H
+
+	LD      E,(IX+2)
+	LD      D,(IX+3)
+	LD      (P0Y),DE
+
+        LD      H,B
+        LD      L,C
+        OR      A
+        SBC     HL,DE
+        AND     H
+
+	LD      E,(IX+6)
+	LD      D,(IX+7)
+	LD      (P1Y),DE
+
+        LD      H,B
+        LD      L,C
+        OR      A
+        SBC     HL,DE
+        AND     H
+        RET     M
+
+        ; check lower bounding box
+        LD      HL,(P2Y)
+        OR      A
+        SBC     HL,BC
+        LD      A,H
+
+        LD      HL,(P1Y)
+        OR      A
+        SBC     HL,BC
+        AND     H
+
+        LD      HL,(P0Y)
+        OR      A
+        SBC     HL,BC
+        AND     H
+        RET     M
+
+        LD      L,(IY+0)
+        LD      H,(IY+1)
+        LD      (EQA),HL
+
+        LD      L,(IY+2)
+        LD      H,(IY+3)
+        LD      (EQB),HL
+
+	LD      HL,(P0Y)
+	LD      DE,(TY)
+	OR      A
+	SBC     HL,DE
+	LD      (EQC),HL
+
+	LD      A,(EQA+1)
+	LD      B,A
+	LD      A,(EQA)
+	OR      B
+        JP      Z,SPLINE_SIMPLE
+
+	LD      HL,(EQA)
+        ADD     HL,HL
+        ADD     HL,HL
+	LD      DE,(EQC)
+	CALL    MUL
+        EX      DE,HL
+        LD      L,(IY+4)
+        LD      H,(IY+5)
+        OR      A
+        SBC     HL,DE
+        LD      (DELTA),HL
+        EXX
+        EX      DE,HL
+        LD      L,(IY+6)
+        LD      H,(IY+7)
+        SBC     HL,DE
+        LD      (DELTA+2),HL
+        RET     M
+
+	; return if delta=0
+	LD      A,H
+	OR      L
+	EXX
+	OR      H
+	OR      L
+	EXX
+	JP      Z,DELTAISZERO
+
+	LD      BC,(DELTA)
+	CALL    SQRT
+	LD      (SQRTDELTA),DE
+
+        EX      DE,HL
+        LD      DE,(EQB)
+        OR      A
+        SBC     HL,DE
+        LD      (UPBHAS),HL
+        CALL    SPLINE_ROOT_POS
+
+        LD      HL,0
+        LD      DE,(EQB)
+        OR      A
+        SBC     HL,DE
+        LD      DE,(SQRTDELTA)
+        OR      A
+        SBC     HL,DE
+        LD      (UPBHAS),HL
+        JP      SPLINE_ROOT_NEG
+
+
+; -----------------------------------------------------------------------
+
+
+SPLINE_ROOT_POS:
+        ; rp0=((a<0)&&(b<0))||((b>=0)&&(c>0));
+
+        LD      A,(EQA+1)
+        LD      H,A
+        LD      A,(EQB+1)
+        AND     H
+        LD      D,A
+
+        LD      HL,(EQC)
+        CALL    HLNZ
+        LD      A,(EQB+1)
+        OR      H
+        CPL
+        OR      D
+        RET     M
+
+        ; rp1=((a>0)&&(b+2*a<0))||((b+2*a>=0)&&(a+b+c<=0));
+
+        LD      HL,(EQB)
+        LD      DE,(EQA)
+        ADD     HL,DE
+        ADD     HL,DE
+        LD      C,H
+        LD      A,(EQA+1)
+        CPL
+        AND     C
+        LD      B,A
+
+        LD      HL,(EQA)
+        LD      DE,(EQB)
+        ADD     HL,DE
+        LD      DE,(EQC)
+        ADD     HL,DE
+        CALL    HLNZ
+        LD      A,C
+        CPL
+        AND     H
+        OR      B
+        RET     M
+        JR      SPLINE_T01
+
+HLNZ:
+        LD      A,H
+        OR      L
+        RET     NZ
+        LD      HL,8000h
+        RET
+
+SPLINE_ROOT_NEG:
+        ; rm0=((a>0)&&(b>0))||((b<=0)&&(c<0));
+        LD      HL,(EQB)
+        CALL    HLNZ
+        LD      A,(EQA+1)
+        OR      H
+        CPL
+        LD      L,A
+
+        LD      A,(EQC+1)
+        AND     H
+        OR      L
+        RET     M
+
+        ; rm1=((a<0)&&(b+2*a>0))||((b+2*a<=0)&&(a+b+c>=0));
+
+        LD      HL,(EQB)
+        LD      DE,(EQA)
+        ADD     HL,DE
+        ADD     HL,DE
+        CALL    HLNZ
+        LD      C,H
+
+        LD      A,(EQA+1)
+        CPL
+        OR      H
+        CPL
+        LD      B,A
+
+        LD      HL,(EQA)
+        LD      DE,(EQB)
+        ADD     HL,DE
+        LD      DE,(EQC)
+        ADD     HL,DE
+        LD      A,H
+        CPL
+        AND     C
+        OR      B
+        RET     M
+
+
+SPLINE_T01:
+	LD      HL,(EQA)
+	ADD     HL,HL
+	EX      DE,HL
+	LD      HL,(UPBHAS)
+	CALL    DIV01
+
+SPLINE_HAVET:
+        LD      A,B
+        OR      C
+        JP      Z,SPLINE_U0_GO
+
+	LD      (EQT),BC
+	LD      H,B
+	LD      L,C
+	LD      D,B
+	LD      E,C
+	CALL    UMUL_NOSWAP
+	EXX
+        LD      (EQT2),HL
+
+        LD      L,(IX+0)
+        LD      H,(IX+1)
+        LD      (P0X),HL
+
+        LD      L,(IY+8)
+        LD      H,(IY+9)
+        LD      DE,(EQT2)
+        CALL    HMUL
+        LD      (SIDE1_LOW),HL
+        EXX
+        LD      (SIDE1_HIGH),HL
+
+        LD      L,(IY+10)
+        LD      H,(IY+11)
+        LD      DE,(EQT)
+        CALL    HMUL
+
+        LD      DE,(SIDE1_LOW)
+        ADD     HL,DE
+        EXX
+        LD      DE,(SIDE1_HIGH)
+        ADC     HL,DE
+        LD      DE,(P0X)
+;        LD      E,(IX+0)
+;        LD      D,(IX+1)
+        ADD     HL,DE
+        LD      DE,(GXMIN)
+        OR      A
+        SBC     HL,DE
+
+
+SPLINE_HAVE_TX:
+        LD      DE,(GXMAX_GXMIN)
+        EXX
+        LD      DE,0
+        CALL    DIV7BIT
+
+	PUSH    AF
+	LD      HL,(EQA)
+	LD      DE,(EQT)
+	CALL    HMUL
+	EXX
+	ADD     HL,HL
+	LD      DE,(EQB)
+	ADD     HL,DE
+	BIT     7,H
+	JP      NZ,SPLINE_INC
+
+	POP     AF
+	JP      DRAW_DEC
+
+SPLINE_INC:
+	POP     AF
+	JP      DRAW_INC
+
+; -----------------------------------------------------------------------
+
+SPLINE_U0_GO:
+	LD      HL,0
+	LD      (EQT),HL
+        EXX
+	LD      L,(IX+0)
+	LD      H,(IX+1)
+        LD      DE,(GXMIN)
+        OR      A
+        SBC     HL,DE
+	JP      SPLINE_HAVE_TX
+
+; -----------------------------------------------------------------------
+
+DELTAISZERO:
+	RET
+
+SPLINE_SIMPLE:
+	LD      A,(EQC+1)
+	LD      B,A
+	LD      A,(EQB+1)
+	XOR     B
+	RLCA
+	RET     NC
+
+	LD      HL,(EQB)
+	LD      DE,(EQC)
+	ADD     HL,DE
+	LD      A,(EQB+1)
+	XOR     H
+	RLCA
+	RET     C
+
+	LD      HL,(EQC)
+	LD      DE,(EQB)
+	CALL    DIV01S
+	JP      SPLINE_HAVET
+
+; -----------------------------------------------------------------------
+
+PRECALC_SPLINE:
+	; DE = P2Y
+	LD      E,(IX+10)
+	LD      D,(IX+11)
+	LD      (P2Y),DE
+	; DE = P0Y
+	LD      E,(IX+2)
+	LD      D,(IX+3)
+	LD      (P0Y),DE
+	; DE = P1Y
+	LD      E,(IX+6)
+	LD      D,(IX+7)
+	LD      (P1Y),DE
+	; DE = P2Y
+	LD      DE,(P2Y)
+	; HL = P0Y
+	LD      HL,(P0Y)
+	; HL = P0Y+P2Y
+	ADD     HL,DE
+	; DE = P1Y
+	LD      DE,(P1Y)
+	OR      A ; RESET CARRY
+	; HL = P0Y+P2Y-P1Y
+	SBC     HL,DE
+	OR      A ; RESET CARRY
+	; HL = P0Y+P2Y-2*P1Y
+	SBC     HL,DE
+	LD      (EQA),HL
+        LD      (IY+0),L
+        LD      (IY+1),H
+
+	LD      HL,(P1Y)
+	LD      DE,(P0Y)
+	OR	A
+	SBC     HL,DE
+	; HL = 2*(P1Y-P0Y)
+	ADD     HL,HL
+	LD      (EQB),HL
+        LD      (IY+2),L
+        LD      (IY+3),H
+
+	LD      HL,(EQB)
+	LD      D,H
+	LD      E,L
+	; HL'HL = 4*(P1Y-P0Y)^2
+	CALL    MUL
+        LD      (IY+4),L
+        LD      (IY+5),H
+        EXX
+        LD      (IY+6),L
+        LD      (IY+7),H
+	; HL = P0X
+        LD      L,(IX+0)
+        LD      H,(IX+1)
+        LD      (P0X),HL
+	; DE = P2X
+        LD      E,(IX+8)
+        LD      D,(IX+9)
+        LD      (P2X),DE
+        ; HL = P0X+P2X
+        ADD     HL,DE
+	; DE = P1X
+        LD      E,(IX+4)
+        LD      D,(IX+5)
+        LD      (P1X),DE
+        OR      A
+        SBC     HL,DE
+        OR      A
+        ; HL = P0X+P2X-2*P1X
+        SBC     HL,DE
+        LD      (IY+8),L
+        LD      (IY+9),H
+
+        LD      HL,(P1X)
+        LD      DE,(P0X)
+        OR      A
+       	SBC     HL,DE
+        ; HL = 2*(P1X-P0X)
+        ADD     HL,HL
+        LD      (IY+10),L
+        LD      (IY+11),H
+
+        RET
+
+; -----------------------------------------------------------------------
+; unsigned divide 32/32=7
+; enter HL'HL = input1, DE'DE = input2
+; exit A
+
+DIV7BIT:
+        XOR     A
+        IRP     I,<0,1,2,3,4,5,6,7>
+        OR      A
+        SBC     HL,DE
+        EXX
+        SBC     HL,DE
+        EXX
+        JR      NC,DIV7BIT&I
+        ADD     HL,DE
+        EXX
+        ADC     HL,DE
+        EXX
+DIV7BIT&I:
+        RLA
+        ADD     HL,HL
+        EXX
+        ADC     HL,HL
+        EXX
+        ENDM
+        CPL
+        RET
+
+; -----------------------------------------------------------------------
+; signed multiply 16x16=32
+; enter HL = input1, DE = input2
+; exit HL' high HL low
+
+MUL:
+	LD      A,H
+	XOR     D
+	EXX
+	LD      B,A
+	EXX
+
+	BIT     7,H
+	JR      Z,MUL_OP1_POS
+	PUSH    DE
+	LD      DE,0
+	EX      DE,HL
+	OR      A
+	SBC     HL,DE
+	POP     DE
+MUL_OP1_POS:
+
+	BIT     7,D
+	JR      Z,MUL_OP2_POS
+	PUSH    HL
+	LD      HL,0
+	OR      A
+	SBC     HL,DE
+	EX      DE,HL
+	POP     HL
+MUL_OP2_POS:
+
+	CALL    UMUL
+
+	EXX
+	BIT     7,B
+	EXX
+	RET     Z
+
+	XOR     A
+	LD      D,A
+	LD      E,A
+	EX      DE,HL
+	SBC     HL,DE
+	EXX
+	LD      D,A
+	LD      E,A
+	EX      DE,HL
+	SBC     HL,DE
+	EXX
+	RET
+
+; -----------------------------------------------------------------------
+
+UMUL:
+	PUSH    HL
+	SBC     HL,DE
+	POP     HL
+	JR      C,UMUL_NOSWAP
+	EX      DE,HL
+UMUL_NOSWAP:
+
+	LD      B,H
+	LD      C,L
+	LD      HL,0
+	EXX
+	LD      HL,0
+	LD      D,H
+	LD      E,L
+	EXX
+
+	; fall through
+
+UMUL8:
+	SRL     B
+	RR      C
+
+	JR      NC,UMUL8_NOADD
+	ADD     HL,DE
+	EXX
+	ADC     HL,DE
+	EXX
+UMUL8_NOADD:
+	SLA     E
+	RL      D
+	EXX
+	RL      E
+	RL      D
+	EXX
+	LD      A,B
+	OR      C
+	JP      NZ,UMUL8
+	RET
+
+; -----------------------------------------------------------------------
+
+HMUL:
+	LD      A,H
+	EXX
+	LD      B,A
+	EXX
+
+	BIT     7,H
+	JR      Z,HMUL_OP1_POS
+	PUSH    DE
+	LD      DE,0
+	EX      DE,HL
+	OR      A
+	SBC     HL,DE
+	POP     DE
+HMUL_OP1_POS:
+
+	CALL    UMUL
+
+	EXX
+	BIT     7,B
+	EXX
+	RET     Z
+
+	XOR     A
+	LD      D,A
+	LD      E,A
+	EX      DE,HL
+	SBC     HL,DE
+	EXX
+	LD      D,A
+	LD      E,A
+	EX      DE,HL
+	SBC     HL,DE
+	EXX
+	RET
+
+; -----------------------------------------------------------------------
+; unsigned sqrt 
+; enter HLBC =  32-bit input
+; exit DE = 16-bit output
+
+SQRT:
+	LD      DE,4000h
+	EXX
+	XOR     A
+	LD      H,A
+	LD      L,A
+	LD      B,A
+	LD      C,A
+	LD      D,A
+	LD      E,A
+	EXX
+
+	IRP     I,<0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15>
+	SBC     HL,DE
+	EXX
+	SBC     HL,DE
+
+	IF      I LT 15
+	JR      NC,SQRT_SKIP&I
+	EXX
+	ADD     HL,DE
+	EXX
+	ADC     HL,DE
+SQRT_SKIP&I:
+	ENDIF
+
+	CCF
+	RL      E
+	RL      D
+
+	IF      I LT 4
+	EXX
+	SLA     C
+	RL      B
+	ADC     HL,HL
+	EXX
+	ADC     HL,HL
+	EXX
+	SLA     C
+	RL      B
+	ADC     HL,HL
+	EXX
+	ADC     HL,HL
+	EXX
+	ELSE
+	IF      I LT 8
+	EXX
+	SLA     B
+	ADC     HL,HL
+	EXX
+	ADC     HL,HL
+	EXX
+	SLA     B
+	ADC     HL,HL
+	EXX
+	ADC     HL,HL
+	EXX
+	ELSE
+	IF      I LT 15
+	EXX
+	ADD     HL,HL
+	EXX
+	ADC     HL,HL
+	EXX
+	ADD     HL,HL
+	EXX
+	ADC     HL,HL
+	EXX
+	ENDIF
+	ENDIF
+	ENDIF
+	ENDM
+	RET
+
+; -----------------------------------------------------------------------
+; signed divide 16/16=16
+; enter HL = input1, DE = input2
+; exit BC output
+
+DIV01S:
+	BIT     7,H
+	JR      Z,DIV01S_OP1_POS
+	PUSH    DE
+	LD      DE,0
+	EX      DE,HL
+	OR      A
+	SBC     HL,DE
+	POP     DE
+DIV01S_OP1_POS:
+
+	BIT     7,D
+	JR      Z,DIV01S_OP2_POS
+	PUSH    HL
+	LD      HL,0
+	OR      A
+	SBC     HL,DE
+	EX      DE,HL
+	POP     HL
+DIV01S_OP2_POS:
+
+	JR      DIV01P
+
+; -----------------------------------------------------------------------
+
+DIV01:
+	BIT     7,H
+	JR      Z,DIV01P
+
+	PUSH    DE
+	LD      DE,0
+	EX      DE,HL
+	OR      A
+	SBC     HL,DE
+	POP     DE
+	PUSH    HL
+	LD      HL,0
+	OR      A
+	SBC     HL,DE
+	EX      DE,HL
+	POP     HL
+
+DIV01P:
+	LD      BC,0
+	IRP     I,<0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15>
+	ADD     HL,HL
+	OR      A
+	SBC     HL,DE
+	JR      NC,DIV01&I
+	ADD     HL,DE
+DIV01&I:
+	CCF
+	RL      C
+	RL      B        
+	ENDM
+	RET
+
+; -----------------------------------------------------------------------
+; CALLBIOS - call a bios routine
+; enter: IX = address
+
+CALLBIOS:
+	LD      (CALLBIOS1),IX
+	RST     030h
+CALLBIOS0:
+	DB      0
+CALLBIOS1:
+	DW      0
+	RET
+
+; -----------------------------------------------------------------------
+; PREPARE - prepare compatibility
+
+PREPARE:
+	LD      A,(EXPTBL)
+	LD      (CALLBIOS0),A
+	RET
+
+; -----------------------------------------------------------------------
+; PRINTHEX - print a byte in hexadecimal format
+; enter: A = byte
+
+PRINTHEX:
+	PUSH    AF
+	RRCA
+	RRCA
+	RRCA
+	RRCA
+	AND     0Fh
+	CALL    PRINTDIG
+	POP     AF
+	AND     0Fh
+PRINTDIG:
+	CP      10
+	JR      C,PRINTDIG0
+	ADD     A,'A'-10
+	JR      PRINTDIG1
+PRINTDIG0:
+	ADD     A,'0'
+PRINTDIG1:
+	LD      C,PRTCHR
+	LD      E,A
+	CALL    BDOS
+	RET
+
+; -----------------------------------------------------------------------
+; CALLSUB - call the subrom
+; enter: IX = address 
+
+CALLSUB:
+	LD      IY,(0FAF7h)
+	CALL    001Ch
+	RET
+
+; -----------------------------------------------------------------------
+; SCREEN11 - set up SCREEN 11 using the BIOS
+
+SCREEN11:
+	; change to screen 8
+	LD      IX,CHGMOD
+	LD      A,8
+	CALL    CALLSUB
+
+	; clear SCREEN
+	LD      IX,CLSSUB
+	CALL    CALLSUB
+
+	; turn off sprites && set color 0 as opaque
+	LD      A,(RG8SAV)
+	OR      2+32
+	LD      B,A
+	LD      C,8
+	LD      IX,WRTVDP
+	CALL    CALLSUB
+
+	RET
+
+; -----------------------------------------------------------------------
+; Work Area
+
+TX:             DW      0
+TXINC:          DW      0
+TY:             DW      0
+TYINC:          DW      0
+P0X:            DW      0
+P0Y:            DW      0
+P1X:            DW      0
+P1Y:            DW      0
+P2X:            DW      0
+P2Y:            DW      0
+EQA:            DW      0
+EQB:            DW      0
+EQC:            DW      0
+EQT:            DW      0
+EQT2:           DW      0
+EQ1T:           DW      0
+EQ1T2:          DW      0
+EQ2T1T:         DW      0
+DELTA:          DS      4
+SQRTDELTA:      DW      0
+UPBHAS:         DW      0
+P1Y_P0Y:        DW      0
+P1X_P0X:        DW      0
+TY_P0Y:         DW      0
+TX_P0X:         DW      0
+TX_P1X:         DW      0
+GXMAX_GXMIN:    DW      0
+SIDE1_LOW:      DW      0
+SIDE1_HIGH:     DW      0
+CURLINE:        DB      0
+WINDING:        DB      0
+OLDJIFFY:       DW      0
+NEWJIFFY:       DW      0
+
+ALIGN
+MULTABLE:
+INCLUDE MULT.INC
+
+INCLUDE VERDANA3.INC
+
+TTF_TABLE:
+INCLUDE TTFTAB.INC
+
+
+ENDOFCODE:
+
+	IF      ENDOFCODE GT 0C000h
+	.PRINTX . You must implement the megaram support !!! .
+	ENDIF
+
+	END     START
+
+
+
+
