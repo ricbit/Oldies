@@ -210,6 +210,12 @@ Name: 2000-05-ameba
 Language: C
 Description: Artificial life simulator, to watch evolution in real time.
 
+Name: 2001-11-shalom
+Language: C, Assembly Z80
+Description: Translation of the game Shalom from japanese to portuguese.
+Includes a DSL to apply the translation patch. Don't open patch.txt unless
+you like spoilers.
+
 Name: 2002-02-bfcompiler
 Language: BASIC
 Description: A brainfuck compiler written in 3 lines of MSX BASIC.

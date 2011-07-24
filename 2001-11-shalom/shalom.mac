@@ -1,0 +1,291 @@
+
+                ASEG
+                .PHASE  06000h
+START:
+                JP      DECODE_MESG
+                JP      DECODE_NAME+02000h
+                JP      DECODE_COMM+02000h
+		JP 	DECODE_VRAM+02000h
+
+DECODE_MESG:
+                DI
+                LD      HL,0C000h
+                LD      (0E882h),HL
+                LD      A,C
+                LD      (0E880h),A
+
+                LD      A,(0E889h)
+                OR      A
+                JR      Z,START_00
+
+                CP      1
+                JR      NZ,START_02
+START_01:
+                LD      A,021H
+                LD      (08000h),A
+                LD      DE,08000h
+                JR      COPY_MESG
+
+START_02:
+                CP      3
+                JR      Z,START_03
+                CP      2
+                JR      NZ,START_04
+START_03:
+                LD      A,021h
+                LD      (08000h),A
+                LD      DE,08800h
+                JR      COPY_MESG
+
+START_04:
+                CP      4
+                JR      NZ,NOT_TRANSL
+                LD      A,021h
+                LD      (08000h),A
+                LD      DE,08CE0h
+                JR      COPY_MESG
+
+START_00:
+		LD	A,(0EB00h)
+		CP	0F0h
+		JR	NZ,START_00_1
+		
+                LD      HL,(0EB40h)
+                LD	A,H
+                AND	A
+                JR	NZ,START_00_1
+                LD	A,L
+                CP	0AFh
+                JR	NZ,START_00_1
+                LD	A,C
+                CP	4
+                JR	NZ,START_00_2
+                LD	C,9
+                JR      START_00_1
+START_00_2:                
+                CP	5
+                JR	NZ,START_00_3
+                LD	C,10
+                JR      START_00_1
+START_00_3:                
+                CP	6
+                JR	NZ,START_00_1
+                LD	C,11
+                JR      START_00_1
+START_00_1:             
+		LD	HL,(0EB40h)   
+                LD      DE,MESG_BANK
+                ADD     HL,DE
+                LD      A,(HL)
+                OR      A
+                JR      Z,NOT_TRANSL
+                LD      (08000h),A
+
+                LD      HL,(0EB40h)
+                ADD     HL,HL
+                LD      DE,MESG_ADDR
+                ADD     HL,DE
+                LD      E,(HL)
+                INC     HL
+                LD      D,(HL)
+
+COPY_MESG:
+                LD      H,0
+                LD      L,C
+                ADD     HL,HL
+                ADD     HL,DE
+                LD      A,(HL)
+                INC     HL
+                LD      H,(HL)
+                LD      L,A
+                OR      H
+                JR      Z,NOT_TRANSL
+                LD      DE,0C000h
+COPY_MESG_LOOP:
+                LD      A,(HL)
+                INC     HL
+                LD      (DE),A
+                INC     DE
+                INC     A
+                JR      Z,COPY_EXIT
+                JR      COPY_MESG_LOOP
+COPY_EXIT:
+                EI
+                RET
+
+NOT_TRANSL:
+                LD      HL,0C000h
+                LD      A,2Eh ;'N'
+                LD      (HL),A
+                INC     HL
+                LD      A,34H ;'T'
+                LD      (HL),A
+                INC     HL
+                LD      A,(0E889h)
+                CALL    PRINTHEX
+                LD      A,(0EB41h)
+                CALL    PRINTHEX
+                LD      A,(0EB40h)
+                CALL    PRINTHEX
+                LD      A,C
+                CALL    PRINTHEX
+                LD      A,0FFh
+                LD      (HL),A
+                EI
+                RET
+
+PRINTHEX:
+                PUSH    AF
+                RRCA
+                RRCA
+                RRCA
+                RRCA
+                AND     0Fh
+                CALL    PRINTDIGIT
+                POP     AF
+                AND     0Fh
+PRINTDIGIT:
+                CP      0Ah
+                JR      NC,PRINTDIGIT1
+                SUB     07h
+PRINTDIGIT1:
+                ADD     A,017h
+                LD      (HL),A
+                INC     HL
+                RET
+
+DECODE_NAME:
+                DI
+                LD      L,(IX+15h)
+                LD      H,0
+                ADD     HL,HL
+                LD      DE,09470h
+                ADD     HL,DE
+                LD      A,(HL)
+                INC     HL
+                LD      H,(HL)
+                LD      L,A
+                LD      DE,0EB1Bh
+DECODE_NAME_LOOP:
+                LD      A,(HL)
+                LD      (DE),A
+                CP      0FFh
+                RET     Z
+                INC     HL
+                INC     DE
+                JR      DECODE_NAME_LOOP
+
+DECODE_COMM:
+                DI
+                LD      H,0
+                ADD     HL,HL
+                LD      DE,099C0h
+                ADD     HL,DE
+                LD      A,(HL)
+                INC     HL
+                LD      H,(HL)
+                LD      L,A
+                LD      DE,0D000h
+DECODE_COMM_LOOP:
+                LD      A,(HL)
+                LD      (DE),A
+                CP      0FFh
+                JR      Z,DECODE_COMM_RET
+                INC     HL
+                INC     DE
+                JR      DECODE_COMM_LOOP
+DECODE_COMM_RET:
+                LD      HL,08000h
+                LD      A,(0F0F2h)
+                LD      DE,0D000h
+                RET
+
+; ----
+
+                CHECK MACRO ADDR,MESG
+
+                LD      A,D
+                CP      HIGH (ADDR)
+                JR      NZ,NEXT_&ADDR
+                LD      A,E
+                CP      LOW (ADDR)
+                JR      NZ,NEXT_&ADDR
+                LD      DE,MESG*2+0AD50h
+                JP      DECODE_VRAM_MESG+02000h
+NEXT_&ADDR:
+
+                ENDM
+
+; ----
+
+DECODE_VRAM:
+		CALL	SAVE_MAPPERS+02000h
+                LD      A,020h
+                LD      (0F0F2h),A
+		LD	A,021h
+		LD	(0A000h),A
+                LD      (0F0F3h),A
+		EI
+                CHECK   0606Ch,0
+                CHECK   06E97h,1
+                CHECK   06F2Eh,2
+                CHECK   06FB1h,3
+                CHECK   06FCEh,4
+                CHECK   0BEC5h,5
+                CHECK   0BF7Dh,6
+                CHECK   06E7Eh,7
+                CHECK   06F6Fh,8
+                CHECK   06FEDh,9
+                CHECK   0701Ch,0Ah
+                CHECK   07031h,0Bh
+                CHECK   07054h,0Ch
+                CHECK   0AF0Ah,0Dh
+                JR      DECODE_VRAM_START
+DECODE_VRAM_MESG:
+                EX      DE,HL
+                LD      A,(HL)
+                INC     HL
+                LD      H,(HL)
+                LD      L,A
+                LD      A,H
+                ADD     A,020h
+                LD      H,A
+                EX      DE,HL
+DECODE_VRAM_START:
+		EX 	DE,HL
+		LD	E,(HL)
+		INC 	HL
+		LD 	D,(HL)
+		EX	DE,HL
+		INC	DE
+DECODE_VRAM_LOOP:
+		LD	A,(DE)
+		INC	DE
+		LD	B,A
+		INC	B
+		JR	Z,DECODE_VRAM_END
+		INC	B
+		JR	Z,DECODE_VRAM_START
+		AND	C
+		CALL	004Dh
+		INC	HL
+		JR	DECODE_VRAM_LOOP
+DECODE_VRAM_END:
+		DI
+		RET
+		
+SAVE_MAPPERS:
+		LD	A,(0F0F1h)
+		LD	(0DFF1h),A
+		LD	A,(0F0F2h)
+		LD	(0DFF2h),A
+		LD	A,(0F0F3h)
+		LD	(0DFF3h),A
+		RET
+
+; ----
+INCLUDE ADDR.INC
+
+STOP:
+                END     START
+        

@@ -1,0 +1,6647 @@
+/* patch para remendar o charset */ 
+
+8F57 
+#25 #38 @STOP
+
+8F5E
+#0 #4 #8 @STOP
+
+8F6D
+#0 #0 #8 #20 @STOP
+
+8F67
+#X10 #X8
+@STOP
+
+8F81
+@SHIFT 1
+@STOP
+
+8F8F
+#X49 #0
+@STOP
+
+8FB9
+@SHIFT 10
+@STOP
+
+9041
+@SHIFT 26
+@STOP
+
+9131
+@SHIFT 1
+@STOP
+
+9139
+#0 #0 #X38 #X18 #X18 #X18 #X3C #0
+@STOP
+
+9141
+@INCLUDE SHAMIN.BIN
+@STOP
+
+9211
+@INCLUDE SHAALF.BIN
+@STOP
+
+96B9
+#X7E #X63 #X63 #X62 #X7C #X66 #X63 #X00 @STOP
+
+96C1
+#X3E #X22 #X2E #X28 #X28 #X28 #X38 #X00 @STOP
+
+96C9
+#X00 #X1C #X14 #X14 #X14 #X74 #X44 #X7C @STOP
+
+96D1
+#0 #0 #X3F #X60 #X60 #X60 #X3F #XC @STOP
+
+96D9 
+#X3E #X63 #X60 #X60 #X60 #X63 #X3E #X18 @STOP
+
+96E1
+#0 #0 #0 #0 #0 #X30 #X30 #0 @STOP
+
+/* corrige a tela de entrada do nome */
+
+2AB8 
+FIM @STOP
+
+2A0E 
+#0 #0 #0 @STOP
+
+2A15 
+#0 #0 #0 @STOP
+
+2A1C 
+#0 #0 #0 @STOP
+
+2A23 
+#0 #0 #0 @STOP
+
+2A2A 
+#0 #0 #0 @STOP
+
+1F36 
+Nome da garota @STOP
+
+29AF 
+#X36 #X5F @STOP
+
+29B5 
+#14 @STOP
+
+2ABB 
+Seu nome @STOP
+
+280B 
+#8 @STOP
+
+2815 
+#0 #0 @STOP
+
+29F6 
+#X21 @STOP
+
+29F8 
+#31 @STOP
+
+29FC 
+#X21 #XBB #X69
+#X11 #X06 #XEF
+#X01 #X09 #X00
+#XED #XB0 @CLEAR
+#X21 #XBB #X69
+#X01 #X09 #X00
+#X13
+#XED #XB0
+@STOP
+
+29B4 
+#X0E #X0E #XED #XB0
+#XC3 #X6F #X69
+A #00 E #00 I #00 O #00 U
+@STOP
+
+2A33 
+#6 @STOP
+
+2AB2 
+#XF4 #0 #0 @STOP
+
+/* corrige as mensagens no monitor */
+
+C830
+Se #0 #0 u #0 #0 #0 no #0 #0 me #0 #0 @STOP
+
+C840
+Nogamero #0 dtaa #0 #0 #0 @STOP
+
+C850 
+#0 #0 In #4 #0 #X40 c #0 #0 io @STOP
+
+/* altera os nomes default */
+
+8E5E
+#XF0 i @STOP
+
+8E64
+c @STOP
+
+8E6A
+#X7D #X7E @STOP
+
+8E70
+#X7F #X80 @STOP
+
+2691
+#X7D #X7E @STOP
+
+2697
+#X7F #X80 @STOP
+
+
+/* patch para restaurar os valores do megarom mapper */
+
+1F50
+#XE5 #XD5 #XF5 #X21 #XF1 #XF0 #X11 #XF1 @CLEAR
+#XDF #X1A #X32 #X00 #X60 #X77 #X13 #X23 #X1A @CLEAR
+#X32 #X00 #X80 #X77 #X13 #X23 #X1A #X32 @CLEAR
+#X00 #XA0 #X77 #XF1 #XD1 #XE1 #XFB #XC9
+@STOP
+
+/* patch para escrever na vram diretamente */
+
+19C4
+#XF3
+#X3E #X20
+#X32 #X00 #X80
+#XCD #X09 #X80 
+#XC3 #X50 #X5F
+@STOP
+
+/* descompressor de texto */
+
+E76 
+#X3E #X20
+#X32 #X00 #X60
+#XC3 #X00 #X60 
+@STOP
+
+/* suporte a nomes com mais de quatro letras */
+
+E372
+#X54
+#X5D
+#X77
+#X7B
+#XC6 #X05
+#X5F
+#XC3 #X9C #X83
+@STOP
+
+1298
+#X3E #X20
+#X32 #X00 #X80
+#XCD #X03 #X80
+#X3E #X02
+#X32 #X00 #X80
+#XC3 #XB1 #X52
+@STOP 
+
+/* suporte ao menu traduzido */
+16FE
+#XF3
+#X3E #X20
+#X32 #X00 #X80
+#XCD #X06 #X80
+#X77
+@STOP
+
+173F
+#XF3
+#X3E #X20
+#X32 #X00 #X80
+#XCD #X06 #X80
+#X77
+@STOP
+
+/* suporte a acentuacao no texto */
+
+F13
+#XFE #X03
+#X38 #X13
+#XFE #X07
+#X30 #X0F
+@STOP
+
+/* suporte a acentuacao no menu */
+
+19E2
+#XFE #X03
+#X38 #X0F
+#XFE #X07
+#X30 #X0B
+@STOP
+
+/* rotinas auxiliares */
+
+40000
+@INCLUDE SHALOM.COM
+@STOP
+
+/* nomes */
+
+415D0
+@BLOCKSTART 41470
+
+@MESG 0
+@MEND
+
+@MESG 1
+Marty
+@MEND
+
+@MESG 2
+Kim
+@MEND
+
+@MESG 3
+Daria
+@MEND
+
+@MESG 4
+Pusso
+@MEND
+
+@MESG 5
+Lyon
+@MEND
+
+@MESG 6
+Kalios
+@MEND
+
+@MESG 7
+Melos
+@MEND
+
+@MESG 8
+Mary
+@MEND
+
+@MESG 9
+Rod
+@MEND
+
+@MESG A
+Mike
+@MEND
+
+@MESG B
+Kyaro
+@MEND
+
+@MESG C
+Terato
+@MEND
+
+@MESG D
+Saparo
+@MEND
+
+@MESG E
+Kurt
+@MEND
+
+@MESG F
+Johann
+@MEND
+
+@MESG 10
+Rei
+@MEND
+
+@MESG 11
+Remy
+@MEND
+
+@MESG 12
+Arthur
+@MEND
+
+@MESG 13
+Maria
+@MEND
+
+@MESG 14
+Brena
+@MEND
+
+@MESG 15
+Pierre
+@MEND
+
+@MESG 16
+Nicola
+@MEND
+
+@MESG 17
+Catarina
+@MEND
+
+@MESG 18
+Simon
+@MEND
+
+@MESG 19
+Jotam
+@MEND
+
+@MESG 1A
+Sara
+@MEND
+
+@MESG 1B
+Paulo
+@MEND
+
+@MESG 1C
+Loira
+@MEND
+
+@MESG 1D
+Kelly
+@MEND
+
+@MESG 1E
+Gunus
+@MEND
+
+@MESG 1F
+Pedro
+@MEND
+
+@MESG 20
+Dee
+@MEND
+
+@MESG 21
+Rick
+@MEND
+
+@MESG 22
+Teresa
+@MEND
+
+@MESG 23
+Amos
+@MEND
+
+@MESG 24
+Bret
+@MEND
+
+@MESG 25
+Melany
+@MEND
+
+@MESG 26
+Mami
+@MEND
+
+@MESG 27
+Dante
+@MEND
+
+@MESG 28
+Kamiom
+@MEND
+
+@MESG 29
+Jose'
+@MEND
+
+@MESG 2A
+Aline
+@MEND
+
+@MESG 2B
+Shikemu
+@MEND
+
+@MESG 2C
+Barl
+@MEND
+
+@MESG 2D
+Monge
+@MEND
+
+@MESG 2E
+Scott
+@MEND
+
+@MESG 2F
+Karl
+@MEND
+
+@MESG 30
+Teela
+@MEND
+
+@MESG 31
+Ray
+@MEND
+
+@MESG 32
+Levy
+@MEND
+
+@MESG 33
+Puff
+@MEND
+
+@MESG 34
+Hanna
+@MEND
+
+@MESG 35
+Saul
+@MEND
+
+@MESG 36
+Sereia
+@MEND
+
+@MESG 37
+Tritao
+@MEND
+
+@MESG 38
+Anna
+@MEND
+
+@MESG 39
+Bode
+@MEND
+
+@MESG 3A
+Chris
+@MEND
+
+@MESG 3B
+Tana
+@MEND
+
+@MESG 3C
+Ruson
+@MEND
+
+@MESG 3D
+Aleck
+@MEND
+
+@MESG 3E
+Yasau
+@MEND
+
+@MESG 3F
+Anjo
+@MEND
+
+@MESG 40
+Ben
+@MEND
+
+@MESG 41
+Mira
+@MEND
+
+@MESG 42
+Tios
+@MEND
+
+@MESG 43
+Juracy
+@MEND
+
+@MESG 44
+acidx
+@MEND
+
+@MESG 45
+MrGHOST
+@MEND
+
+@MESG 46
+Sato
+@MEND
+
+@MESG 47
+Quaresma
+@MEND
+
+@MESG 48
+Sturaro
+@MEND
+
+@MESG 49
+Leonard
+@MEND
+
+@MESG 4A
+Delavy
+@MEND
+
+@MESG 4B
+SLotman
+@MEND
+
+@MESG 4C
+Ginseng
+@MEND
+
+@MESG 4D
+Fada
+@MEND
+
+@MESG 4E
+Peka
+@MEND
+
+@MESG 4F
+Yoram
+@MEND
+
+@MESG 50
+Omuri
+@MEND
+
+@MESG 51
+Ahazu
+@MEND
+
+@MESG 52
+Serum
+@MEND
+
+@MESG 53
+Marmota
+@MEND
+
+@MESG 54
+Galileu
+@MEND
+
+@MESG 55
+Sarak
+@MEND
+
+@MESG 56
+Mane'
+@MEND
+
+@MESG 57
+Kanan
+@MEND
+
+@MESG 58
+Tritonete
+@MEND
+
+@MESG 59
+Betty
+@MEND
+
+@MESG 5A
+Barun
+@MEND
+
+@MESG 5B
+Tanu
+@MEND
+
+@MESG 5C
+Patty
+@MEND
+
+@MESG 5D
+Esau'
+@MEND
+
+@MESG 5E
+Luna
+@MEND
+
+@MESG 5F
+Bebbe
+@MEND
+
+@MESG 60
+Jonas
+@MEND
+
+@MESG 61
+Avatar
+@MEND
+
+@MESG 62
+Anna
+@MEND
+
+@MESG 63
+Ruth
+@MEND
+
+@MESG 64
+Marlon
+@MEND
+
+@MESG 65
+Kirion
+@MEND
+
+@MESG 66
+Gron
+@MEND
+
+@MESG 67
+Nagata
+@MEND
+
+@MESG 68
+Chie
+@MEND
+
+@MESG 69
+Maiko
+@MEND
+
+@MESG 6A
+Nagae
+@MEND
+
+@MESG 6B
+Fukui
+@MEND
+
+@MESG 6C
+Toshinari
+@MEND
+
+@MESG 6D
+Kikkawa
+@MEND
+
+@MESG 6E
+Sasaki
+@MEND
+
+@MESG 6F
+Yamako
+@MEND
+
+@MESG 70
+Uehara
+@MEND
+
+@MESG 71
+Iku
+@MEND
+
+@MESG 72
+Ryu
+@MEND
+
+@MESG 73
+Shu
+@MEND
+
+@MESG 74
+Takemasa
+@MEND
+
+@MESG 75
+Makki
+@MEND
+
+@MESG 76
+Princesa
+@MEND
+
+@MESG 77
+Yabin
+@MEND
+
+@MESG 78
+Mide
+@MEND
+
+@MESG 79
+Temuna
+@MEND
+
+@MESG 7A
+Nebu
+@MEND
+
+@MESG 7B
+Fujike
+@MEND
+
+@MESG 7C
+Butan
+@MEND
+
+@MESG 7D
+Barna
+@MEND
+
+@MESG 7E
+Agu
+@MEND
+
+@MESG 7F
+Daha
+@MEND
+
+@MESG 80
+Jason
+@MEND
+
+@MESG 81
+Yuteko
+@MEND
+
+@MESG 82
+Agaho
+@MEND
+
+@MESG 83
+Taluta
+@MEND
+
+@MESG 84
+Ludan
+@MEND
+
+@MESG 85
+Petaha
+@MEND
+
+@MESG 86
+Naya
+@MEND
+
+@MESG 87
+Elisa
+@MEND
+
+@MESG 88
+Naba
+@MEND
+
+@MESG 89
+Watt
+@MEND
+
+@MESG 8A
+Chiao
+@MEND
+
+@MESG 8B
+Dau'
+@MEND
+
+@MESG 8C
+Carlos
+@MEND
+
+@MESG 8D
+Ratsuka
+@MEND
+
+@MESG 8E
+Eru
+@MEND
+
+@MESG 8F
+Sheba
+@MEND
+
+@MESG 90
+Lemo
+@MEND
+
+@MESG 91
+Jill
+@MEND
+
+@MESG 92
+Uiya
+@MEND
+
+@MESG 93
+Bibi
+@MEND
+
+@MESG 94
+Abuto
+@MEND
+
+@MESG 95
+Pasha
+@MEND
+
+@MESG 96
+Rana
+@MEND
+
+@MESG 97
+Sepa
+@MEND
+
+@MESG 98
+Walan
+@MEND
+
+@MESG 99
+Stola
+@MEND
+
+@MESG 9A
+Lyzol
+@MEND
+
+@MESG 9B
+Zoba
+@MEND
+
+@MESG 9C
+Oran
+@MEND
+
+@MESG 9D
+Ricbit
+@MEND
+
+@MESG 9E
+Aden
+@MEND
+
+@MESG 9F
+Yafuo
+@MEND
+
+@MESG A0
+Baher
+@MEND
+
+@MESG A1
+Sook
+@MEND
+
+@MESG A2
+Minare
+@MEND
+
+@MESG A3
+Hoots
+@MEND
+
+@MESG A4
+Shirata
+@MEND
+
+@MESG A5
+Kanuk
+@MEND
+
+@MESG A6
+Heki
+@MEND
+
+@MESG A7
+Bamiya
+@MEND
+
+@BLOCKEND
+
+/* comandos */
+
+41A80
+@BLOCKSTART 419C0
+
+@MESG 0
+@MESG 1
+ADAGA
+@MEND
+
+@MESG 2
+VELA
+@MEND
+
+@MESG 3
+A'GUA
+@MEND
+
+@MESG 4
+ANEL
+@MEND
+
+@MESG 5
+MUDA
+@MEND
+
+@MESG 6
+CARTA
+@MEND
+
+/* machado */
+@MESG 7
+#X73 #X74 #X75 #X76 #X77
+@MEND
+
+/* diamante */
+@MESG 8
+#XA1 #XA2 #XA3 #XA4 #XA5
+@MEND
+
+@MESG 9
+PASSE
+@MEND
+
+@MESG A
+COLAR
+@MEND
+
+@MESG B
+MANTO
+@MEND
+
+/* martelo */
+@MESG C
+#X73 #X5F #X62 #X7C #X77
+@MEND
+
+@MESG D
+@MESG E
+@MESG F
+@MESG 10
+@MESG 11
+@MESG 12
+@MESG 13
+@MESG 14
+@MESG 15
+@MESG 16
+@MESG 17
+@MESG 18
+ABRIR
+@MEND
+
+@MESG 19
+NTC19
+@MEND
+
+@MESG 1A
+OUVIR
+@MEND
+
+@MESG 1B
+OLHAR
+@MEND
+
+@MESG 1C
+FALAR
+@MEND
+
+@MESG 1D
+OLHAR
+@MEND
+
+/* examinar */
+@MESG 1E
+#X5B #X5C #X5D #X5E #X5F
+@MEND
+
+@MESG 1F
+PEGAR
+@MEND
+
+@MESG 20
+USAR
+@MEND
+
+/* mostrar */
+@MESG 21
+#X60 #X61 #X62 #X63 #X64
+@MEND
+
+@MESG 22
+DAR
+@MEND
+
+@MESG 23
+FAZER
+@MEND
+
+@MESG 24
+CASA
+@MEND
+
+@MESG 25
+CAMPO
+@MEND
+
+@MESG 26
+MUDA
+@MEND
+
+@MESG 27
+VOCE
+@MEND
+
+/* butako */
+@MESG 28
+#X7D #X7E #X7F #X80 #0
+@MEND
+
+/* bajular */
+@MESG 29
+#X69 #X6A #X6B #X6C #X6D
+@MEND
+
+@MESG 2A
+LAVAR
+@MEND
+
+@MESG 2B
+BEBER
+@MEND
+
+@MESG 2C
+PEGAR
+@MEND
+
+@MESG 2D
+ROUPA
+@MEND
+
+/* vestir */
+@MESG 2E
+#X85 #X86 #X62 #X64 #0
+@MEND
+
+@MESG 2F
+PISAR
+@MEND
+
+/* cheirar */
+@MESG 30
+#X8D #X8E #X8F #X5F #0
+@MEND
+
+/* quebrar */
+@MESG 31
+#X87 #X88 #X89 #X63 #X64
+@MEND
+
+/* empurrar */
+@MESG 32
+#X84 #X8A #X8B #X8C #X5F
+@MEND
+
+/* perguntar */
+@MESG 33
+#X6E #X6F #X70 #X71 #X5F
+@MEND
+
+/* perguntar */
+@MESG 34
+#X6E #X6F #X70 #X71 #X5F
+@MEND
+
+@MESG 35
+JOGO
+@MEND
+
+@MESG 36
+AVISO
+@MEND
+
+/* refletir */
+@MESG 37
+#X81 #X82 #X83 #X62 #X64
+@MEND
+
+@MESG 38
+BATER
+@MEND
+
+/* bajular */
+@MESG 39
+#X69 #X6A #X6B #X6C #X6D
+@MEND
+
+/* consolar */
+@MESG 3A
+#X65 #X90 #X91 #X92 #X64
+@MEND
+
+@MESG 3B
+OUVIR
+@MEND
+
+@MESG 3C
+MOVER
+@MEND
+
+/* ajudar */
+@MESG 3D
+#X93 #X94 #X95 #X64 #0
+@MEND
+
+/* insistir */
+@MESG 3E
+#X96 #X97 #X98 #X99 #X9A
+@MEND
+
+/* cobrar */
+@MESG 3F
+#X65 #X9B #X63 #X64 #0
+@MEND
+
+/* desistir */
+@MESG 40
+#X9C #X9D #X98 #X99 #X9A
+@MEND
+
+@MESG 41
+PEDIR
+@MEND
+
+@MESG 42
+BEIJO
+@MEND
+
+@MESG 43
+FITA
+@MEND
+
+@MESG 44
+DISCO
+@MEND
+
+/* conferir */
+@MESG 45
+#X65 #X66 #X67 #X68 #X64
+@MEND
+
+/* 3 lados */
+@MESG 46
+#X13 #0 #X9E #X9F #XA0
+@MEND
+
+/* 4 lados */
+@MESG 47
+#X14 #0 #X9E #X9F #XA0
+@MEND
+
+/* 6 lados */
+@MESG 48
+#X16 #0 #X9E #X9F #XA0
+@MEND
+
+@MESG 49
+ORBE
+@MEND
+
+@MESG 4A
+FADA
+@MEND
+
+@MESG 4B
+COMER
+@MEND
+
+@MESG 4C
+ZOAR
+@MEND
+
+@MESG 4D
+CURAR
+@MEND
+
+/* espiar */
+@MESG 4E
+#X78 #X79 #X7A #X64 #0
+@MEND
+
+@MESG 4F
+FUGIR
+@MEND
+
+@MESG 50
+LUTAR
+@MEND
+
+@MESG 51
+SRAM
+@MEND
+
+@MESG 52
+BEIJO
+@MEND
+
+@MESG 53
+OUVIR
+@MEND
+
+@MESG 54
+POLIR
+@MEND
+
+/* dormir */
+@MESG 55
+#XA6 #XA7 #X5D #X9A
+@MEND
+
+/* picotar */
+@MESG 56
+#XA8 #XA9 #XAA #XAB #X6D
+@MEND
+
+@MESG 57
+LER
+@MEND
+
+/* encorajar */
+@MESG 58
+#XAC #XAD #XAE #XAF #X5F
+@MEND
+
+@MESG 59
+PEGAR 
+@MEND
+
+@MESG 5A
+COLO
+@MEND
+
+/* abraço */
+@MESG 5B
+#XB0 #XB1 #XB2 #XB3 #0
+@MEND
+
+@MESG 5C
+REZAR
+@MEND
+
+@MESG 5D
+SENHA
+@MEND
+
+@BLOCKEND
+
+/* texto 01xxxxxx */ 
+
+42040
+@BLOCKSTART 42000
+
+@MESG 0
+@@BUTAKO @OPEN Com quem voce^ quer falar? Seja claro! @CLOSE @ENTER
+@@YOU @OPEN Mas que pentelha @CLOSE
+@MEND
+
+@MESG 1
+@@BUTAKO @OPEN Ai' na~o tem ningue'm! Voce^ esta' dormindo, @YOU @NOSPACE ? @CLOSE @WAIT
+@@YOU @OPEN Que falta de respeito! Zzzzz;; @CLOSE
+@MEND
+
+@MESG 2
+@@BUTAKO @OPEN So' tem a gente aqui! @CLOSE @WAIT
+@@YOU @OPEN Eu sei! Mas e se eu quiser falar mesmo assim, qual o problema? @CLOSE
+@MEND
+
+@MESG 3
+@@BUTAKO @OPEN Esta' conversando com quem? @CLOSE @WAIT
+@@YOU @OPEN Eu gosto de falar sozinho, ta'! @CLOSE
+@MEND
+
+@MESG 4
+@@BUTAKO @OPEN O que voce^ esta' olhando? @WAIT Na~o temos tempo
+para ficar nos distrai'ndo! @CLOSE @WAIT
+@@YOU @OPEN Sou distrai'do com orgulho! @CLOSE
+@MEND
+
+@MESG 5
+@@BUTAKO @OPEN A paisagem e' isso que voce^ esta' vendo; @CLOSE
+@MEND
+
+@MESG 6
+@@BUTAKO @OPEN Na~o tem nada que chame a aten+a~o; @CLOSE 
+@MEND 
+
+@MESG 7
+@@BUTAKO @OPEN Na~o vejo nada de esquisito por aqui. @CLOSE @WAIT
+@@YOU @OPEN E'; a u'nica coisa esquisita aqui e' a sua cara. @CLOSE
+@MEND
+
+@MESG 8
+@@BUTAKO @OPEN Voce^ quer me examinar? @WAIT Na sua idade e' 
+meio esquisito brincar de me'dico, na~o acha? @CLOSE @WAIT
+@@YOU @OPEN Na~o; @ENTER A`s vezes e' bom; @WAIT Mas o que voce^
+estava dizendo mesmo? @CLOSE
+@MEND
+
+@MESG 9
+@@BUTAKO @OPEN Na~o adianta me examinar; @CLOSE
+@MEND
+
+@MESG A
+@@BUTAKO @OPEN Eu na~o tenho tempo a perder; @CLOSE
+@MEND
+
+@MESG B
+@@BUTAKO @OPEN Por que voce^ na~o examina sua pro'pria cabe+a? @CLOSE @WAIT
+@@YOU @OPEN E' que na~o tem muita coisa aqui dentro; @CLOSE
+@MEND
+
+@MESG C
+@@BUTAKO @OPEN Voce^ tem o mau costume de ir pegando em tudo; @CLOSE
+@MEND
+
+@MESG D
+@@BUTAKO @OPEN Voce^ quer que uma lady como eu carregue para voce^? @CLOSE @WAIT
+@@YOU @OPEN Lady? Onde? @CLOSE
+@MEND
+
+@MESG E
+@@BUTAKO @OPEN Por que voce^ na~o pega comida pra mim? @CLOSE @WAIT
+@@YOU @OPEN Na~o fique falando bobagens! @CLOSE
+@MEND
+
+@MESG F
+@@BUTAKO @OPEN Eu na~o vejo nada para pegar; @CLOSE
+@MEND
+
+@MESG 10
+@@BUTAKO @OPEN Use sua pro'pria cabe+a; boba~o! @CLOSE
+@MEND
+
+@MESG 11
+@@BUTAKO @OPEN Eu na~o sou sua empregada, @YOU @NOSPACE ! Comporte-se! @CLOSE @WAIT
+@@YOU @OPEN Ue'; eu achei que era! @CLOSE
+@MEND
+
+@MESG 12
+@@BUTAKO @OPEN Parece que na~o tem nada que de^ para usar; @CLOSE
+@MEND
+
+@MESG 13
+@@BUTAKO @OPEN O que voce^ quer usar? Seja claro! @CLOSE
+@MEND
+
+@MESG 14
+@@BUTAKO @OPEN Na~o me mostre coisas estranhas! @CLOSE 
+@@YOU @OPEN No que voce^ esta' pensando? @CLOSE
+@MEND
+
+@MESG 15
+@@BUTAKO @OPEN Fala se'rio, voce^ esta' so' fingindo que
+quer mostrar algo; @CLOSE
+@MEND
+
+@MESG 16
+@@BUTAKO @OPEN Pra quem voce^ quer mostrar? Na~o tem ningue'm aqui! @CLOSE @ENTER
+@@YOU @OPEN Ah, e' mesmo; @CLOSE 
+@MEND
+
+@MESG 17
+@@BUTAKO @OPEN Pra quem voce^ quer mostrar? @CLOSE
+@MEND
+
+@MESG 18
+@@BUTAKO @OPEN Eu na~o tenho nada para entregar; @CLOSE
+@MEND
+
+@MESG 19
+@@BUTAKO @OPEN Voce^ vai me dar? Abandonar minha companhia? @CLOSE @WAIT
+@@YOU @OPEN A oferta e' tentadora; @CLOSE
+@MEND
+
+@MESG 1A
+@@BUTAKO @OPEN Voce^ na~o tem mais nada pra fazer? @CLOSE
+@MEND
+
+@MESG 1B
+@@BUTAKO @OPEN Pra quem sera' que voce^ quer entregar isso? @CLOSE
+@MEND
+
+@MESG 1C
+@@BUTAKO @OPEN Agora na~o e' hora pra isso! @CLOSE
+@MEND
+
+@MESG 1D
+@@BUTAKO @OPEN Voce^ tem que decidir o que fazer! @CLOSE @WAIT
+@@YOU @OPEN Mas eu estou indeciso; @CLOSE
+@MEND
+
+@MESG 1E
+@@BUTAKO @OPEN Deixa disso! Estamos com pressa! @CLOSE
+@MEND
+
+@MESG 1F
+@@BUTAKO @OPEN Fazer o que^? @CLOSE @ENTER
+@@YOU @OPEN Sei la'; @CLOSE
+@MEND
+
+@BLOCKEND
+
+/* texto 02xxxxxx */
+
+42840
+@BLOCKSTART 42800
+
+@MESG 0
+@MESG 1
+@MESG 2
+@MESG 3
+@MESG 4
+@@SOMEONE @ENTER @OPEN Tem alguma coisa esquisita no meu rosto? @CLOSE @WAIT
+@@YOU @OPEN Tem meleca escorrendo do seu nariz; @CLOSE
+@MEND
+
+@MESG 5
+@@SOMEONE @ENTER @OPEN E' falta de educa+a~o ficar encarando! @CLOSE
+@MEND
+
+@MESG 6
+@@SOMEONE @ENTER @OPEN SMACK! @CLOSE @WAIT
+@@YOU @OPEN Eu, hein? To^ te estranhando! @CLOSE
+@MEND
+
+@MESG 7
+@@SOMEONE @ENTER @OPEN Voce^ esta' me encarando para me hipnotizar? @CLOSE
+@MEND
+
+@MESG 8 
+@@SOMEONE @ENTER @OPEN Isso faz co'cegas! Pa'ra! @CLOSE
+@MEND
+
+@MESG 9
+@@SOMEONE @ENTER @OPEN Vou te contar um segredo; @WAIT 
+Somos primos de terceiro grau! @CLOSE
+@MEND
+
+@MESG A
+@@SOMEONE @ENTER @OPEN Desde quando voce^ tem o ha'bito de tocar os outros? @CLOSE
+@MEND
+
+@MESG B
+@@SOMEONE @ENTER @OPEN Voce^ tem uns ha'bitos estranhos @CLOSE
+@MEND
+
+@MESG C
+@@SOMEONE @ENTER @OPEN Na~o adianta pegar o que voce^ na~o pode carregar. @CLOSE
+@MEND
+
+@MESG D
+@@SOMEONE @ENTER @OPEN AAAhhh! Ladra~o! @CLOSE @ENTER
+@@YOU @OPEN Onde? Eu pego ele! @CLOSE @WAIT
+@@BUTAKO @OPEN Seu bobo, era de voce^ que estavam falando! @CLOSE
+@MEND
+
+@MESG E
+@@SOMEONE @ENTER @OPEN Voce^ quer pegar em tudo, hein? @CLOSE
+@MEND
+
+@MESG F
+@@SOMEONE @ENTER @OPEN Eu na~o tenho dinheiro! @CLOSE 
+@MEND
+
+@MESG 10
+@@SOMEONE @ENTER @OPEN Voce^ gosta de mandar nos outros, ne'? @CLOSE
+@MEND
+
+@MESG 11
+@@SOMEONE @ENTER @OPEN Eu na~o tenho nenhuma ferramenta. @CLOSE
+@MEND
+
+@MESG 12
+@@SOMEONE @ENTER @OPEN Eu sou um simples ser humano. @CLOSE
+@MEND
+
+@MESG 13
+@@SOMEONE @ENTER @OPEN O que voce^ quer fazer comigo? @CLOSE
+@MEND
+
+@MESG 14
+@@SOMEONE @ENTER @OPEN O que voce^ vai me mostrar? Estou curioso! @CLOSE
+@MEND
+
+@MESG 15
+@@SOMEONE @ENTER @OPEN Pra que voce^ me mostrou o rosto? @CLOSE
+@MEND
+
+@MESG 16
+@@SOMEONE @ENTER @OPEN Pra que voce^ quer me mostrar isso ai'? @CLOSE
+@MEND
+
+@MESG 17
+@@SOMEONE @ENTER @OPEN Ta', voce^ me mostrou. E dai'? @CLOSE
+@MEND
+
+@MESG 18
+@@SOMEONE @ENTER @OPEN Eu quero ver isso ai', sim! @CLOSE
+@MEND
+
+@MESG 19
+@@SOMEONE @ENTER @OPEN E' comigo? @CLOSE
+@MEND
+
+@MESG 1A
+@@SOMEONE @ENTER @OPEN Voce^ vai me dar alguma coisa? @CLOSE
+@MEND
+
+@MESG 1B
+@@SOMEONE @ENTER @OPEN Voce^ quer que eu carregue isso ai'? @CLOSE
+@MEND
+
+@MESG 1C
+@@SOMEONE @ENTER @OPEN Seja claro, por favor. @CLOSE
+@MEND
+
+@MESG 1D
+@@SOMEONE @ENTER @OPEN Quer que eu comece a fazer o que^? @CLOSE
+@MEND
+
+@MESG 1E
+@@SOMEONE @ENTER @OPEN Voce^ quer que eu fa+a alguma coisa estranha; @CLOSE
+@MEND
+
+@MESG 1F
+@@SOMEONE @ENTER @OPEN O que^? @CLOSE
+@MEND
+
+@BLOCKEND 
+
+/* texto 04xxxxxx */
+
+42CF0
+@BLOCKSTART 42CE0
+
+@MESG 0
+@@SOMEONE @ENTER @OPEN Onde eu iria usar isso? @CLOSE
+@MEND
+
+@MESG 1
+@@SOMEONE @ENTER @OPEN Pra que voce^ me mostrou isso? @CLOSE
+@MEND
+
+@MESG 2
+@@SOMEONE @ENTER @OPEN Eu na~o quero pegar isso! @CLOSE
+@MEND
+
+@BLOCKEND
+
+/* mensagens escritas diretamente na vram */
+
+43000
+@BLOCKSTART 42D50
+
+@MESG 0
+#X49 #X3A APERTE ESPA=O @ENTER
+#X8C #X3A INICIA @ENTER
+#XAC #X3A CONTINUA @ENTER
+#XE5 #X3A TRADU=AO: @CLEAR RICBIT 2004 @ENTER
+#XCB #X3A ~ 
+@MEND
+
+@MESG 1
+#X2D #X3A FITA @ENTER
+#XED #X39 SENHA @ENTER
+#XC3 #X38 Ricbit @OPEN Eu sou o @CLEAR #0 administrador @ENTER
+#X09 #X39 de Save Game #XF5 @CLEAR #0 Escolha @ENTER
+#X49 #X39 o metodo: @CLOSE @ENTER
+#X2C #X39 ' 
+@MEND
+ 
+
+@MESG 2
+#XC3 #X38 Ricbit @OPEN Prepare a @CLEAR #0 fita @ENTER
+#X09 #X39 e aperte @CLEAR #0 ENTER #XF5 @CLOSE
+@MEND
+ 
+@MESG 3
+#XC3 #X38 Ricbit @OPEN Estou lendo @CLEAR #0 agora #XF5 @ENTER
+#X09 #X39 Aguarde #XF5 @CLOSE
+@MEND
+ 
+@MESG 4
+#XC3 #X38 Ricbit @OPEN Leitura @CLEAR #0 finalizada #XF5 @CLOSE
+@MEND
+
+@MESG 5
+#X65 #X3A @OPEN Estou salvando @ENTER
+#XA5 #X3A agora, aguarde; @CLOSE
+@MEND
+ 
+@MESG 6
+#X65 #X3A @OPEN Estou verificando @ENTER
+#XA5 #X3A agora, aguarde; @CLOSE
+@MEND
+ 
+@MESG 7
+#X6D #X3A DISCO
+@MEND
+
+@MESG 8
+#XC3 #X38 Ricbit @OPEN Prepare o @CLEAR #0 disco @ENTER
+#X09 #X39 e aperte @CLEAR #0 ENTER #XF5 @CLOSE
+@MEND
+ 
+@MESG 9
+@MESG C
+#XC3 #X38 Ricbit @OPEN A leitura @CLEAR #0 esta @ENTER
+#X09 #X39 com problemas #XF5 @CLOSE @ENTER
+#XB7 #X38 '
+@MEND
+ 
+@MESG A
+#XC3 #X38 Ricbit @OPEN Aperte @CLEAR #0 ENTER #XF5 @CLOSE
+@MEND
+  
+@MESG B
+#X83 #X38 Ricbit @OPEN Insira a @CLEAR #0 senha #XF5 @CLOSE
+@MEND
+  
+@MESG D
+#X08 #X39 Hoje @ENTER
+#X12 #X39 foi morto @ENTER
+#X48 #X39 condenando o Reino @ENTER
+#X88 #X39 a um triste fim! @ENTER
+#XCC #X39 THE END 
+@MEND
+  
+@MEND
+
+@BLOCKEND
+
+/* Inicio da descricao das salas - alocacao automatica de endereco */
+
+44000
+@ROOMMODE
+
+@ROOMSTART 0200
+
+@RMESG 0
+Hero'i: Voce^ @ENTER
+Aluno do colegial,
+li'der do clube de computadores. @ENTER
+Depois das aulas, usa os micros do clube para jogar. @ENTER
+Parece rude, mas no fundo e' bem gentil. @REND
+
+@RMESG 1
+Heroi'na: Namorada @ENTER
+Esta' na mesma classe que voce^,
+e tambe'm pertence ao clube de computadores. @ENTER
+Como voce^ e' um tapado, na~o percebeu
+que ela esta' a fim de voce^. @REND
+
+@RMESG 2
+Hoje, @YOU jogava no clube, quando @GIRL entrou,
+com um jogo novo. 
+@REND
+
+@RMESG 3
+@@YOU @OPEN Ue', voce^ veio sozinha? @CLOSE @ENTER
+@@GIRL @OPEN Vim; @CLOSE 
+@REND
+
+@RMESG 4
+@@GIRL @OPEN Jogando de novo? Voce^
+devia estar programando! @CLOSE @WAIT
+@@YOU @OPEN Entendi, entendi. 
+Na~o precisa passar serma~o! @CLOSE 
+@REND
+
+@RMESG 5
+@@YOU @OPEN O que voce^ esta' segurando? @CLOSE @ENTER
+@@GIRL @OPEN Na~o e' nada; @CLOSE 
+@REND
+
+@RMESG 6
+@@YOU @OPEN E' o Shalom, o jogo novo da Konami, na~o e'? Vamos jogar! @CLOSE @WAIT
+@@GIRL @OPEN Na~o! Na~o pode! @CLOSE @WAIT
+@@YOU @OPEN Deixa de ser pa~o-dura.
+Jogar um pouquinho so' na~o estraga; @CLOSE @WAIT
+@@GIRL @OPEN E' melhor pra voce^ se na~o jogar! @CLOSE 
+@REND
+
+@RMESG 7
+@@YOU @OPEN ;olha ali atra's! @CLOSE @WAIT
+@@GIRL @OPEN Ali onde? ;aai! @CLOSE @ENTER
+@@YOU @OPEN Que boba. Caiu no truque! @CLOSE 
+@RWAITEND F9
+
+@RMESG 8
+@@GIRL @OPEN Seu indecente! @ENTER Tira a ma~o! @CLOSE @ENTER SOCK! POW! CRACK! @ENTER
+@@YOU @OPEN Ai! Isso doeu! @CLOSE 
+@REND
+
+@RMESG 9
+@@GIRL @OPEN Voce^ quer jogar de qualquer jeito, ne'?
+Entendi. @WAIT Pelo menos tome cuidado! @CLOSE @WAIT 
+@@YOU @OPEN Cuidado com o que^? Bem, vou ligar agora! @CLOSE 
+@RWAITEND FC
+
+@RMESG A
+@@YOU @OPEN Meu nome? @ENTER
+Meu nome e' @YOU @NOSPACE . @CLOSE
+@REND
+
+@RMESG B
+@@YOU @OPEN Tenho que colocar o nome da garota que eu gosto? Hmmm; @CLOSE @WAIT
+@@GIRL @OPEN @YOU @NOSPACE , por que voce^ na~o coloca o meu nome? @CLOSE @WAIT
+@@YOU @OPEN O que^? Voce^ gosta de mim? @CLOSE @WAIT
+@@GIRL @OPEN Ja' que eu trouxe o jogo, agrade+a
+colocando #0 @KOPEN @GIRL @KCLOSE @ENTER ai'! @CLOSE @WAIT
+@@YOU @OPEN Isso parece mais obsessa~o que 
+declara+a~o de amor; @WAIT @KOPEN @GIRL @KCLOSE ; Pronto. @CLOSE
+@REND
+
+@RMESG C
+@@YOU @OPEN Bem,vou come+ar; @CLOSE 
+@REND
+
+@RMESG D
+@@YOU @OPEN Aaaahhh!! @CLOSE @ENTER
+@@GIRL @OPEN Aaiii! @YOU @NOSPACE !! @CLOSE
+@REND
+
+@RMESG E
+O @YOU desaparece diante dos olhos de @GIRL @NOSPACE !
+@RWAITEND FF
+
+@RMESG F
+@RMESG 10
+@RMESG 21
+@REND
+
+@RMESG 11
+@@GIRL @OPEN O que esta' procurando? @ENTER
+Voce^ esta' com um olhar estranho; @CLOSE 
+@REND
+
+@RMESG 12
+@@GIRL @OPEN
+Pega uma cadeira para mim,
+assim no's dois podemos jogar.
+@CLOSE 
+@REND
+
+@RMESG 13
+Rei Pampas @ENTER
+Filho dos hero'is Popolon e Afrodite,
+manteve a paz no Reino Grego apo's
+a morte dos dois. @ENTER
+Pore'm, sua filha Chelsea sumiu,
+e por isso ele ficou doente, 
+repousando em sua cama. @REND
+
+@RMESG 14
+Butako @ENTER
+Habitante do Reino Grego, e' uma porquinha 
+que aprendeu a falar a li'ngua dos homens. 
+A`s vezes ficara' te pentelhando, e a`s vezes ficara' 
+te encorajando, mas sera' uma boa parceira.
+@REND
+
+@RMESG 15
+Princesa Chelsea @ENTER
+Filha u'nica do Rei Pampas. @ENTER
+E' a garota mais bela e gentil de todo o reino, 
+querida e admirada por todos os seus su'ditos. @ENTER
+Mas, um dia, ela misteriosamente desapareceu.
+@REND
+
+@RMESG 16
+Gog @ENTER
+E' o rei do terror, senhor do mundo sombrio. @ENTER
+Pretende ressuscitar do inferno para dominar
+o mundo dos homens. 
+@REND
+
+@RMESG 17
+Popolon @ENTER
+No passado, tornou-se um hero'i ao derrotar
+Hudnos e Galious durante a crise no Reino Grego. @ENTER
+Atualmente, ele e' um anjo que protege o reino, 
+observando la' do ce'u. 
+@REND
+
+@RMESG 18
+Afrodite @ENTER
+Antigamente era uma princesa, que lutou 
+bravamente para salvar seu rece'm-nascido filho
+Pampas. @ENTER
+Atualmente, observa o reino la' de cima,
+junto com Popolon. 
+@REND
+
+@RMESG 19
+@RMESG 1A
+@RMESG 1B
+@@YOU @OPEN Ungh! Parece que meu corpo
+ficou em peda+os. O que aconteceu? @CLOSE @WAIT
+@@YOU @OPEN Lembrei! Eu tinha acabado de
+come+ar o jogo, quando tudo ficou escuro @CLOSE
+@REND
+
+@RMESG 1C
+@@YOU @OPEN Meu corpo esta' ta~o pesado; @ENTER
+Na~o consigo levantar! @CLOSE
+@REND
+
+@RMESG 1E
+@RETURN Porco @OPEN Oink Oink @CLOSE @ENTER
+@@YOU @OPEN Estou ouvindo voz de porco? @CLOSE
+@REND
+
+@RMESG 1F
+@@YOU @OPEN Minhas pa'lpebras esta~o um pouco pesadas; @CLOSE 
+@RWAITEND FC
+
+@RMESG 20
+@@YOU @OPEN Uaaa! Que e' isso? @WAIT
+Na~o e' um pouco pesado, e' um porco pesado! Eu devo estar sonhando! @CLOSE
+@RWAITEND FF
+
+@RMESG 22
+@RETURN Porco @OPEN Desculpe. @ENTER Eu na~o tinha a inten+a~o de assustar. @CLOSE @WAIT
+@@YOU @OPEN Podia na~o ter inten+a~o, mas ver sua cara assusta qualquer um! @CLOSE
+@REND
+
+@RMESG 23
+@@YOU @OPEN Voce^; consegue falar? @CLOSE @ENTER
+@RETURN Porco @OPEN Consigo sim. @ENTER Assustado? @CLOSE @WAIT
+@@YOU @OPEN Qualquer um se assusta olhando pra sua cara! @CLOSE
+@REND
+
+@RMESG 24
+@RETURN Porco @OPEN
+Voce^ parece meio perdido, por isso vou te mostrar onde esta'. @WAIT
+Aqui na~o e' a sua cidade. Aqui e' um antigo reino de fantasia. @WAIT
+Magia e milagres acontecem de verdade neste mundo. @CLOSE @WAIT
+@@YOU @OPEN Se liga, meu. Aqui e' Santa Cruz do Rio Pardo, 
+a cidade onde nasci @CLOSE @WAIT
+@RETURN Porco @OPEN Bem, enta~o olhe a sua volta! @CLOSE
+@RWAITEND F6
+
+@RMESG 25
+@RETURN Porco @OPEN E ai'? Na~o parece o seu mundo, na~o acha? @CLOSE @ENTER
+@@YOU @OPEN ;; @CLOSE @WAIT
+@RETURN Porco @OPEN Ate' que enfim entendeu! @WAIT
+Voce^ veio parar nesse mundo pela maldi+a~o daquele jogo. @WAIT
+Se voce^ quiser retornar para seu mundo; @WAIT
+existe apenas uma maneira! @CLOSE @ENTER
+@@YOU @OPEN Qual e'? @CLOSE @WAIT
+@RETURN Porco @OPEN Voce^ precisa @ENTER derrotar Gog, o grande
+rei dos demonios! @CLOSE @WAIT
+@@YOU @OPEN Brincou! @CLOSE
+@REND
+
+@RMESG 26
+@@YOU @OPEN Se na~o tem jeito; @WAIT
+Eu tenho que fazer esse Gog sofrer agora mesmo! @ENTER
+Onde ele esta'? @CLOSE @WAIT
+@RETURN Porco @OPEN O paradeiro do Gog e' desconhecido. @WAIT
+Na~o seja impaciente. Vamos encontrar o Rei Pampas primeiro. @CLOSE @WAIT
+@@YOU @OPEN Quem e' esse? Voce^ conhece, porco? @CLOSE @WAIT
+@RETURN Porco @OPEN Voce^ vai entender quando conhece^-lo. @WAIT
+Mas; porco? Na~o tem um nominho melhor para mim, na~o? @CLOSE @WAIT
+@@YOU @OPEN Ahn; enta~o que tal Butao? @CLOSE @WAIT
+@RETURN Porco @OPEN Que falta de @ENTER educa+a~o! Butao e' nome 
+de homem. Eu sou uma lady! @CLOSE @WAIT
+@@YOU @OPEN Hehe; Vai ser Butako enta~o. @ENTER Eu sou @YOU @NOSPACE . @CLOSE @WAIT
+@@BUTAKO @OPEN Melhorou. Vamos ra'pido ao castelo, enta~o. @CLOSE
+@RWAITEND FC
+
+@RMESG 27
+@@YOU @OPEN Voce^ e' feia pra caramba, hein? @CLOSE @WAIT
+@RETURN Porco @OPEN Voce^ nunca se olhou no espelho? @CLOSE
+@REND
+
+@RMESG 28
+@RETURN Porco @OPEN Voce^ e' exagerado, na~o? @CLOSE @ENTER
+@@YOU @OPEN ? @CLOSE @WAIT
+@RETURN Porco @OPEN Que tarado! Fica me tocando por
+qualquer coisa! Abusado! @CLOSE 
+@REND
+
+@RMESG 29
+@RETURN Porco @OPEN Que insistente! Comporte-se! @CLOSE
+@REND
+
+@RMESG 2A
+@RETURN Porco @OPEN Eu sou ta~o bonita assim 
+para voce^ ficar me encarando? @CLOSE @WAIT
+@@YOU @OPEN Fala se'rio. Pra ficar bonita, voce^
+precisa lavar o rosto com bombril @CLOSE
+@REND
+
+@RMESG 2B
+@RETURN Porco @OPEN E' melhor na~o se mexer ainda; @CLOSE
+@REND
+@ROOMEND
+
+
+@ROOMSTART 00CF
+
+@RMESG 0
+@@YOU @OPEN Por acaso voce^ teria uma arma ou um escudo para emprestar? @CLOSE @WAIT
+&Rod @OPEN Pra que voce^ quer? @CLOSE @ENTER
+@@YOU @OPEN Vou tentar derrotar o Gog! @CLOSE @WAIT
+&Rod @OPEN Voce^ e' muito jovem pra isso! @WAIT
+Deixe-me ver se tem algo aqui que voce^ va' gostar; @WAIT
+Eu vou te dar essa adaga! Tome cuidado! @CLOSE
+@REND
+
+@RMESG 1
+@@YOU @OPEN Por acaso voce^ teria outra arma ou escudo para emprestar? @CLOSE @WAIT
+&Rod @OPEN Eu na~o uso armas; meu pro'prio corpo e' uma arma! @CLOSE
+@REND
+
+@RMESG 2
+&Mike @OPEN Cuidado! @CLOSE
+@REND
+
+@RMESG 3
+&Kyaro @OPEN No's somos os soldados da Gre'cia.  @WAIT
+Estamos sempre treinando o uso das armas! @CLOSE
+@REND
+
+@RMESG 4
+&Terato @OPEN Voce^ tambe'm, venha aqui assistir o treino @CLOSE
+@REND
+
+@RMESG 5
+&Saparo @OPEN Cuidado com as armas! @CLOSE
+@REND
+
+@ROOMEND
+
+
+
+@ROOMSTART 00AF
+
+@RMESG 0
+&Kurt @OPEN O Rei esta' descansando agora. 
+Seja breve em sua conversa. @CLOSE
+@REND
+
+@RMESG 1
+&Johann @OPEN O Rei esta' esperando ansiosamente por voce^s. @CLOSE
+@REND
+
+@RMESG 2
+@@BUTAKO @OPEN Tem um retrato pendurado na parede; @CLOSE
+@REND
+
+@RMESG 3
+@@BUTAKO @OPEN De quem sera' esse retrato? @CLOSE
+@REND
+
+@RMESG 4
+&Rei @OPEN @YOU @NOSPACE ! Butako! Eu estava esperando por voce^s! @WAIT
+Eu sabia que, como anjos, voce^s viriam para nos ajudar! @WAIT
+O Reino Grego esta' correndo agora um grande perigo, por causa do Gog; @CLOSE @WAIT
+@@YOU @OPEN O que o Gog esta' fazendo? @CLOSE
+@RWAITEND 01
+
+@RMESG 5
+&Rei @OPEN Ha' muito tempo, o Gog e' o Senhor do Mal encarnado, @WAIT
+reinando no inferno como o grande Rei dos Demo^nios. @WAIT
+As profecias antigas dizem o seguinte: @WAIT
+@KOPEN Algue'm seduzira' o cora+a~o dos homens para
+desvia'-los do caminho de Deus. @WAIT
+E quando chegar essa e'poca, ele ressuscitara' do inferno, @WAIT
+para semear o mal e o terror no mundo dos homens. @WAIT
+A destrui+a~o comecara' com a ajuda dos oito demo^nios. @WAIT
+E isso ocorrera' quando as estrelas 
+do ce'u formarem uma Grande Cruz @KCLOSE @CLOSE @WAIT
+@@YOU @OPEN ;; @CLOSE @ENTER
+&Rei @OPEN Ale'm disso, minha filha u'nica, a Princesa Chelsea, @WAIT
+esta' desaparecida ha' mais de quinze dias. @WAIT
+Por favor, eu quero que encontre Chelsea e derrote o Demo^nio Gog! @WAIT
+Tenho um retrato com o rosto da minha filha, voce^ pode ve^-la ali. @CLOSE @WAIT
+@@YOU @OPEN Essa histo'ria e' muito assustadora @CLOSE
+@REND
+
+@RMESG 6
+@@YOU @OPEN Caramba! Que bonita! Eu preciso definitivamente acabar com o Gog! @CLOSE @WAIT
+@@BUTAKO @OPEN Ela e' bonita mesmo; @WAIT Mas voce^ fica babando sempre que ve^ 
+uma mulher bonita, ne'? @CLOSE
+@REND
+
+@RMESG 7
+@@YOU @OPEN Vou tentar derrotar o Gog! @CLOSE @ENTER
+&Rei @OPEN Obrigado! Seja forte! @CLOSE
+@REND
+
+@RMESG 8
+&Rei @OPEN Voce^ ja' viu o retrato da minha filha? @CLOSE
+@REND
+
+@RMESG 9
+&Rei @OPEN @YOU @NOSPACE ! Butako! Eu estava esperando por voce^s!
+Eu sabia que, como anjos, voce^s viriam para nos ajudar! @WAIT
+O Reino Grego esta' correndo agora um grande perigo, por causa do Gog; @CLOSE @WAIT
+@@YOU @OPEN O que o Gog esta' fazendo? @CLOSE
+@RWAITEND 01
+
+@RMESG 0A
+&Rei @OPEN Ha' muito tempo, o Gog e' o Senhor do Mal encarnado, 
+reinando no inferno como o grande Rei dos Demo^nios. @WAIT
+As profecias antigas dizem o seguinte: @WAIT
+@KOPEN Algue'm seduzira' o cora+a~o dos homens para
+desvia'-los do caminho de Deus. @WAIT
+E quando chegar essa e'poca, ele ressuscitara' do inferno, 
+para semear o mal e o terror no mundo dos homens. @WAIT
+A destrui+a~o comecara' com a ajuda dos oito demo^nios. @WAIT
+E isso ocorrera' quando as estrelas 
+do ce'u formarem uma Grande Cruz @KCLOSE @CLOSE @ENTER
+@@YOU @OPEN ;; @CLOSE @ENTER @WAIT
+&Rei @OPEN Ale'm disso, minha filha u'nica, a Princesa Chelsea, 
+esta' desaparecida ha' mais de quinze dias. @WAIT
+Por favor, eu quero que encontre Chelsea e derrote o Demo^nio Gog! 
+Tenho um retrato com o rosto da minha filha, voce^ pode ve^-la ali. @CLOSE @WAIT
+@@YOU @OPEN Essa histo'ria e' muito assustadora @CLOSE
+@REND
+
+@RMESG 0B
+@@YOU @OPEN Caramba! Que bonita! Eu preciso definitivamente acabar com o Gog! @CLOSE @WAIT
+@@BUTAKO @OPEN Ela e' bonita mesmo; Mas voce^ fica babando sempre que ve^ 
+uma mulher bonita, ne'? @CLOSE
+@REND
+
+@ROOMEND
+
+
+@ROOMSTART 003B
+@ROOMSTART 004B
+@ROOMSTART 0075
+@ROOMSTART 00E4
+@ROOMSTART 00F9
+@ROOMSTART 010F
+@ROOMSTART 0183
+@ROOMSTART 01AC
+@ROOMSTART 01BC
+
+@RMESG 0
+@@SOMEONE @ENTER @OPEN Eu sou o administrador de Save Game. @WAIT
+Use a op+a~o @ENTER @KOPEN FAZER @KCLOSE #0 para escolher seu me'todo predileto. @WAIT
+No Reino Grego tem mais oito fudebas que podem fazer Save para voce^. @CLOSE
+@REND
+
+@RMESG 1
+@@SOMEONE @ENTER @OPEN Prepare a fita e aperte ENTER. @CLOSE
+@RWAITEND 10
+
+@RMESG 2
+@@SOMEONE @ENTER @OPEN Prepare o disco e aperte ENTER. @CLOSE
+@RWAITEND 11
+
+@RMESG 3
+@@SOMEONE @ENTER @OPEN Vou fazer a verifica+a~o da grava+a~o. @WAIT
+Aperte ENTER para come+ar. @CLOSE
+@RWAITEND 14
+
+@RMESG 4
+@@SOMEONE @ENTER @OPEN O Save foi realizado com sucesso. @WAIT
+Continue sua viagem com cuidado! @CLOSE
+@REND
+
+@RMESG 5
+@@SOMEONE @ENTER @OPEN Tome cuidado @CLOSE
+@REND
+
+@RMESG 6
+@@SOMEONE @ENTER @OPEN Vou fazer a verifica+a~o da grava+a~o. @WAIT
+Rebobine a fita e aperte ENTER para come+ar. @CLOSE
+@RWAITEND 13
+
+@RMESG 8
+@@SOMEONE @ENTER @OPEN A grava+a~o esta' com problema. @CLOSE
+@REND
+
+@RMESG 9
+@@SOMEONE @ENTER @OPEN Aperte ENTER. @CLOSE
+@RWAITEND 1F
+
+@RMESG A
+@@SOMEONE @ENTER @OPEN Vou fazer a verifica+a~o da grava+a~o. @WAIT
+Aperte ENTER para come+ar. @CLOSE
+@RWAITEND 20
+
+@RMESG B
+@@SOMEONE @ENTER @OPEN Memorize as palavras a seguir, por favor. @CLOSE
+@RWAITEND 29
+
+@RMESG C
+@@SOMEONE @ENTER @OPEN Confira a senha, vou falar novamente. @CLOSE
+@RWAITEND 2A
+
+@RMESG D
+@@SOMEONE @ENTER @OPEN E' importante que voce^ memorize todas as letras. @WAIT
+Viaje com cuidado @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 012F
+
+@RMESG 0
+@@BUTAKO @OPEN @KOPEN Vila Iriko @KCLOSE @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01A4
+
+@RMESG 00
+&Eru @OPEN A vila na outra margem deve ser habitada; @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 010B
+
+@RMESG 0
+@@BUTAKO @OPEN @KOPEN Montanha Helmon @KCLOSE @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 012E
+
+@RMESG 0
+&Tanu @OPEN Como isso foi acontecer? @WAIT 
+Betty, a minha filha querida, foi levada
+para um sacrifi'cio! @WAIT Betty!! @CLOSE
+@REND
+
+@RMESG 1
+&Esau @OPEN Pobre mulher. A Betty e' a u'nica filha da Tanu. @CLOSE
+@REND
+
+@RMESG 2
+@@YOU @OPEN Como e' a Betty? Ela e' bonita? @CLOSE @WAIT
+&Esau @OPEN Ela e' a garota mais bonita da vila! @CLOSE @WAIT
+@@BUTAKO @OPEN @YOU @NOSPACE , no que voce^ esta' pensando? @CLOSE
+@REND
+
+@RMESG 3
+@@SOMEONE @ENTER @OPEN Voce^ salvou a Betty! Eu agrade+o muito! @CLOSE
+@REND
+
+@RMESG 4
+@@SOMEONE @ENTER @OPEN Voce^ matou o demo^nio! @YOU @NOSPACE , voce^ e' um hero'i! @CLOSE
+@REND
+
+@ROOMEND
+
+
+@ROOMSTART 012D
+
+@RMESG 0
+&Barun @OPEN Aqui dentro e' o observato'rio onde Galileu
+estuda as estrelas. @CLOSE
+@REND
+
+@RMESG 1
+&Patty @OPEN Galileu e' um grande astro^nomo! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 010E
+
+@RMESG 0
+&Luna @OPEN A Betty e' a minha melhor amiga. Por favor, derrote o demo^nio! @CLOSE
+@REND
+
+@RMESG 1
+&Bebbe @OPEN O demo^nio esta' perto da montanha Helmon @CLOSE
+@REND
+
+@RMESG 2
+@@SOMEONE @ENTER @OPEN Voce^ salvou a Betty! Eu agrade+o muito! @CLOSE
+@REND
+
+@RMESG 3
+@@SOMEONE @ENTER @OPEN Voce^ matou o demo^nio! @YOU @NOSPACE , voce^ e' um hero'i! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 010D
+
+@RMESG 0
+&Jonas @OPEN Betty, uma garota da vila, sera' sacrificada para um demo^nio! @WAIT
+Por favor, nos ajude! @CLOSE @ENTER
+@@YOU @OPEN Demo^nio? @CLOSE @ENTER
+&Jonas @OPEN Isso mesmo! @WAIT O grande demo^nio, Gog, mandou 
+oito demo^nios para esse mundo. @WAIT Este e' o primeiro deles. @CLOSE
+@REND
+
+@RMESG 1
+&Jonas @OPEN Por favor, salve a Betty! @CLOSE
+@REND
+
+@RMESG 2
+@@SOMEONE @ENTER @OPEN Voce^ salvou a Betty! Eu agrade+o muito! @CLOSE
+@REND
+
+@RMESG 3
+@@SOMEONE @ENTER @OPEN Voce^ matou o demo^nio! @YOU @NOSPACE , voce^ e' um hero'i! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00ED
+
+@RMESG 0
+&Watt @OPEN Tem oito demo^nios espalhados pelo reino, causando desgra+as! @CLOSE
+@REND
+
+@ROOMEND
+
+
+@ROOMSTART 0109
+
+@RMESG 0
+&Betty @OPEN Socorro! @CLOSE
+@REND
+
+@RMESG 1
+&Betty @OPEN Voce^ e' o @YOU @NOSPACE , ne'? Obrigada! Estou salva! @CLOSE @WAIT
+@@YOU @OPEN Na~o precisa agradecer; @WAIT Depois voce^ faz um chazinho pra mim 
+e estamos quites! @CLOSE @WAIT
+&Betty @OPEN Obrigada! Eu vou correndo pra casa da mama~e, estou com saudades!
+@WAIT Ate' mais! @CLOSE
+@RWAITEND 05
+
+@RMESG 2
+@@YOU @OPEN ;eu fa+o qualquer coisa para ajudar essa garota; @WAIT
+Que bonita! Eu na~o mere+o tanto; @CLOSE @WAIT
+@@BUTAKO @OPEN Que mulherengo! Agora na~o e' hora de ficar xavecando! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00CE
+@RMESG 00
+&Elisa @OPEN A Princesa Chelsea e' muito importante para o Rei Pampas, @WAIT
+por isso ele a deixou muito mimada. @CLOSE
+@REND
+@ROOMEND
+
+@ROOMSTART 00AE
+@RMESG 00
+&Yoram @OPEN Se o Gog ressuscitar, o mundo sera' destrui'do. @WAIT
+Ele construira' em seu lugar o Mundo dos Demo^nios. @WAIT
+Somente se aparecer uma pessoa especial, @WAIT
+com amor e justi+a no cora+a~o, @WAIT
+o Demo^nio sera' enfrentado e a profecia se cumprira'. @CLOSE
+@REND
+@ROOMEND
+
+@ROOMSTART 0170
+
+@RMESG 0
+&Teresa @OPEN Eu sou a vendedora de velas. @WAIT Se na~o quer
+comprar nada, enta~o se manda daqui! @CLOSE
+@REND
+
+@RMESG 1
+@@YOU @OPEN Quanto custa umazinha? @CLOSE @WAIT
+&Teresa @OPEN Essas velas sa~o feitas a` ma~o, cansa e leva tempo pra fazer. 
+@WAIT Pense nisso e me diga um pre+o! 
+@CLOSE
+@REND 
+
+@RMESG 2
+@@YOU @OPEN Hmm; de gra+a! @CLOSE @ENTER
+&Teresa @OPEN Ta' louco? Na~o viaja! De gra+a nem morta! @CLOSE
+@REND 
+
+@RMESG 3
+@@BUTAKO @OPEN E' so' uma velha comum, vendendo velas. @CLOSE @WAIT
+&Teresa @OPEN Velha? Eu ainda sou uma senhorita @CLOSE 
+@@YOU @OPEN ;; @CLOSE
+@REND
+
+@RMESG 4
+&Teresa @OPEN Ei! Na~o e' pra sair pegando minhas velas sem pagar! @CLOSE
+@REND
+
+@RMESG 5
+@@YOU @OPEN Puxa, a senhorita faz velas de excelente qualidade, @WAIT
+sa~o magni'ficas! @CLOSE @ENTER
+&Teresa @OPEN Isso mesmo! Ja' vi que voce^ entende de velas! @WAIT
+Vou te dar uma vela para voce^ apreciar! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0146
+
+@RMESG 0
+@@BUTAKO @OPEN @KOPEN Vila dos @ENTER Cegos @KCLOSE @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0148
+
+@RMESG 0
+&Mane @OPEN Eu sou um carpinteiro. @WAIT Estou cortando essas a'rvores para
+consertar o outro lado da ponte. @CLOSE
+@REND
+
+@RMESG 1
+&Mane @OPEN A ponte esta' consertada! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0149
+@ROOMSTART 00CD
+@ROOMSTART 00D2
+
+@RMESG 0
+@@BUTAKO @OPEN @KOPEN Esta regia~o pertence ao Reino Grego @KCLOSE @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00E7
+@ROOMSTART 00A7
+
+@RMESG 0
+&Bode @OPEN Be'e'e'e'e' @CLOSE
+@REND
+
+@RMESG 1
+@@BUTAKO @OPEN E' um bode. @CLOSE
+@REND
+
+@RMESG 2
+@@BUTAKO @OPEN Que bode mono'tono! @CLOSE
+@REND
+
+@RMESG 3
+&Bode @OPEN Be' Be' Be'! @CLOSE @ENTER
+@@BUTAKO @OPEN Puxei a barba desse bode estu'pido. @CLOSE
+@REND
+
+@RMESG 4
+&Bode @OPEN Be'be' @CLOSE
+@REND
+
+@RMESG 5
+&Bode @OPEN Be'? @CLOSE
+@REND
+
+@RMESG 6
+&Bode @OPEN Crunch crunch bbbe'e' @CLOSE @ENTER
+@@BUTAKO @OPEN Bode burro! Na~o e' pra comer! @CLOSE @WAIT
+&Bode @OPEN Be'e' @CLOSE @ENTER
+@@BUTAKO @OPEN Esse bode come qualquer coisa que ve^ pela frente! @CLOSE
+@REND
+
+@RMESG 7
+&Bode @OPEN Be'be'? @CLOSE
+@REND
+
+@RMESG 8
+@@BUTAKO @OPEN Tem um bode aqui. @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00C8
+
+@RMESG 0
+&Simon @OPEN Desculpe, estou ocupado! @CLOSE
+@REND
+
+@RMESG 1
+@@YOU @OPEN Por acaso voce^ viu uma garota chamada Maria? @CLOSE @WAIT
+&Simon @OPEN Eu vi uma garota brincando por aqui ha' uns dois dias; @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0166
+
+@RMESG 0
+&Kalios @OPEN @YOU @NOSPACE ! Eu sou o chefe dessa vila. @CLOSE @ENTER
+@@YOU @OPEN Cade^ voce^? @CLOSE @WAIT
+&Kalios @OPEN E' uma longa histo'ria; O povo dessa vila e' muito religioso,
+@WAIT todos os dias nos reuni'amos para rezar para Deus. @WAIT
+Mas um dia, o Gog ficou com inveja de tanta adora+a~o @WAIT
+e resolveu apagar nosso povo da existe^ncia! @CLOSE @ENTER
+@@BUTAKO @OPEN Ah! Que cruel! @CLOSE
+@REND
+
+@RMESG 1
+&Kalios @OPEN Esta' muito difi'cil viver assim. @WAIT Por favor, ajude
+as pessoas dessa vila! @CLOSE
+@REND
+
+@RMESG 2
+&Remy @OPEN Aqui na vila moram seis pessoas. Por favor, nos ajude! @CLOSE
+@REND
+
+@RMESG 3
+&Kalios @OPEN Obrigado, @YOU @NOSPACE ! @ENTER Obrigado, Butako! @CLOSE
+@REND
+
+@RMESG 4
+&Remy @OPEN Voce^s dois so' podem ser mensageiros de Deus! @CLOSE
+@REND
+
+@RMESG 5
+@@YOU @OPEN No's trouxemos a'gua da lagoa Oma~. Voce^s sera~o 
+purificados! @CLOSE
+@RWAITEND 03
+
+@RMESG 6
+@@SOMEONE @ENTER @OPEN Essa sua a'gua funciona mesmo! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0163
+@ROOMSTART 01C4
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Deserto de @ENTER Oma~ @KCLOSE @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0165
+
+@RMESG 0
+&Kelly @OPEN E' muito perigoso ficar sem enxergar os outros! @WAIT
+Como na~o sei onde as pessoas esta~o, @WAIT acabei ficando com 324 
+calombos na cabe+a. @CLOSE
+@REND
+
+@RMESG 1
+@@YOU @OPEN Ai! Tome cuidado @CLOSE
+@REND
+
+@RMESG 2
+&Gunus @OPEN Ai Ai Ai! Na~o da' para andar com mais cuidado? @CLOSE
+@REND
+
+@RMESG 3
+&Gunus @OPEN Eu sou Gunus, @ENTER o hipnotizador, @WAIT 
+mas na~o tenho muitos clientes ultimamente; @CLOSE @ENTER
+@@YOU @OPEN Por que? @CLOSE @WAIT
+&Gunus @OPEN Para ficar inconscientes, @WAIT
+meus clientes precisam ver profundamente os meus olhos. @WAIT
+Mas ningue'm consegue ver meus olhos pois estou invisi'vel! @CLOSE
+@REND
+
+@RMESG 4
+@@SOMEONE @OPEN Sera' que um dia eu volto a ser normal? @CLOSE
+@REND
+
+@RMESG 5
+&Kelly @OPEN Que bom! Assim eu na~o vou mais ter calombos! @CLOSE
+@REND
+
+@RMESG 6
+&Gunus @OPEN Finalmente, eu me sinto vivo novamente! @CLOSE
+@REND
+
+@RMESG 7
+&Gunus @OPEN Ei! E' melhor voce^ na~o ver os meus olhos. @CLOSE
+@REND
+
+@RMESG 8
+@@YOU @OPEN Gunus, a Butako bateu fortemente a cabe+a e perdeu a memo'ria; @WAIT
+Voce^ pode ajuda'-la? @CLOSE @WAIT
+&Gunus @OPEN Hmm, como voce^ me salvou da outra vez, eu vou te ajudar de gra+a. @WAIT
+Mas eu na~o posso garantir que vai funcionar, ok? @CLOSE @WAIT
+&Gunus @OPEN Vamos come+ar! Butako, olhe bem para meus olhos; @CLOSE @ENTER
+@@BUTAKO @OPEN ;; @CLOSE @WAIT
+&Gunus @OPEN Suas pa'lpebras esta~o pesadas; Voce^ esta' ficando com sono; @CLOSE @WAIT
+@@YOU @OPEN Zzzz; zzzz; @CLOSE @ENTER
+&Gunus @OPEN Ei! Na~o e' voce^ que tem que dormir! @CLOSE @WAIT
+&Gunus @OPEN Abra a chave do seu cora+a~o; @CLOSE @ENTER
+@@BUTAKO @OPEN ;; @CLOSE @WAIT
+@@BUTAKO @OPEN @YOU @NOSPACE ! Esse jogo na~o pode! O que^!? Onde!? Aaaiii! 
+@YOU @NOSPACE ! @CLOSE @WAIT
+@@YOU @OPEN Ela esta' completamente atordoada! @CLOSE @WAIT
+&Gunus @OPEN Na~o e' isso, a memo'ria dela esta' retornando aos poucos, @WAIT
+mas ela tem um segredo importante guardado no fundo da alma! @CLOSE @WAIT
+&Gunus @OPEN Aten+a~o! Quando eu contar ate' tre^s, abra os olhos! @WAIT
+Sua memo'ria vai retornar! @ENTER 1; 2; 3; ja'!! @CLOSE @WAIT
+@@BUTAKO @OPEN Ua'a', como eu dormi bem! Chega de pregui+a, @YOU @NOSPACE ,
+vamos logo! @CLOSE @WAIT
+&Gunus @OPEN Que bom, que bom! Sigam com cuidado! @CLOSE @ENTER
+@@YOU @OPEN Obrigado! @CLOSE
+@REND
+
+@RMESG 9
+&Gunus @OPEN A Butako ja' esta' curada. @CLOSE
+@REND
+
+@RMESG 0A
+&Gunus @OPEN Nossa; Mas que cara e' essa? @CLOSE
+@REND
+
+@RMESG 0B
+@@YOU @OPEN No's trouxemos a'gua da lagoa Oma~. Voce^s sera~o 
+purificados! @CLOSE
+@RWAITEND 03
+
+@RMESG C
+@@SOMEONE @ENTER @OPEN Eu ja' recebi a a'gua. @CLOSE
+@REND
+
+@RMESG 0D
+@@BUTAKO @OPEN O que voce^ quer ver?  @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0186
+
+@RMESG 00
+&Pedro @OPEN Bua'a'! Na~o tem ningue'm da aldeia aqui! @CLOSE @WAIT
+@@YOU @OPEN Na~o chore! Na~o se preocupe! @CLOSE
+@REND
+
+@RMESG 01
+&Dee @OPEN Olha, olha! @WAIT Na u'ltima vez que rezei, surgiu um desenho
+na minha barriga! @CLOSE
+@REND
+
+@RMESG 02
+&Dee @OPEN Ra'pido, fa+a eu voltar ao normal! @CLOSE
+@REND
+
+@RMESG 03
+&Pedro @OPEN Ufa! Obrigado, @YOU @NOSPACE ! @CLOSE
+@REND
+
+@RMESG 04
+&Dee @OPEN Obrigado! @CLOSE
+@REND
+
+@RMESG 05
+&Dee @OPEN Veja! Eu estava pedindo para Deus, @KOPEN Me fa+a uma revela+a~o @KCLOSE @CLOSE @WAIT
+@@YOU @OPEN Vamos observar bem, isso pode ser u'til no futuro. @CLOSE
+@REND
+
+@RMESG 06
+@@YOU @OPEN No's trouxemos a'gua da lagoa Oma~. Voce^s sera~o 
+purificados! @CLOSE
+@RWAITEND 03
+
+@RMESG 07
+@@SOMEONE @ENTER @OPEN Ja' jogaram a a'gua em mim; @CLOSE
+@REND
+
+@RMESG 08
+@@BUTAKO @OPEN O que voce^ quer ver? @CLOSE
+@REND
+
+@RMESG 09
+&Dee @OPEN Desculpe. Na~o posso mais te mostrar; @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01E3
+
+@RMESG 0
+&Dau @OPEN Aqui nessa a'rea tem uma lagoa. @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01E5
+
+@RMESG 0
+&Carlos @OPEN No's gostamos de passear no deserto a`s vezes. @CLOSE @WAIT
+@RETURN Sally @OPEN Gostamos tanto que sempre voltamos! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01C6
+
+@RMESG 0
+@@YOU @OPEN Essa lagoa e' ta~o limpa; A a'gua parece transparente! @CLOSE
+@REND
+
+@RMESG 1
+@@YOU @OPEN Aaah; Eu gosto de lavar o rosto, ele fica limpinho! @CLOSE
+@REND
+
+@RMESG 2
+@@YOU @OPEN Hmmm; A a'gua esta' fria, uma deli'cia @CLOSE
+@REND
+
+@RMESG 3
+@@YOU @OPEN Vou levar um pouco dessa a'gua comigo! @CLOSE
+@REND
+
+@RMESG 4
+@@BUTAKO @OPEN Espera ai'! Voce^ na~o vai lavar sua roupa aqui! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01A2
+
+@RMESG 0
+&Ratsuka @OPEN Na outra margem tem umas rui'nas antigas. @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0142
+
+@RMESG 0
+&Amos @OPEN O Gog ira' transformar o Reino Grego num impe'rio do mal! @CLOSE
+@REND
+
+@RMESG 1
+&Amos @OPEN No's estamos tentando melhorar a lagoa de Oma~. @WAIT 
+Pela a'gua da' para sentir que o progresso e' visi'vel! @CLOSE
+@REND
+
+@RMESG 2
+&Bret @OPEN Ningue'm ouve o que ele diz. @CLOSE
+@REND
+
+@RMESG 3
+&Melany @OPEN Sera' que e' verdade? @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0185
+
+@RMESG 00
+&Rick @OPEN @YOU @NOSPACE ! Um demo^nio amadil+oou nossa vila. @WAIT
+Aqui e' perigoso! Fuja agora! @CLOSE
+@REND
+
+@RMESG 01
+@RETURN Demo^nio @OPEN Aaaaahh! @ENTER @YOU @NOSPACE ! Butako! @ENTER 
+Voce^s enxergam demais! @WAIT
+Mais um pouco e o mestre Gog apareceria nesse mundo; @WAIT
+Malditos! Vou assassinar voce^s aqui mesmo!
+@CLOSE
+@RWAITEND 05
+
+@RMESG 02
+@@YOU @OPEN No's trouxemos a'gua da lagoa Oma~. Voce^s sera~o 
+purificados! @CLOSE
+@RWAITEND 03
+
+@ROOMEND
+
+
+@ROOMSTART 014B
+
+@RMESG 00
+&Naba @OPEN Minha prima Teresa faz velas. 
+Ela gosta muito de ser bajulada! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 016E
+
+@RMESG 00
+&Chiao @OPEN Quando o demo^nio da Montanha Helmon surgiu, @WAIT
+destruiu a ponte feita pelo Mane'. @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0024
+@ROOMSTART 0052
+@ROOMSTART 005C
+@ROOMSTART 00CA
+@ROOMSTART 0116
+@ROOMSTART 01B1
+@ROOMSTART 01C5
+@ROOMSTART 01D9
+
+@RMESG 00
+&Marmota @OPEN Aqui apenas no's, as marmotas, podemos passar. @CLOSE
+@REND
+
+@RMESG 01
+&Marmota @OPEN Ah, isso aqui e' um passe livre! Pode passar, e tome cuidado! @CLOSE
+@REND
+
+@RMESG 02
+&Marmota @OPEN Pode passar, na boa. @CLOSE
+@REND
+
+@RMESG 03
+@@YOU @OPEN O que eu preciso fazer para poder passar? @CLOSE @WAIT
+&Marmota @OPEN Voce^ precisa de um passe livre. @WAIT 
+Eu na~o posso dar um passe livre para qualquer um. @WAIT
+So' ganham passe livre os humanos que fizeram alguma boa a+a~o, @WAIT
+como ajudar uma marmota que teve o pe' machucado. @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00B1
+
+@RMESG 00
+&Naya @OPEN Fui eu que construi' o chafariz no Castelo Grego. 
+@WAIT Embaixo dele, tem um tu'nel na vertical, @WAIT
+que atinge um co'rrego subterra^neo.
+@CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00D1
+
+@RMESG 00
+&Levy @OPEN Na regia~o dominada pelo rei Kamiom | @NOSPACE , @WAIT
+muitos habitantes esta~o sumidos. @CLOSE
+@REND
+
+@RMESG 01
+&Levy @OPEN Me disseram que o rei Kamiom | e' @ENTER
+uma pessoa ma'. @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00F1
+
+@RMESG 00
+&Peka @OPEN Quando as estrelas formarem uma Grande Cruz no ce'u do Reino, @WAIT
+o Grande Demo^nio das Trevas surgira'! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00EF
+
+@RMESG 00
+&Serum @OPEN Esta' acabando uma era desse mundo. @WAIT
+O Grande Demo^nio Gog ira' ressuscitar de seu longo sono! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0111
+
+@RMESG 00
+&Petaha @OPEN Deus preve^ os acontecimentos, falando atrave's dos profetas. @WAIT
+Assim, quando o fato acontecer, todos acreditara~o em Deus! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00F3
+
+@RMESG 00
+&Nicola @OPEN Nesta casa existe um manto, @WAIT 
+uma reli'quia passada de gera+a~o a gera+a~o. @CLOSE
+@REND
+
+@RMESG 01
+&Nicola @OPEN Dizem que o manto possui uma for+a estranha. @WAIT
+Antigamente, foi usado pelo rei David em suas batalhas! @CLOSE
+@REND
+
+@RMESG 02
+&Nicola @OPEN Na~o tenha pressa, descanse! @CLOSE
+@REND
+
+@RMESG 03
+@@BUTAKO @OPEN Tem um manto em cima do canto da mesa. @CLOSE
+@REND
+
+@RMESG 04
+@@BUTAKO @OPEN Parece um manto comum. Na~o tem nada de especial nele; @CLOSE
+@REND
+
+@RMESG 05
+@@BUTAKO @OPEN O senhor ja' esta' bem velhinho, ne'; @CLOSE
+@REND
+
+@RMESG 06
+@@BUTAKO @OPEN A senhora na~o ouve bem, na~o e' mesmo? @CLOSE
+@REND
+
+@RMESG 07
+@@BUTAKO @OPEN Esse tipo de manto a gente acha em qualquer canto @CLOSE
+@REND
+
+@RMESG 08
+@@YOU @OPEN Vovo'zinha, quantos anos a senhora tem? @CLOSE @WAIT
+&Catarina @OPEN E' isso mesmo, agora meu filho foi cortar lenha na montanha! @CLOSE
+@REND
+
+@RMESG 09
+@@YOU @OPEN A senhora sabe de alguma coisa sobre o Gog? @CLOSE @WAIT
+&Catarina @OPEN Ho ho ho! Quando o Rei Pampas era jovem, ele era um gato! @WAIT
+Eu tambe'm era fa~ dele! @CLOSE
+@REND
+
+@RMESG 0A
+@@YOU @OPEN A senhora entende o que eu estou falando? @CLOSE @WAIT
+&Catarina @OPEN Ah, voce^ ja' sabia? Na verdade aquele manto e' falso. @WAIT
+Ha' dois ou tre^s dias, o manto desapareceu. @WAIT
+Para na~o deixar o vovo^ preocupado, eu coloquei um falso no lugar. @CLOSE
+@REND
+
+@RMESG 0B
+&Catarina @OPEN Na~o estou ouvindo direito o que voce^ diz; @CLOSE
+@REND
+
+@RMESG 0C
+@@SOMEONE @ENTER @OPEN Fique com esse manto por ter salvo Maria. @WAIT
+E' o tesouro mais importante da minha fami'lia! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00EE
+
+@RMESG 00
+&Puff @OPEN Dizem que o Gunus e' o melhor me'dico do Reino Grego. @WAIT
+Ele usa hipnotismo como parte do tratamento. @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0113
+
+@RMESG 00
+&Brena @OPEN Por acaso voce^ viu minha filha Maria? @CLOSE @WAIT
+@@YOU @OPEN Na~o vi, na~o. @CLOSE
+@REND
+
+@RMESG 01
+@@YOU @OPEN Aconteceu alguma coisa com ela? @CLOSE @WAIT
+&Brena @OPEN Faz dois ou tre^s dias que ela saiu e na~o voltou para casa; @WAIT
+Sera' que ela foi sequestrada por um demo^nio? @CLOSE
+@REND
+
+@RMESG 02
+&Brena @OPEN O que^ eu vou fazer agora? @WAIT 
+Socorram-me! Deus! Buda! Ala'! @YOU @NOSPACE ! @CLOSE
+@REND
+
+@RMESG 03
+&Pierre @OPEN Minha irma~ Maria sempre foi meio moleca! @WAIT
+Ela costuma ir em lugares onde poucos va~o; @CLOSE
+@REND
+
+@RMESG 04
+&Pierre @OPEN Onde sera' que ela foi;? @CLOSE 
+@REND
+
+@RMESG 05
+&Brena @OPEN Obrigado por salvar minha filha! @CLOSE 
+@REND
+
+@RMESG 06
+&Pierre @OPEN Obrigado, @YOU @NOSPACE ! @CLOSE
+@REND
+
+@RMESG 07
+&Maria @OPEN Obrigado por ter me ajudado aquela vez. @WAIT
+Eu estava com medo, mas foi muito divertido! @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00B3
+
+@RMESG 00
+@@BUTAKO @OPEN Eu acho que vi um ratinho; @CLOSE
+@REND
+
+@RMESG 01
+@@YOU @OPEN Oi filhote de rato! O que voce^ esta' fazendo por aqui? @CLOSE @WAIT
+&Marmota @OPEN Ta' viajando, meu? Olha direito pra mim! Eu sou uma marmota! @CLOSE
+@REND
+
+@RMESG 02
+&Marmota @OPEN Eu quebrei o pe' e na~o consigo me mexer. @CLOSE @ENTER
+@@BUTAKO @OPEN Ah, coitadinho @CLOSE
+@REND
+
+@RMESG 03
+&Marmota @OPEN Voce^ na~o e' o @YOU @NOSPACE ? Sera' que voce^ na~o pode 
+me ajudar? @CLOSE
+@REND
+
+@RMESG 04
+@@BUTAKO @OPEN Ele machucou o pe'. @CLOSE
+@REND
+
+@RMESG 05
+@@BUTAKO @OPEN E' um rato. @CLOSE @ENTER
+&Marmota @OPEN Na~o sou, na~o, ja' disse que sou uma marmota! @CLOSE
+@REND
+
+@RMESG 06
+&Marmota @OPEN E' melhor na~o fazer isso! Tenho gosto ruim! Vou te dar congesta~o! @CLOSE
+@REND
+
+@RMESG 07
+@@YOU @OPEN Voce^ e' parente do Eiras? @CLOSE @WAIT
+&Marmota @OPEN Ja' te disse que sou uma marmota, na~o uma toupeira! @CLOSE
+@REND
+
+@RMESG 08
+@@BUTAKO @OPEN Na~o tem jeito, ne'? Vou fazer os curativos. @CLOSE @WAIT
+&Marmota @OPEN Aaahh; Que porco mais gentil! @CLOSE @WAIT
+@@BUTAKO @OPEN Eu na~o sou um porco! @CLOSE
+@REND
+
+@RMESG 09
+&Marmota @OPEN Eu estou cavando corredores pelo subterra^neo do Reino. @WAIT
+Vou te dar esse Passe Livre como agradecimento. @WAIT
+Mostrando esse passe para as outras marmotas, @WAIT sua passagem sera' liberada. 
+Obrigado pela ajuda! @CLOSE 
+@RWAITEND 05
+
+@RMESG 0A
+@@BUTAKO @OPEN O que voce^ quer examinar? @CLOSE
+@REND
+
+@ROOMEND
+
+
+@ROOMSTART 0090
+
+@RMESG 00
+&Omuri @OPEN Gog enviou oito demo^nios para destruir o Reino Grego. @WAIT
+E quando as estrelas do ce'u formarem uma Grande Cruz, @WAIT
+Gog finalmente voltara' para destruir o mundo! @CLOSE
+@REND
+
+@ROOMEND
+
+
+@ROOMSTART 008D
+
+@RMESG 00
+@@BUTAKO @OPEN Na~o da' para falar com uma a'rvore! @CLOSE 
+@REND
+
+@RMESG 01
+@@YOU @OPEN Vou cortar essa a'rvore. @CLOSE 
+@RWAITEND 21
+
+@RMESG 02
+@@YOU @OPEN Desde quando voce^ corta uma a'rvore e no lugar aparece uma ponte? @CLOSE 
+@@BUTAKO @OPEN Ah, pontes e a'rvores sa~o quase a mesma coisa! @CLOSE 
+@REND
+
+@RMESG 03
+@@BUTAKO @OPEN O que voce^ quer fazer? @CLOSE 
+@REND
+
+@RMESG 04
+@@BUTAKO @OPEN Me diz o que voce^ quer olhar! @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00EC
+
+@RMESG 00
+&Tana @OPEN Estou ta~o preocupada! @CLOSE 
+@REND
+
+@RMESG 01
+&Tana @OPEN Meu marido, Aleck, e' cortador de lenha. @WAIT 
+Hoje ele saiu e esqueceu o machado para trabalhar! @CLOSE 
+@REND
+
+@RMESG 02
+@@YOU @OPEN Se voce^ quiser, eu posso ajudar; @CLOSE @WAIT
+&Tana @OPEN Obrigada! Voce^ pode levar esse machado para o meu marido? @CLOSE
+@REND
+
+@RMESG 03
+&Tana @OPEN Voce^ conseguiu entregar o machado para meu marido Aleck? @CLOSE 
+@REND
+
+@RMESG 04
+&Tana @OPEN E o machado;? @CLOSE @ENTER
+@@YOU @OPEN Ja' entreguei! @CLOSE @ENTER
+&Tana @OPEN Obrigada! @CLOSE
+@REND
+
+@RMESG 05
+@@BUTAKO @OPEN O que voce^ quer fazer? @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00CC
+
+@RMESG 00
+&Ruson @OPEN Meu pai sempre vai pra bem longe de casa para cortar lenha! @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 006A
+
+@RMESG 00
+&Yuteko @OPEN O Arthur fez sozinho uma planta+a~o no jardim da casa. @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 006B
+
+@RMESG 00
+&Jason @OPEN Na~o caia num buraco de jeito nenhum, meu jovem @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00AD
+
+@RMESG 00
+&Kanan @OPEN Se voce^ quiser chegar no outro lado do rio, @WAIT 
+vai ter que cortar uma a'rvore perto da margem. @CLOSE 
+@REND
+
+@ROOMEND
+
+
+@ROOMSTART 006C
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Terra do @ENTER Reset @KCLOSE @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 006D
+
+@RMESG 00
+&Yasau @OPEN Um anjo pode te levar para as portas do ce'u, @WAIT
+subindo pelas nuvens. @WAIT
+Eu acho que os grandes hero'is do passado podem te receber por la'. @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 014D
+
+@RMESG 00
+&Jotam @OPEN Os ensinamentos antigos diziam o seguinte: @WAIT
+@KOPEN Se algue'm lhe der um tapa na face esquerda, 
+ofere+a a direita @KCLOSE @WAIT
+Mas esque+am esse tipo de atitude, isso e' coisa do passado! @WAIT
+Na batalha, lute sempre com garra contra o mal! @CLOSE
+@REND
+
+@RMESG 01
+&Jotam @OPEN Voce^ e' o @YOU @NOSPACE , na~o e'? @WAIT
+O Manto que reduz a for+a dos monstros deve te proteger. @CLOSE
+@REND
+
+@RMESG 02
+&Jotam @OPEN Agora eu na~o posso falar; estou fazendo um serma~o @CLOSE
+@REND
+
+@RMESG 03
+&Sara @OPEN Ele e' um profeta! Desconfie do que ele diz! @CLOSE
+@REND
+
+@RMESG 04
+&Paulo @OPEN Esse profeta e' falso! @CLOSE
+@REND
+
+@RMESG 05
+&Loira @OPEN O profeta fala muito complicado; 
+Eu na~o entendo o que ele diz! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0130
+
+@RMESG 00
+&Ahazu @OPEN O Gog quer destruir nosso mundo! @WAIT
+Mas apenas uma pessoa tem o meio para salvar a popula+a~o. @WAIT
+E a chave esta' com uma garota. @CLOSE
+@REND
+
+@ROOMEND
+
+
+@ROOMSTART 021F
+
+@RMESG 00
+@@BUTAKO @OPEN Aqui e' a passagem subterra^nea feita pelas marmotas. @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01D1
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Lagoa das mulheres @KCLOSE @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01B0
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Terra da @ENTER amne'sia @KCLOSE @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01AB
+@ROOMSTART 01A9
+@ROOMSTART 01C9
+
+@RMESG 00
+@@SOMEONE @ENTER @OPEN Essa regia~o tem deslizamentos de pedras. @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 018B
+
+@RMESG 00
+&Uiya @OPEN Outro dia um aldea~o levou uma pancada forte na cabe+a, @WAIT
+mas foi curado pelo doutor Gunus @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01AA
+
+@RMESG 00
+@@BUTAKO @OPEN O que esta' escrito ai'? @CLOSE @ENTER
+@@YOU @OPEN @KOPEN Cui;da;do;com;  as;pe;dras;! @KCLOSE @CLOSE
+@RWAITEND 09
+
+@RMESG 01
+@@YOU @OPEN Butako, aguente firme! @CLOSE @ENTER
+@@BUTAKO @OPEN Onde estou? Quem sou eu? @CLOSE @WAIT
+@@YOU @OPEN Aqui e' o Reino Grego! Voce^ e' uma porquinha! @CLOSE
+@REND
+
+@RMESG 02
+@@YOU @OPEN Alguma coisa caiu do ce'u e acertou em cheio a cabe+a da 
+Butako. @CLOSE 
+@REND
+
+@RMESG 03
+@@YOU @OPEN Esta' muito machucada! @CLOSE 
+@REND
+
+@RMESG 04
+@@YOU @OPEN O choque com a pedra deixou a Butako muito mal; @WAIT
+Minha cabe+a esta' girando; na~o sei o que fazer! @CLOSE 
+@REND
+
+@RMESG 05
+@@YOU @OPEN Ou vai ou racha! Talvez com uma porrada igual ela volte ao normal; @CLOSE @WAIT
+PLUNCKT! @ENTER
+@@BUTAKO @OPEN ;;he hehe hehehe @CLOSE @ENTER
+@@YOU @OPEN Oh na~o, fez o efeito contra'rio! @CLOSE
+@REND
+
+@RMESG 06
+@@YOU @OPEN Desculpe, Butako! Foi tudo minha culpa! @WAIT
+Eu que sou o culpado por ficar te xingando de porca toda hora! @CLOSE @WAIT
+@@BUTAKO @OPEN ;;quem e' voce^? @CLOSE @ENTER
+@@YOU @OPEN Putz; Voce^ realmente perdeu a memo'ria! @CLOSE
+@REND
+
+@RMESG 07
+@@YOU @OPEN @KOPEN Cuidado com as pedras! @KCLOSE @WAIT
+Foi aqui que a Butako perdeu a memo'ria. @CLOSE 
+@REND
+
+@RMESG 08
+@@BUTAKO @OPEN Da outra vez que li esse aviso, uma pedra caiu na minha cabe+a. @WAIT
+Por que sera'? @CLOSE 
+@REND
+
+@RMESG 09
+@@BUTAKO @OPEN Ali tem um aviso @CLOSE 
+@REND
+
+@RMESG 0A
+@@BUTAKO @OPEN Oiiiiiiink! @CLOSE 
+@REND
+
+@RMESG 0B
+@@YOU @OPEN Eu na~o posso sair e deixar a Butako desse jeito! @CLOSE 
+@REND
+
+@RMESG 0C
+@@YOU @OPEN Na~o estou tendo nenhum progresso; @WAIT
+Talvez a memo'ria dela volte sozinha, com o tempo; @WAIT 
+Vou leva'-la comigo assim mesmo! @CLOSE
+@RWAITEND 05
+
+@RMESG 0D
+@@BUTAKO @OPEN Com quem voce^ quer falar? @CLOSE 
+@REND
+
+@RMESG 0E
+@@BUTAKO @OPEN O que voce^ quer examinar? @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01CE
+
+@RMESG 00
+&Yabin @OPEN Voce^ e' o @YOU @NOSPACE ? Mate o monstro que
+mora dentro do buraco, por favor @CLOSE
+@REND
+
+@RMESG 01
+&Yabin @OPEN A vila esta' salva! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01CF
+
+@RMESG 00
+&Temuna @OPEN Tem um monte de buracos por aqui, @WAIT 
+mas o monstro vive dentro de um buraco so'. @CLOSE
+@REND
+
+@RMESG 01
+&Temuna @OPEN A vila esta' salva! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01AF
+
+@RMESG 00
+&Nebu @OPEN Nessa regia~o tem um monte de buracos. @WAIT 
+Voce^ pode morrer se cair em um deles! @CLOSE
+@REND
+
+@RMESG 01
+&Nebu @OPEN A vila esta' salva! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01F1
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Vila Salsan @KCLOSE @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01D0
+
+@RMESG 00
+@@BUTAKO @OPEN Tem algue'm nadando na lagoa; @CLOSE
+@RWAITEND 05
+
+@RMESG 01
+&Sereia @OPEN Voce^ e' o @YOU @NOSPACE , na~o e'? Voce^ pode
+me ajudar, por favor? @WAIT
+Eu queria que voce^ procurasse uma carta para mim. @CLOSE
+@REND
+
+@RMESG 02
+&Sereia @OPEN Na nossa ra+a, as mulheres chamam sereias, e os homens,
+trito~es. @WAIT Cada um vive em uma lagoa separada. @WAIT
+No's trocamos cartas por um canal subterra^neo que une as lagoas. @WAIT
+Eu mandei uma carta de casamento para la', mas acho que na~o chegou! @WAIT
+Deve ter alguma coisa escondida no canal, @WAIT
+que impede meu amor de receber noti'cias minhas! @CLOSE
+@REND
+
+@RMESG 03
+&Sereia @OPEN Eu na~o posso sair para a superfi'cie; @WAIT Voce^ pode 
+procurar a carta para mim, por favor? @CLOSE
+@REND
+
+@RMESG 04
+@@BUTAKO @OPEN Essa garota e' uma sereia, meio mulher e meio peixe! @CLOSE
+@REND
+
+@RMESG 05
+&Sereia @OPEN Esse rabo e' de verdade, na~o puxe! @CLOSE
+@REND
+
+@RMESG 06
+&Sereia @OPEN Ah, essa e' a carta que eu enviei! Obrigada! @CLOSE
+@REND
+
+@RMESG 07
+&Sereia @OPEN Voce^ pode, por favor, levar essa carta ate' a 
+lagoa dos homens? @WAIT 
+Eu na~o confio mais em deixar as cartas no canal subterra^neo; @CLOSE @WAIT
+@@YOU @OPEN Pode deixar! Eu levo sim! @CLOSE
+@REND
+
+@RMESG 08
+&Sereia @OPEN Essa carta precisa ser entregue na lagoa dos homens. @WAIT
+Voce^ pode leva'-la para mim? @CLOSE
+@REND
+
+@RMESG 09
+@@YOU @OPEN Eu achei sua carta. @CLOSE @ENTER
+&Sereia @OPEN Obrigada! @CLOSE
+@REND
+
+@RMESG 0A
+&Sereia @OPEN Voce^ pode entregar a carta para mim, por favor? @CLOSE
+@REND
+
+@RMESG 0B
+@@YOU @OPEN Eu entreguei a carta na lagoa dos homens. @CLOSE @WAIT
+&Sereia @OPEN Que trabalha~o eu te dei! @CLOSE
+@REND
+
+@RMESG 0C
+@@YOU @OPEN O trita~o pediu pra retornar este presente. @CLOSE @WAIT
+&Sereia @OPEN Ah! Que lindo! @WAIT @YOU @NOSPACE  , Butako, voce^s tem
+a gratida~o de todo o meu povo! @CLOSE
+@RWAITEND 05
+
+@RMESG 0D
+&Sereia @OPEN Muito obrigada! @CLOSE
+@REND
+
+@RMESG 0E
+@@BUTAKO @OPEN Na~o da' para mostrar isso! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01EB
+
+@RMESG 00
+@@BUTAKO @OPEN Parece um martelo. @CLOSE
+@REND
+
+@RMESG 01
+@@BUTAKO @OPEN O monstro que voce^ matou estava segurando isso;
+@WAIT Pra que sera' que ele usava? @CLOSE
+@REND
+
+@RMESG 02
+@@BUTAKO @OPEN Por via das du'vidas e' melhor pegar! @CLOSE
+@RWAITEND 05
+
+@RMESG 03
+@@BUTAKO @OPEN O que voce^ quer examinar? @CLOSE
+@REND
+
+@RMESG 04
+@@BUTAKO @OPEN O que voce^ quer pegar? @CLOSE
+@REND
+
+@ROOMEND
+
+
+@ROOMSTART 01AE
+
+@RMESG 00
+&Mide @OPEN Eu cai' dentro de um po+o onde vive um monstro! @WAIT
+Ele tem um rosto terri'vel! @CLOSE
+@REND
+
+@RMESG 01
+&Mide @OPEN A vila esta' salva! @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01D2
+
+@RMESG 00
+&Bibi @OPEN Antes de entrar em um buraco, e' melhor falar com o Sturaro. @CLOSE
+@REND
+
+@ROOMEND
+
+
+@ROOMSTART 0023
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Terra dos Hereges @KCLOSE @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00C5
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Vila Erato @KCLOSE @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0042
+
+@RMESG 00
+&Barna @OPEN Parece que esse castelo e' muito bem protegido. @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00A2
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Castelo do @ENTER Kamiom | @KCLOSE @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00C3
+
+@RMESG 00
+&Butan @OPEN Em algum lugar por aqui tem uma passagem subterra^nea. @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0082
+
+@RMESG 00
+&Aline @OPEN Ha' 2 ou 3 anos, os habitantes da vila
+come+aram a sumir um por um; @CLOSE @WAIT
+@@YOU @OPEN Foram abduzidos por um demo^nio? @CLOSE
+@RWAITEND 06
+
+@RMESG 01
+&Aline @OPEN Na~o, na~o foi isso que aconteceu. @WAIT
+Ouvi dizer que uma seita demoni'aca faz um culto ao Gog a` noite; @CLOSE @WAIT
+Parece que esta~o todos sofrendo lavagem cerebral pelo demo^nio! @CLOSE @WAIT
+@@YOU @OPEN Na~o brinca! @CLOSE
+@REND
+
+@RMESG 02
+&Aline @OPEN Por favor, salve os aldeo~es! @CLOSE 
+@REND
+
+@RMESG 03
+&Aline @OPEN Todos os aldeo~es ja' voltaram pra casa. Obrigada! @CLOSE 
+@REND
+
+@RMESG 04
+&Jose @OPEN Aqui e' o castelo do Kamiom |. @CLOSE
+@REND
+
+@RMESG 05
+&Shikemu @OPEN Aqui dentro e' a sala de recep+a~o. @CLOSE
+@REND
+
+@RMESG 06
+&Barl @OPEN Aqui dentro e' a sala do Kamiom |. @CLOSE
+@REND
+
+@ROOMEND
+
+
+
+@ROOMSTART 008A
+
+@RMESG 00
+&Arthur @OPEN Ei! Saia dai'! Vai estragar minha planta+a~o! @CLOSE @ENTER
+@@BUTAKO @OPEN Desculpe; @CLOSE 
+@REND
+
+@RMESG 01
+&Arthur @OPEN Eu na~o gosto de gente! Na~o quero nem conversa! @CLOSE
+@REND
+
+@RMESG 02
+@@BUTAKO @OPEN Tem uma casinha e uma planta+a~o aqui. @CLOSE
+@REND
+
+@RMESG 03
+@@BUTAKO @OPEN Tem alguma coisa plantada. @CLOSE
+@REND
+
+@RMESG 04
+@@BUTAKO @OPEN E' uma casa comum; @CLOSE
+@REND
+
+@RMESG 05
+@@BUTAKO @OPEN A a'rvore cresceu! Parece uma muda de aveleiro. @CLOSE
+@REND
+
+@RMESG 06
+@@BUTAKO @OPEN Ta' na cara que na~o da' pra pegar! @CLOSE
+@REND
+
+@RMESG 07
+@@BUTAKO @OPEN Conseguiu pegar a muda do aveleiro, ne'? @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0062
+
+@RMESG 00
+&Kamiom @OPEN Eu sou Kamiom @NOSPACE |. @YOU @NOSPACE , Butako, eu estava esperando
+voce^s. @WAIT
+Todos falam de um demo^nio chamado Gog que invadiu o Reino Grego, @WAIT
+mas isso e' apenas um boato que se espalhou; @WAIT E' uma histo'ria inventada,
+na verdade Gog na~o existe. @CLOSE 
+@REND 
+
+@RMESG 01
+@@YOU @OPEN Como assim Gog na~o existe? Voce^ e' bobo? @CLOSE @WAIT
+&Kamiom @OPEN Quando as pessoas ficam entediadas, @WAIT inventam essas histo'rias
+sombrias. Sa~o bobagens. @CLOSE @WAIT
+@@YOU @OPEN Se ele na~o existe, como vou voltar para o meu mundo? @CLOSE 
+@REND 
+
+@RMESG 02
+&Kamiom @OPEN Voce^s devem estar cansados da viagem, por favor descansem. @CLOSE
+@REND 
+
+@RMESG 03
+@@BUTAKO @OPEN Ele esta' todo molhado de suor. @CLOSE
+@REND 
+
+@RMESG 04
+@@BUTAKO @OPEN Ele esta' sem fo^lego; @CLOSE
+@REND 
+
+@RMESG 05
+@@BUTAKO @OPEN Sniff.. E' aqui! @WAIT Foi aqui que eu senti aquele cheiro da roupa 
+da sala ao lado. @CLOSE @WAIT
+&Kamiom @OPEN O que^? Parece que a Butako esta' com o nariz ruim; @CLOSE @WAIT
+@@YOU @OPEN De jeito nenhum! @CLOSE 
+&Kamiom @OPEN Na~o acredita em mim? @CLOSE @WAIT
+@@YOU @OPEN E', talvez ela esteja com alguma alergia; @CLOSE @WAIT
+@@BUTAKO @OPEN Voce^ e' muito volu'vel. @CLOSE
+@REND 
+
+@RMESG 06
+@@YOU @OPEN Voce^ sabe de quem e' a roupa que esta' jogada na sala ao lado? @CLOSE @WAIT
+&Kamiom @OPEN Eu na~o sei. @CLOSE 
+@REND 
+
+@RMESG 07
+@@YOU @OPEN Por acaso aquela roupa e' sua? @CLOSE @WAIT
+&Kamiom @OPEN Eu nunca tive uma roupa daquele jeito. @CLOSE 
+@REND 
+
+@RMESG 08
+@@YOU @OPEN A roupa tem que ser sua! @CLOSE @ENTER
+&Kamiom @OPEN Mas na~o e'! @CLOSE 
+@REND 
+
+@RMESG 09
+@@YOU @OPEN Confesse, e' sua sim! @CLOSE @ENTER
+&Kamiom @OPEN Ja' disse que na~o e' minha! @WAIT Voce^ acha 
+que eu iria esquecer se tivesse uma roupa de monge?  @CLOSE @WAIT
+@@BUTAKO @OPEN Espera ai'! @WAIT O @YOU disse que era
+uma roupa, mas na~o falou que era de monge! @CLOSE @WAIT
+@@YOU @OPEN Butako, voce^ e' muito esperta! @WAIT Kamiom |!
+Voce^ e' o monge que lidera a religia~o do Gog! @CLOSE @WAIT
+&Kamiom @OPEN ;; Hehehe. Sim, eu sou o monge. @WAIT
+Eu menti quando disse que o Gog na~o existia. @WAIT Em breve
+Gog ira' se materializar nesse mundo e destruir todos! @WAIT
+Bwahahaha. @CLOSE @ENTER
+@@YOU @OPEN Como voce^ pode rir de uma coisa dessas?  @CLOSE 
+@RWAITEND 05
+
+@RMESG 0A
+@@YOU @OPEN Ei! Espera! Onde voce^ vai? @CLOSE 
+@REND 
+
+@RMESG 0B
+@@YOU @OPEN Na~o sabe mesmo, de verdade? @CLOSE @ENTER
+&Kamiom @OPEN Ja' disse que na~o sei! @CLOSE 
+@REND 
+
+
+@RMESG 0C
+SOCK! @WAIT
+@@YOU @OPEN AAAaaaiiii! @WAIT A parede e' muito dura, na~o vai quebrar. @CLOSE 
+@REND
+
+@RMESG 0D
+@@BUTAKO @OPEN Acho que a parede se mexe nessa dire+a~o; @CLOSE 
+@RWAITEND 08
+
+@RMESG 0E
+@@BUTAKO @OPEN A parede se mexeu mesmo! Tem uma passagem aqui. @CLOSE 
+@REND
+
+@RMESG 0F
+@@BUTAKO @OPEN O que voce^ quer olhar? @CLOSE 
+@REND
+
+@RMESG 10
+@@BUTAKO @OPEN O que voce^ quer examinar? @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0085
+
+@RMESG 00
+&Scott @OPEN Faz algum tempo que tenho ouvido umas vozes estranhas, todas as noites. @CLOSE 
+@REND 
+
+@RMESG 01
+&Karl @OPEN Ultimamente eu tenho ouvido umas vozes estranhas a` @ENTER meia-noite. @CLOSE @WAIT
+@RETURN Marine @OPEN E' como se uma multida~o estivesse entoando junto, numa voz grave; @CLOSE @WAIT
+@@YOU @OPEN Parece perigoso; @CLOSE
+@REND
+
+@RMESG 02
+@@SOMEONE @ENTER @OPEN Aquelas vozes estranhas silenciaram! @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 00A5
+
+@RMESG 00
+&Teela @OPEN Ei; Outro dia eu vi um aldea~o desaparecer 
+diante dos meus olhos! @CLOSE @WAIT
+@@YOU @OPEN Como assim desapareceu?  @CLOSE @WAIT
+&Teela @OPEN Se na~o me engano, ele empurrou quatro pedras; @WAIT
+Acho que a ordem era esquerda, pra cima, pra baixo e direita. @WAIT
+Mas eu na~o lembro em qual pedra ele come+ou. @CLOSE
+@REND 
+
+@RMESG 01
+@@YOU @OPEN Voce^ sabe onde fica?  @CLOSE @ENTER
+&Teela @OPEN E' num campo aqui pertinho. @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 00A1
+
+@RMESG 00
+&Fujike @OPEN O Rei Kamiom e' um especialista em jogos. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0176
+
+@RMESG 00
+&Zoba @OPEN Fiquei enterrado no meio da areia! @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0157
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Rui'nas dos Gigantes @KCLOSE @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 00E2
+
+@RMESG 00
+@@BUTAKO @OPEN Ei! Aqui tem uma escada! @CLOSE
+@REND 
+
+@RMESG 01
+@@BUTAKO @OPEN Na~o aconteceu nada. @CLOSE @ENTER
+@@YOU @OPEN Estranho; @CLOSE @WAIT
+@@BUTAKO @OPEN Vamos tentar mais uma vez. @CLOSE 
+@REND 
+
+@RMESG 02
+@@BUTAKO @OPEN Olha, a pedra se mexeu! @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0208
+
+@RMESG 00
+&Monge @OPEN No's pertencemos ao Gog! @WAIT Tiraremos dos humanos 
+a raza~o, a moral, a justi+a e o amor! @WAIT E trocaremos pelo o'dio, pela
+trai+a~o, pelo desejo, pelo mal! @WAIT Abram sua alma e aceitem Gog em seu cora+a~o. @CLOSE
+@REND 
+
+@RMESG 01
+&Monge @OPEN O que^? @YOU @NOSPACE ! Como chegou aqui? @CLOSE @WAIT
+@@YOU @OPEN Voce^ e' o monge li'der da seita que venera o Gog! @CLOSE
+@REND 
+
+@RMESG 02
+@@YOU @OPEN Qual e' o seu plano? @CLOSE @WAIT
+&Monge @OPEN Hahaha. Eu contarei pra voce^! @WAIT  
+Farei lavagem cerebral em todos os humanos, @WAIT e enta~o eles trabalhara~o para o Gog! @CLOSE @WAIT
+@@BUTAKO @OPEN Que terri'vel! Voce^ quer perveter o cora+a~o das pessoas! @CLOSE
+@REND 
+
+@RMESG 03
+&Monge @OPEN Voce^s acharam meu esconderijo, agora ele e' inu'til. @WAIT Ate' mais! @CLOSE 
+@RWAITEND 05
+
+@RMESG 04
+@@BUTAKO @OPEN Aqui e' o reduto dessa religia~o maligna. @CLOSE
+@REND 
+
+@RMESG 05
+@@BUTAKO @OPEN Esses devotos sa~o aldeo~es que ficaram obcecados @CLOSE
+@REND 
+
+@RMESG 06
+@@YOU @OPEN Ei! Espera ai'! @CLOSE @WAIT
+@@BUTAKO @OPEN @YOU @NOSPACE ! O que faremos com essas pessoas? @CLOSE @WAIT
+@@YOU @OPEN Se no's pegarmos aquele monge, @WAIT podemos retornar as coisas ao jeito que eram antes. @CLOSE 
+
+@REND 
+
+
+@ROOMEND
+
+@ROOMSTART 0202
+@ROOMSTART 0203
+@ROOMSTART 0204
+@ROOMSTART 0205
+@ROOMSTART 0206
+@ROOMSTART 0207
+@ROOMSTART 0209
+@ROOMSTART 020A
+@ROOMSTART 020B
+
+@RMESG 00
+@@BUTAKO @OPEN Na~o consigo ver nada, esta' muito escuro. @CLOSE
+@REND 
+
+@RMESG 01
+@@BUTAKO @OPEN Parece que estamos em um caminho subterra^neo. @CLOSE
+@REND 
+
+@RMESG 02
+@@YOU @OPEN Na~o da' pra ver nada, esta' muito escuro. @CLOSE @WAIT
+@@BUTAKO @OPEN Na~o consigo acender a vela. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0063
+
+@RMESG 00
+@@BUTAKO @OPEN Parece que o monge largou a roupa aqui ao fugir. @CLOSE @WAIT
+@@YOU @OPEN E' mesmo, a roupa ainda esta' quentinha. @CLOSE
+@REND
+
+@RMESG 01
+@@BUTAKO @OPEN Tem uma roupa azul aqui. @CLOSE 
+@REND
+
+@RMESG 02
+@@YOU @OPEN Hum, e' do meu tamanho certinho. @CLOSE @ENTER
+@@BUTAKO @OPEN Voce^ quer se tornar um monge? @CLOSE 
+@REND
+
+@RMESG 03
+@@BUTAKO @OPEN Toma! Isso e' castigo por ter maltratado os aldeo~es! @CLOSE @WAIT
+@@YOU @OPEN Calma! Relaxa! @CLOSE
+@REND
+
+@RMESG 04
+@@YOU @OPEN Por que^ voce^ na~o cheira? Afinal, voce^ tem um nariz enorme! @CLOSE @WAIT
+@@BUTAKO @OPEN Me+a suas palavras! @WAIT Sniff.. sniff... @ENTER
+Ei, eu acho que ja' senti esse cheiro antes; @CLOSE @WAIT
+@@YOU @OPEN Se'rio? Onde? @CLOSE @ENTER
+@@BUTAKO @OPEN Na~o lembro; @CLOSE @ENTER
+@@YOU @OPEN Bah! Sua porca burra! @CLOSE 
+@REND
+
+@RMESG 05
+@@BUTAKO @OPEN Credo, na~o mexe nisso, esta' sujo! @CLOSE 
+@REND
+
+@RMESG 06
+@@BUTAKO @OPEN Na~o tem sai'da! @CLOSE 
+@REND
+
+@RMESG 07
+@@BUTAKO @OPEN Estou sentindo uma brisa entrando de algum lugar; @CLOSE 
+@REND
+
+@RMESG 08
+@@BUTAKO @OPEN Ah, a brisa esta' entrando por uma fresta nessa parede. @CLOSE 
+@REND
+
+@RMESG 09
+SOCK! @WAIT
+@@YOU @OPEN AAAaaaiiii! @WAIT A parede e' muito dura, na~o vai quebrar. @CLOSE 
+@REND
+
+@RMESG 0A
+@@BUTAKO @OPEN Acho que a parede se mexe nessa dire+a~o; @CLOSE 
+@RWAITEND 07
+
+@RMESG 0B
+@@BUTAKO @OPEN A parede se mexeu mesmo! Tem uma passagem aqui. @CLOSE 
+@REND
+
+@RMESG 0C
+@@BUTAKO @OPEN O que voce^ quer examinar? @CLOSE 
+@REND
+
+@RMESG 0D
+@@BUTAKO @OPEN O que voce^ quer pegar? @CLOSE 
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0083
+
+@RMESG 00
+&Kamiom @OPEN @YOU @NOSPACE ! Butako! Voce^s ira~o morrer nesta sala! @CLOSE
+@REND 
+
+@RMESG 01
+&Kamiom @OPEN Quer quebrar a minha cara? Voce^ pirou de vez. @CLOSE
+@REND 
+
+@RMESG 02
+&Kamiom @OPEN Voce^ precisa comer muito espinafre pra me empurrar. @CLOSE
+@REND 
+
+@RMESG 03
+&Kamiom @OPEN Eu realizarei seu desejo; @WAIT Vou lhe mostrar o jogo de tortura humana que planejei! @CLOSE
+@RWAITEND 1E
+
+@RMESG 04
+&Kamiom @OPEN Aprenda a li+a~o que vem do Inferno! @WAIT Gog surgira' no Reino Grego
+e matara' todos os humanos. @WAIT E enta~o todos renascera~o com Gog no cora+a~o. @CLOSE
+@REND 
+
+@RMESG 05
+&Kamiom @OPEN Eu na~o quero que ningue'm mais me veja. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0117
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Terra das Reli'quias @KCLOSE @CLOSE
+@REND 
+
+@ROOMEND
+
+
+@ROOMSTART 00F6
+
+@RMESG 00
+&Reppo @OPEN Recentemente, um homem chamado Dante ficou zanzando por aqui @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0136
+
+@RMESG 00
+&Lyzol @OPEN Eu afundei no meio da areia! @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 00F7
+@ROOMSTART 0119
+@ROOMSTART 0137
+
+@RMESG 00
+@@SOMEONE @ENTER @OPEN Se voce^ ficar enterrado em um buraco na areia, @WAIT na~o se 
+desespere, aperte #0 @KOPEN ? @KCLOSE @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0118
+
+@RMESG 00
+@@BUTAKO @OPEN A terra esta' nos engolindo! @CLOSE
+@REND 
+
+@RMESG 01
+@@BUTAKO @OPEN Estamos sendo sugados para o centro? @CLOSE @WAIT
+@@YOU @OPEN Eu tambe'm tive essa impressa~o; @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0079
+
+@RMESG 00
+@@BUTAKO @OPEN Onde estamos? A areia estava nos engolindo; @WAIT
+Eu na~o lembro mais nada depois disso. @WAIT Parece que fomos salvos. @CLOSE @WAIT
+@@YOU @OPEN Aqui e' o ce'u? Se for, Sa~o Pedro tem um pe'ssimo gosto pra mo'veis; @CLOSE
+
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0035
+
+@RMESG 00
+&Abuto @OPEN A Montanha da Ma'scara e' muito grande! @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0098
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Montanha da Ma'scara @KCLOSE @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0096
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Terra dos Desfiladeiros @KCLOSE @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 00F8
+
+@RMESG 00
+&Sarak @OPEN Eu vi a Princesa Chelsea por aqui, alguns dias atra's, @WAIT
+acompanhada de uma pessoa. @CLOSE 
+@REND 
+
+@ROOMEND
+
+
+@ROOMSTART 0095
+
+@RMESG 00
+&Pasha @OPEN Quando algo na~o vai pra frente, @WAIT use todos os recursos que tiver. @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 00F4
+
+@RMESG 00
+&Ray @OPEN @YOU @NOSPACE , Butako, o fim do mundo esta' chegando. @WAIT Parece que ha'
+um lugar maldito onde veneram o Gog a` noite. @WAIT E' certo que ha' uma pessoa
+por tra's disso. @CLOSE 
+@REND 
+
+@RMESG 01
+&Ray @OPEN Enta~o o li'der da seita que venera o Gog e' o Kamiom |! @CLOSE 
+@REND 
+
+@RMESG 02
+@@YOU @OPEN Tome cuidado voce^ tambe'm! @CLOSE @ENTER
+&Ray @OPEN Na~o se preocupe! @CLOSE 
+@REND 
+
+@ROOMEND
+
+
+@ROOMSTART 020F
+
+@RMESG 00
+@@YOU @OPEN Oba, algoda~o-doce! @CLOSE @WAIT
+@@BUTAKO @OPEN Na~o e' isso, e' diferente! @CLOSE @ENTER
+@@YOU @OPEN Enta~o e' chocolate branco? @CLOSE @WAIT
+@@BUTAKO @OPEN Credo, como voce^ e' guloso! Isso e' uma nuvem. @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0210
+
+@RMESG 00
+@RETURN Afrodite @OPEN Eu sou a esposa do Popolon, Afrodite. @WAIT
+Eu tenho protegido esse mundo com todas as minhas for+as. @WAIT
+Em minha e'poca, dia apo's dia eu livrei as pessoas da agonia. @WAIT
+Por isso eu fui presenteada com a honra de tornar-me uma deusa. @CLOSE
+@REND 
+
+@RMESG 01
+@RETURN Afrodite @OPEN As pessoas nunca esqueceram do que fiz em minha e'poca, @WAIT
+e sa~o gratas ate' hoje. @CLOSE
+@REND 
+
+@RMESG 02
+@RETURN Afrodite @OPEN Agora eu vivo em paz aqui em cima. @CLOSE
+@REND 
+
+@RMESG 03
+@@BUTAKO @OPEN E' a ma~e do Rei Pampas, Afrodite. @WAIT E' uma excelente
+pessoa, gentil e determinada. @CLOSE
+@REND 
+
+@RMESG 04
+@RETURN Popolon @OPEN Eu sou o grande hero'i do passado, Popolon. @WAIT Fui eu que
+venci o @KOPEN Knightmare @KCLOSE @CLOSE @WAIT
+@@YOU @OPEN @KOPEN Knightmare @KCLOSE ? Esse e' o subti'tulo do jogo 
+que a @GIRL trouxe! @CLOSE 
+@RWAITEND 0E
+
+@RMESG 05
+@@YOU @OPEN Quando o jogo come+ou, eu fui trazido para o Reino Grego. @WAIT
+Que truque e' esse que o jogo fez comigo? @CLOSE @WAIT
+@RETURN Popolon @OPEN Parece que @ENTER @KOPEN Knightmare @KCLOSE #0 tem @ENTER um plano 
+para ajudar as pessoas. 
+@RWAITEND F7
+
+@RMESG 06
+Na sua e'poca, algumas pessoas desobedeceram as leis divinas @WAIT
+e cometeram va'rios crimes. @WAIT Assim, Sata~ entrou em seus cora+o~es. 
+@RWAITEND 4E
+
+@RMESG 07
+Isso deu a Sata~ for+a para viver na superfi'cie, @WAIT causando destrui+a~o. @CLOSE @ENTER
+@@YOU @OPEN Deus na~o podia fazer nada? @CLOSE @WAIT
+@RETURN Popolon @OPEN Apenas uma pessoa pode derrotar Sata~. @CLOSE @ENTER
+@@YOU @OPEN ;; @CLOSE @WAIT 
+@RETURN Popolon @OPEN E' aquele que tem o #0 @KOPEN Shalom @KCLOSE . Quando
+o jogo come+ou, @WAIT seu cora+a~o foi preenchido com confian+a para
+derrotar Sata~. @WAIT
+Agora todas as pessoas precisam ser salvas de Sata~! @WAIT
+@YOU , voce^ ira' destruir Sata~! @CLOSE
+@RWAITEND FC
+
+@RMESG 08
+@@YOU @OPEN Que papo chato; @CLOSE @WAIT
+@RETURN Popolon @OPEN @YOU , voce^ foi escolhido por Deus.
+Precisa cumprir a missa~o! @CLOSE 
+@RWAITEND F8
+
+@RMESG 09
+@RETURN Popolon @OPEN Por tre^s vezes a desgra+a surgiu sobre as pessoas. @WAIT
+Em minha e'poca foi o Galious, na e'poca de Pampas foi o Gog, @WAIT
+na sua e'poca e' Sata~. @CLOSE @WAIT
+@@YOU @OPEN Ou seja, ale'm de derrotar o demo^nio dessa e'poca, Gog, @WAIT
+ainda preciso retornar para minha e'poca e enfrentar Sata~? @CLOSE @WAIT
+@RETURN Popolon @OPEN Sim. Quando voce^ derrotar Gog, meu mundo sera' salvo. @WAIT
+E ale'm disso, seu mundo tambe'm se salvara'! @CLOSE
+@RWAITEND FC
+
+@RMESG 0A
+@@YOU @OPEN A @GIRL sabia disso tudo? @CLOSE @ENTER
+@RETURN Popolon @OPEN ;; @CLOSE @WAIT
+@@BUTAKO @OPEN Quem sabe? Talvez ela tenha trazido o jogo porque sabia de tudo. @CLOSE @WAIT
+@RETURN Popolon @OPEN @GIRL e' uma pessoa especial. Seja sempre gentil com ela! @CLOSE
+@REND
+
+@RMESG 0B
+@RETURN Popolon @OPEN Eu fui escolhido para ser o novo deus daqui. @WAIT Por isso
+vim ao ce'u junto com minha amada. @CLOSE
+@REND 
+
+@RMESG 0C
+@@BUTAKO @OPEN E' o campea~o do amor e da justi+a, Popolon! @WAIT E ale'm disso, tambe'm 
+e' o pai do Rei Pampas! @CLOSE
+@REND 
+
+@RMESG 0D
+@@YOU @OPEN Enta~o, essa e' a verdade sobre @ENTER @KOPEN Shalom @KCLOSE ; @CLOSE @WAIT
+@RETURN Popolon @OPEN Voce^ foi escolhido indiretamente por quem fez o jogo. @WAIT
+Ele era uma mensagem para voce^. @CLOSE 
+@RWAITEND C2
+
+@ROOMEND
+
+@ROOMSTART 0152
+
+@RMESG 00
+&Anjo @OPEN @YOU @NOSPACE , o portal na~o se abrira' para voce^. @WAIT 
+Ainda na~o e' a hora. @CLOSE 
+@REND 
+
+@RMESG 01
+@@YOU @OPEN Como eu vou saber quando chegara' #0 @KOPEN a hora @KCLOSE ? @CLOSE @WAIT
+&Anjo @OPEN Quando ela chegar, voce^ sabera'. @CLOSE 
+@REND 
+
+@RMESG 02
+&Anjo @OPEN A hora chegou. Entre no portal, por favor. @CLOSE 
+@REND 
+
+@RMESG 03
+&Anjo @OPEN E' uma honra encontrar os deuses! @CLOSE 
+@REND 
+
+@RMESG 04
+@@BUTAKO @OPEN O corpo dele tem um brilho dourado; @CLOSE 
+@REND 
+
+@RMESG 05
+&Anjo @OPEN Eu sou um anjo enviado por Deus. @CLOSE 
+@REND 
+
+@RMESG 06
+@@BUTAKO @OPEN O que voce^ quer olhar? @CLOSE 
+@REND 
+
+@RMESG 07
+@@BUTAKO @OPEN O que voce^ quer examinar? @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0099
+
+@RMESG 00
+&Mami @OPEN Ja' acordaram? Esta' tudo bem? @CLOSE @ENTER
+@@YOU @OPEN Foi voce^ que nos salvou? @CLOSE @WAIT
+&Mami @OPEN Na~o, foi meu filho Dante. @WAIT Quando ele os viu lutando na areia,
+foi correndo salva'-los. @CLOSE @WAIT
+@@YOU @OPEN Onde ele esta'? @CLOSE @ENTER
+&Mami @OPEN Ele saiu quase agora. @CLOSE 
+@REND 
+
+@RMESG 01
+&Mami @OPEN Tome cuidado quando sair! @CLOSE
+@REND 
+
+@RMESG 02
+@@BUTAKO @OPEN Algue'm deixou cair um colar. @CLOSE
+@REND 
+
+@RMESG 03
+@@BUTAKO @OPEN Acho que ja' vi esse colar; @CLOSE
+@REND 
+
+@RMESG 04
+@@BUTAKO @OPEN Vou pega'-lo. @CLOSE
+@RWAITEND 05
+
+@RMESG 05
+@@BUTAKO @OPEN Por acaso esse colar e' seu? @CLOSE @ENTER
+&Mami @OPEN Na~o e' meu, na~o. @CLOSE
+@REND 
+
+@RMESG 06
+&Mami @OPEN Da u'ltima vez que veio aqui, o Dante trouxe uma garota muito bonita. @WAIT
+Parece que ela era uma princesa. @CLOSE @WAIT
+@@BUTAKO @OPEN Ah! Lembrei! Eu vi esse colar la' no Castelo Grego! @WAIT 
+A Princesa Chelsea estava usando o colar naquele retrato! @CLOSE @WAIT
+&Mami @OPEN Meu filho falou isso pra mim: @WAIT @KOPEN Nosso casamento 
+sera' aprovado como recompensa pela derrota de Gog. @KCLOSE @CLOSE @WAIT
+@@BUTAKO @OPEN Acho que o Rei Pampas era contra o casamento 
+de Dante e Chelsea. @WAIT Derrotando Gog, eles acham que o Rei ira'
+aprovar o casamento. @WAIT Por isso que ela deixou o castelo; @CLOSE @WAIT
+&Mami @OPEN Enta~o aquela garota era a Princesa Chelsea; @CLOSE @WAIT
+@@YOU @OPEN Os dois querem muito ficar juntos. @WAIT Mas o Gog e' osso
+duro de roer. @CLOSE
+@REND 
+
+@RMESG 07
+@@BUTAKO @OPEN E' melhor olhar antes. @CLOSE
+@REND 
+
+@RMESG 08
+@@BUTAKO @OPEN Qual e' o seu plano? @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0159
+
+@RMESG 00
+&Dante @OPEN Ora, voce^ e' o @YOU @NOSPACE . E voce^ deve ser a Butako. @CLOSE @WAIT
+@@YOU @OPEN E voce^, quem e'? @CLOSE @ENTER
+&Dante @OPEN Eu me chamo Dante. @CLOSE @WAIT
+@@YOU @OPEN Ah! Foi voce^ que nos ajudou quando esta'vamos presos na areia! @CLOSE @WAIT
+&Dante @OPEN Isso mesmo! @CLOSE 
+@REND 
+
+@RMESG 01
+@@YOU @OPEN No's somos muito gratos por nos salvar. @CLOSE @ENTER
+@@BUTAKO @OPEN Obrigada! @CLOSE 
+@REND 
+
+@RMESG 02
+&Dante @OPEN Isto e';;!? @WAIT O colar da Princesa Chelsea? Onde voce^ achou isso? @CLOSE @WAIT
+@@YOU @OPEN Eu o achei no cha~o da sua casa. @CLOSE @WAIT
+&Dante @OPEN Eu e Chelsea nos amamos. @WAIT Eu acho que se derrotarmos o Gog, 
+o Rei ira' permitir o casamento. @CLOSE @WAIT
+@@YOU @OPEN Acho que sim; @CLOSE 
+@REND 
+
+@RMESG 03
+&Dante @OPEN Eu e a Chelsea estamos procurando documentos antigos que falem do Gog. @WAIT
+No's achamos que os documentos esta~o em uma rui'na no deserto. @WAIT 
+Ela esta' agora procurando em outro deserto. @CLOSE 
+@REND 
+
+@RMESG 04
+&Dante @OPEN Por que voce^ tambe'm na~o nos ajuda a procurar esses documentos? @CLOSE @WAIT
+@@YOU @OPEN Vamos ajudar sim. @CLOSE 
+@REND 
+
+@RMESG 05
+@@BUTAKO @OPEN Ei! Tem uma la^mpada aqui! @CLOSE 
+@RWAITEND 05
+
+@RMESG 06
+@@BUTAKO @OPEN E' uma la^mpada de ouro puro! @CLOSE 
+@REND
+
+@RMESG 07
+@@YOU @OPEN Ela e' bastante pesada. @CLOSE 
+@REND
+
+@RMESG 08
+@RETURN Agol @OPEN Obrigado por me libertar. Hua hua hua hua. @CLOSE 
+@RWAITEND 22
+
+@RMESG 09
+@@YOU @OPEN Dante! O que aconteceu? Aguente firme! @CLOSE @WAIT
+&Dante @OPEN Enquanto voce^s lutavam, eu fui atingido por uma bala perdida. @CLOSE @WAIT
+@@YOU @OPEN Voce^ esta' morrendo? @CLOSE @WAIT
+&Dante @OPEN Meu corpo esta' muito fraco; @ENTER
+@YOU @NOSPACE , fale para a Chelsea: @WAIT
+@KOPEN Desculpe por na~o faze^-la feliz. Estarei olhando voce^ la' do ce'u. @KCLOSE @WAIT
+@YOU @NOSPACE , o Gog precisa ser destrui'do! @WAIT Eu su; pli; co;; @CLOSE @ENTER
+@@YOU @OPEN Dante! @CLOSE @ENTER
+@@BUTAKO @OPEN Dante! @CLOSE 
+@RWAITEND 23
+
+@RMESG 0A
+@@YOU @OPEN A morte do Dante na~o sera' em va~o. Vamos dar uma li+a~o no Gog! @CLOSE 
+@REND 
+
+@RMESG 0B
+@@BUTAKO @OPEN E' melhor olhar antes. @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0156
+
+@RMESG 00
+&Delavy @OPEN Eu era um fudeba que fazia save, @WAIT mas estou ocupado
+programando o ZGrapher. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 01BA
+@ROOMSTART 01D8
+@ROOMSTART 01F5
+
+@RMESG 00
+@@SOMEONE @ENTER
+@OPEN Em algum lugar desse deserto, @WAIT mora uma bruxa chamada Rana. @WAIT
+Pore'm, rastrea'-la na~o e' ta~o fa'cil assim. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 01FA
+@ROOMSTART 01DA
+@ROOMSTART 01B8
+@ROOMSTART 01F9
+
+@RMESG 00
+@@SOMEONE @ENTER
+@OPEN Se por acaso voce^ se perder no deserto, @WAIT o melhor e' voltar por onde veio. @CLOSE
+@REND 
+
+@ROOMEND
+
+
+@ROOMSTART 005E
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Vila do Staff @KCLOSE @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 007C
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Terra dos Remos @KCLOSE @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 009B
+
+@RMESG 00
+&Baher @OPEN O tempo esta' bom, na~o?  @CLOSE
+@REND 
+
+@ROOMEND
+
+
+@ROOMSTART 0012
+
+@RMESG 00
+&Ludan @OPEN Ha' um rumor que sereias moram na lagoa!  @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0010
+
+@RMESG 00
+&Taluta @OPEN Parece que algue'm mora na lagoa.  @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0030
+
+@RMESG 00
+@@BUTAKO @OPEN Tem algue'm na lagoa.  @CLOSE
+@REND 
+
+@RMESG 01
+@@YOU @OPEN Como chama essa lagoa? @CLOSE @ENTER
+&Trita #3 o @OPEN Essa e' a lagoa dos homens. @CLOSE
+@REND 
+
+@RMESG 02
+@@BUTAKO @OPEN E' um trita~o, meio homem e meio peixe.  @CLOSE
+@REND 
+
+@RMESG 03
+@@BUTAKO @OPEN Voce^ esta' com uma cara triste. Parece olhar de peixe morto.  @CLOSE @WAIT
+&Trita #3 o @OPEN Ei! Eu ainda na~o morri! @CLOSE
+@REND 
+
+@RMESG 04
+&Trita #3 o @OPEN Voce^ e' cego? Na~o ta' vendo? Eu sou um trita~o! @CLOSE @WAIT
+@@YOU @OPEN Voce^ e' um cara mal-educado. @CLOSE 
+@REND 
+
+@RMESG 05
+&Trita #3 o @OPEN Na~o adianta tentar me comer, eu tenho gosto ruim. @CLOSE 
+@REND 
+
+@RMESG 06
+&Trita #3 o @OPEN Ou+a a minha histo'ria. @WAIT Eu me comunico com as sereias
+ atrave's de um canal subterra^neo. @WAIT Mas eu na~o recebi a resposta
+ da proposta de casamento que fiz @CLOSE @WAIT
+@@YOU @OPEN Com essa cara feia ningue'm ia mandar resposta mesmo. @CLOSE @WAIT
+@@BUTAKO @OPEN @YOU @NOSPACE , comporte-se!  @CLOSE
+@REND 
+
+@RMESG 07
+@@YOU @OPEN Eu vou te ajudar, tonta~o. @CLOSE @WAIT
+&Trita #3 o @OPEN Eu na~o sou um tonta~o, eu sou um trita~o! @CLOSE 
+@REND 
+
+@RMESG 08
+@@YOU @OPEN Eu vou ver o que posso fazer por voce^. @CLOSE
+@REND 
+
+@RMESG 09
+&Trita #3 o @OPEN O que e' isso? @CLOSE @ENTER
+@@YOU @OPEN E' a resposta da sereia. @CLOSE @ENTER
+&Trita #3 o @OPEN Oba! @CLOSE 
+@REND 
+
+@RMESG 0A
+&Trita #3 o @OPEN Estou lendo; Nossa! @CLOSE @ENTER
+@@BUTAKO @OPEN O que esta' escrito?  @CLOSE @WAIT
+&Trita #3 o @OPEN Hm; @YOU @NOSPACE , voce^ pode entregar isso aqui para a sereia por mim? @CLOSE 
+@RWAITEND 0B
+
+@RMESG 0B
+@@YOU @OPEN Entrego sim. @CLOSE @ENTER
+@@BUTAKO @OPEN Ai, que inveja; O amor correspondido e' ta~o belo!  @CLOSE @WAIT
+@@YOU @OPEN Hm? Voce^ tambe'm esta' gostando de algue'm, Butako? Conta ai'! @CLOSE @WAIT
+@@BUTAKO @OPEN Gulp! @CLOSE @ENTER
+@@YOU @OPEN Aposto que e' algum javali! @CLOSE @ENTER
+@@BUTAKO @OPEN Seu bobo! @CLOSE 
+@REND
+
+@RMESG 0C
+&Trita #3 o @OPEN @YOU @NOSPACE , Butako, obrigado! @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0050
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Lagoa dos @ENTER Homens @KCLOSE @CLOSE
+@REND 
+
+@ROOMEND
+
+
+@ROOMSTART 0193
+
+@RMESG 00
+&Tritonete @OPEN Eu sou o filho da sereia e do trita~o. @WAIT Voce^ ajudou no casamento
+deles. @WAIT Por favor, aceite dos dois esse humilde presente. @CLOSE
+@RWAITEND 05
+
+@RMESG 01
+@@BUTAKO @OPEN E' um barco! @CLOSE
+@REND 
+
+@RMESG 02
+@@BUTAKO @OPEN Tem uma mensagem entalhada no casco. @WAIT @KOPEN Para o cupido de
+nosso amor @KCLOSE . @WAIT Hehe, @YOU @NOSPACE , de cupido?  @CLOSE @ENTER
+@@YOU @OPEN Eles viajaram na maionese. @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 01A1
+
+@RMESG 00
+@@BUTAKO @OPEN Aqui tem umas rui'nas. @CLOSE
+@REND
+
+@RMESG 01
+@@BUTAKO @OPEN Onde foi que eu ja' vi essa forma? @CLOSE
+@REND
+
+@RMESG 02
+@@BUTAKO @OPEN Lembrei! Ela apareceu na barriga do Dee, @WAIT aquele
+garoto que estava transparente. @WAIT O desenho era igual ao formato dessa rui'na! @CLOSE
+@REND
+
+@RMESG 03
+@@BUTAKO @OPEN Ah! Aqui tem uma escada! @CLOSE
+@RWAITEND 24
+
+@ROOMEND
+
+
+@ROOMSTART 002B
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Bai'a Puzzle @KCLOSE @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 017E
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Terra do Trabalho @KCLOSE @CLOSE
+@REND 
+
+@ROOMEND
+
+
+@ROOMSTART 017C
+
+@RMESG 00
+&Ben @OPEN O sr. Tios pode fazer milagres! @CLOSE
+@REND 
+
+@RMESG 01
+&Mira @OPEN No's somos pupilos do sr. Tios, mas e' muito difi'cil falar com ele. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 01FF
+
+@RMESG 00
+&Oran @OPEN Somente o sr. Tios tem a for+a para derrotar um dos demo^nios! @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0047
+
+@RMESG 00
+&Daha @OPEN Parece que um redemoinho aqui perto engoliu um aldea~o, @WAIT
+e ele foi encontrado fora da bai'a! @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0026
+
+@RMESG 00
+&Agaho @OPEN Surgiu um redemoinho aqui perto da margem. @CLOSE
+@REND 
+
+@ROOMEND
+
+
+@ROOMSTART 000B
+
+@RMESG 00
+&Agu @OPEN Tem um redemoinho do outro lado da bai'a. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 000D
+
+@RMESG 00
+&Kirion @OPEN A ponte que levava a` ilha dentro da bai'a caiu! @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 002D
+
+@RMESG 00
+&Marlon @OPEN Tem um monstro escondido dentro da ilha no meio da bai'a. @CLOSE
+@REND 
+
+@RMESG 01
+&Ruth @OPEN Eu acho que o monstro que mora na bai'a e' um dos oito demo^nios. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 002C
+
+@RMESG 00
+&Anna @OPEN @YOU @NOSPACE , aqui nessa bai'a mora um monstro perigoso! @CLOSE
+@REND 
+
+@ROOMEND
+
+
+
+@ROOMSTART 00C9
+
+@RMESG 00
+&Hanna @OPEN Ei, @YOU @NOSPACE ! Ou+a, ou+a! Eu tenho um segredo pra contar. @CLOSE
+@REND 
+
+@RMESG 01
+@@YOU @OPEN O que e'? @CLOSE @WAIT
+&Hanna @OPEN Tem um tiozinho chamado Arthur, que na~o gosta muito de gente, @WAIT
+mas e' especialista em len+o'is frea'ticos. @CLOSE @WAIT
+@@YOU @OPEN Ele e' estilista? @CLOSE @ENTER
+&Hanna @OPEN Hein? @CLOSE @WAIT
+@@YOU @OPEN Quem mexe com len+o'is e confec+a~o e' estilista, ne'? @CLOSE @WAIT
+@@BUTAKO @OPEN Acorda, @YOU @NOSPACE ! @CLOSE 
+@REND 
+
+@RMESG 02
+&Hanna @OPEN Na~o e' nada disso! @WAIT Len+o'is frea'ticos sa~o canais de a'gua subterra^nea. @CLOSE
+@REND 
+
+@RMESG 03
+&Hanna @OPEN Era so' isso. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0201
+
+@RMESG 00
+@RETURN Hokora @OPEN Hahaha. Eu sou Hokora, um servo de Gog. @WAIT Voce^s esta~o no interior
+do meu esto^mago! @WAIT
+Todos que entram aqui morrem! @CLOSE 
+@REND 
+
+@RMESG 01
+@@BUTAKO @OPEN Esta' tudo escuro aqui em volta, na~o consigo ver nada. @CLOSE 
+@REND 
+
+@RMESG 02
+@@YOU @OPEN Ja' sei! Vou usar a vela. @CLOSE @ENTER
+@@BUTAKO @OPEN Boa ide'ia! @CLOSE 
+@RWAITEND 02
+
+@RMESG 03
+@@BUTAKO @OPEN Eu sinto um mal muito grande nesse local. @CLOSE 
+@REND 
+
+@RMESG 04
+@@BUTAKO @OPEN Estamos cercados pelas paredes estomacais! @WAIT E isso aqui no cha~o e' suco
+ga'strico! @CLOSE 
+@REND 
+
+@RMESG 05
+&Maria @OPEN Eu sou a Maria. @CLOSE @ENTER
+@@YOU @OPEN Eu ja' ouvi sobre voce^, esta~o todos te procurando! @CLOSE
+@REND 
+
+@RMESG 06
+@@BUTAKO @OPEN Quer usar isso de novo?  @CLOSE 
+@REND 
+
+@RMESG 07
+@@BUTAKO @OPEN Na~o e' bom se mexer no escuro! @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0089
+
+@RMESG 00
+&Arthur @OPEN Idiota! Na~o entre nesse buraco! Eu vou ficar muito bravo! @CLOSE
+@REND 
+
+@RMESG 01
+@@YOU @OPEN Por que^ voce^ estava ta~o calma no esto^mago daquele bicho? @CLOSE @WAIT
+&Maria @OPEN E' por causa do manto que estou vestindo. @WAIT 
+Ele da' poderes milagrosos a quem o usa! @CLOSE @WAIT
+&Maria @OPEN Quero agradecer por me tirar de la', fique com o manto. @WAIT 
+Muito obrigada pela ajuda! Se cuida! @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0107
+
+@RMESG 00
+@@BUTAKO @OPEN O que houve, garoto? Voce^ na~o pode dormir aqui. @CLOSE @WAIT
+&Saul @OPEN Eu na~o estou dormindo! Estou muito fraco, e cai'! @CLOSE
+@REND
+
+@RMESG 01
+@@BUTAKO @OPEN Nossa! Parece que esta' sofrendo; @CLOSE
+@REND
+
+@RMESG 02
+@@BUTAKO @OPEN Seus la'bios esta~o secos! @CLOSE
+@REND
+
+@RMESG 03
+@@BUTAKO @OPEN Voce^ pode me explicar por que esta' dormindo aqui? @CLOSE @WAIT
+&Saul @OPEN Eu ja' disse que na~o estou dormindo! @WAIT
+A a'gua do po+o da nossa aldeia secou, na~o tem nada para beber. @WAIT
+Ficou decidido que eu tinha que achar novos lugares para fazer po+os. @WAIT
+Me disseram que aqui corria a'gua subterra^nea, por isso vim aqui. @CLOSE @WAIT
+@@YOU @OPEN Na~o tem nenhuma gotinha de a'gua la' na sua aldeia? @CLOSE
+@REND
+
+@RMESG 04
+@@BUTAKO @OPEN Agora esta' tudo bem! @CLOSE
+@REND
+
+@RMESG 05
+@@BUTAKO @OPEN Coitadinho; O @YOU vai ajuda'-lo. E' meio inu'til, mas e'
+melhor que nada @CLOSE @WAIT
+@@YOU @OPEN Na~o fala besteira, sua porca! @CLOSE
+@REND
+
+@RMESG 06
+@@YOU @OPEN Aqui na~o tem nenhum espelho; @CLOSE @WAIT
+@@BUTAKO @OPEN E' pra refletir sobre o assunto, sua anta! @CLOSE @ENTER
+@@YOU @OPEN Ah ta'; @CLOSE
+@REND
+
+@RMESG 07
+@@YOU @OPEN O que no's vamos fazer? @CLOSE @WAIT
+@@BUTAKO @OPEN Na~o adianta trazer um pouquinho de a'gua, @WAIT tem que ser
+em grande quantidade; @WAIT Se pelo menos tive'ssemos um galho de @ENTER
+aveleiro; @CLOSE
+@REND
+
+@RMESG 08
+@@YOU @OPEN O que e' um galho de aveleiro? @CLOSE @WAIT
+&Saul @OPEN E' um galho que serve para achar a'gua! @CLOSE @WAIT
+@@BUTAKO @OPEN Sim, o galho da a'rvore de avela~ funciona
+como um i'ma de achar a'gua @CLOSE
+@REND
+
+@RMESG 09
+&Saul @OPEN Eu gostaria que voce^ andasse por aqui enquanto @ENTER @KOPEN usa @KCLOSE
+#0 o galho;  @CLOSE 
+@REND
+
+@RMESG 0A
+&Saul @OPEN Na~o da', na~o consigo me mexer. @CLOSE 
+@REND
+
+@RMESG 0B
+@@BUTAKO @OPEN Aqui na~o tem nada. @CLOSE
+@REND
+
+@RMESG 0C
+@@BUTAKO @OPEN Aha'! E' aqui! @CLOSE
+@RWAITEND 0A
+
+@RMESG 0D
+@@BUTAKO @OPEN Garoto! Encontramos uma fonte aqui! @CLOSE @WAIT
+&Saul @OPEN Obrigado! Ja' estou ate' me sentindo melhor! @WAIT 
+Para agradecer, quero convida'-los para visitar minha casa. 
+Me sigam! @CLOSE @WAIT
+@@YOU @OPEN Ele melhorou ra'pido, hein? @CLOSE @ENTER
+@@BUTAKO @OPEN Crian+as tem muita energia! @CLOSE 
+@RWAITEND 05
+
+@RMESG 0E
+@@BUTAKO @OPEN Aqui fica a fonte que no's dois descobrimos. @CLOSE
+@REND
+
+@ROOMEND
+
+
+@ROOMSTART 020E
+
+@RMESG 00
+&Saul @OPEN Vovo^, essas pessoas me ajudaram. @WAIT Eles encontraram uma fonte! @CLOSE
+@REND 
+
+@RMESG 01
+&Saul @OPEN No's estaremos eternamente gratos! @CLOSE
+@REND 
+
+@RMESG 02
+&Chris @OPEN Se eu puder ajudar em alguma coisa, por favor me avisem. @CLOSE
+@REND 
+
+@RMESG 03
+@@YOU @OPEN Se voce^ souber algo sobre o paradeiro do Gog; @CLOSE @WAIT
+&Chris @OPEN Hm; Isso e' difi'cil; @CLOSE
+@REND 
+
+@RMESG 04
+@@YOU @OPEN Eu imploro; por favor me ajude! @CLOSE @ENTER
+@@BUTAKO @OPEN Que puxa-saco! @CLOSE
+@REND 
+
+@RMESG 05
+@@YOU @OPEN No's ajudamos o Saul! @CLOSE @ENTER
+&Chris @OPEN Mas eu na~o lembro de nada! @CLOSE
+@REND 
+
+@RMESG 06
+@@BUTAKO @OPEN Isso e' inu'til; Vamos procurar em outro lugar. @CLOSE
+@REND 
+
+@RMESG 07
+&Chris @OPEN Ai! Isso do'i! ;;Lembrei! Lembrei da Rana! @CLOSE
+@REND 
+
+@RMESG 08
+@@YOU @OPEN O Gog ta' escondido numa po+a de lama? @CLOSE @WAIT
+@@BUTAKO @OPEN Ele disse Rana, na~o lama! @CLOSE @WAIT
+&Chris @OPEN Rana e' uma bruxa;; 
+@RWAITEND 0C
+
+@RMESG 09
+Ha' muito tempo, ela fez um pacto com o demo^nio para ter a vida eterna. @WAIT
+Parece que ela tem va'rias centenas de anos! @WAIT Acho que ela sabe o local
+da apari+a~o de Gog. @CLOSE @WAIT
+@@YOU @OPEN E onde esta' essa Rana? @CLOSE @WAIT
+&Chris @OPEN Se voce^ andar ao sul da Terra das Pedras Mortais, @WAIT
+encontrara' umas rui'nas. Parece que ela mora la'. @WAIT
+Mas uma tempestade de areia faz as
+pessoas retornarem por onde vieram. @CLOSE
+@REND 
+
+@RMESG 0A
+&Chris @OPEN Isso e' tudo que sei. Por favor, tome cuidado. @CLOSE
+@REND 
+
+@ROOMEND
+
+
+@ROOMSTART 020D
+
+
+@RMESG 00
+&Anna @OPEN Aqui tem tre^s artigos. Cada um deles tem uma mensagem. @WAIT Veja todas, por favor. @CLOSE
+@REND 
+
+@RMESG 01
+&Anna @OPEN E enta~o? Entederam minhas mensagens?  @CLOSE @WAIT
+@@YOU @OPEN Elas passam boas sensa+o~es. @CLOSE
+@REND 
+
+@RMESG 02
+@@BUTAKO @OPEN Parece que tem algo nesse saco. @CLOSE
+@REND 
+
+@RMESG 03
+@@BUTAKO @OPEN No ro'tulo esta' escrito @ENTER @KOPEN Felicidade mari'tima @KCLOSE . @WAIT 
+Tem um monte de frutos do mar dentro. @CLOSE
+@REND 
+
+@RMESG 04
+@@BUTAKO @OPEN Tem muita comida aqui dentro! @ENTER Muita comida, muita felicidade. @WAIT
+Sera' que a mensagem e' #0 @KOPEN Seja muito feliz @KCLOSE ? @CLOSE @ENTER
+@@YOU @OPEN ;; @CLOSE
+@REND 
+
+@RMESG 05
+@@BUTAKO @OPEN Parece feito de ouro. @CLOSE
+@REND 
+
+@RMESG 06
+@@BUTAKO @OPEN E' uma esta'tua de ouro em forma de peixe, que esta' de
+ponta-cabe+a. @CLOSE
+@REND 
+
+@RMESG 07
+@@BUTAKO @OPEN Na~o e' pra pegar! @CLOSE
+@REND 
+
+@RMESG 08
+@@BUTAKO @OPEN Se a esta'tua esta' de ponta-cabe+a, @WAIT enta~o a mensagem
+tem o significado invertido. @WAIT Acho que e': @ENTER @KOPEN 
+Na~o fique duro como uma esta'tua, relaxe! @KCLOSE @CLOSE @WAIT
+@@YOU @OPEN Eu acho que voce^ esta' viajando! @CLOSE
+@REND 
+
+@RMESG 09
+@@BUTAKO @OPEN Isso e' um peixe. @CLOSE
+@REND 
+
+@RMESG 0A
+@@BUTAKO @OPEN E' aquele peixe chamado Cavala. @WAIT O cora+a~o dele tambe'm esta' cortado ao meio. @CLOSE
+@REND 
+
+@RMESG 0B
+@@BUTAKO @OPEN O cora+a~o esta' partido ao meio; 
+Sera' que isso significa: @WAIT @KOPEN Devemos abrir nossos cora+o~es a`s pessoas @KCLOSE ? @CLOSE @WAIT
+@@YOU @OPEN Eu acho que voce^ esta' distorcendo tudo. @CLOSE
+
+@REND 
+
+@RMESG 0C
+@@BUTAKO @OPEN Na~o e' pra pegar! @CLOSE
+@REND 
+
+@RMESG 0D
+@@BUTAKO @OPEN E' melhor olhar bem. @CLOSE
+@REND 
+
+
+@ROOMEND
+
+@ROOMSTART 020C
+
+@RMESG 00
+&Sereia @OPEN Bem vindo a` casa da princesa do meu povo. @WAIT No's gostari'amos
+de te agradecer. @CLOSE
+@REND 
+
+@RMESG 01
+@@YOU @OPEN Gulp! @CLOSE @ENTER
+@@BUTAKO @OPEN O que houve? @CLOSE @WAIT
+@@YOU @OPEN Estou rodeado de minazinhas bonitas! @CLOSE 
+@REND 
+
+@RMESG 02
+&Sereia @OPEN Como foi? @CLOSE @ENTER
+@@YOU @OPEN Foi bastante u'til! @CLOSE @ENTER
+@@BUTAKO @OPEN Muito obrigado! @CLOSE 
+@REND 
+
+@RMESG 03
+&Sereia @OPEN Desculpe por tomar tanto tempo de voce^s. Boa viagem! @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 01D4
+
+@RMESG 00
+&Aleck @OPEN Estou encrencado. @CLOSE
+@REND 
+
+@RMESG 01
+&Aleck @OPEN Hm? Eu tenho um machado parecido com esse. @CLOSE
+@REND 
+
+@RMESG 02
+@@YOU @OPEN Voce^ e' o Aleck, ne'? @WAIT 
+Sua esposa pediu para te entregar esse machado. @CLOSE @WAIT
+&Aleck @OPEN Obrigado, voce^ me salvou! @CLOSE
+@REND 
+
+@RMESG 03
+&Aleck @OPEN Agora eu posso trabalhar! @CLOSE
+@REND 
+
+@RMESG 04
+@@BUTAKO @OPEN Por que voce^ esta' examinando essa a'rvore? @CLOSE @WAIT
+@@YOU @OPEN Pra ver se surge alguma ide'ia pra atravessar o deserto. @CLOSE @WAIT
+@@BUTAKO @OPEN Corta essa! Vamos procurar o caminho em outro lugar! @CLOSE
+@REND 
+
+@RMESG 05
+@@YOU @OPEN Sera' que voce^ pode me emprestar seu machado um pouco? @CLOSE @WAIT
+&Aleck @OPEN E' claro. @CLOSE
+@REND 
+
+@RMESG 06
+@@YOU @OPEN Madeira! @CLOSE
+@RWAITEND 0D
+
+@RMESG 07
+&Aleck @OPEN Na~o posso trabalhar sem meu machado. @CLOSE
+@REND
+
+@RMESG 08
+@@YOU @OPEN Obrigado pelo machado. @CLOSE
+@REND
+
+@RMESG 09
+@@BUTAKO @OPEN Foi um corte bem preciso. @CLOSE
+@REND
+
+@RMESG 0A
+@@BUTAKO @OPEN Isso na~o da' pra pegar! @CLOSE
+@REND
+
+@RMESG 0B
+@@BUTAKO @OPEN Ei, eu estou vendo o caminho de sai'da do deserto! @CLOSE @WAIT
+@@YOU @OPEN Sua sugesta~o de cortar a a'rvore foi boa mesmo. @CLOSE @ENTER
+@@BUTAKO @OPEN Eu sugeri isso? @CLOSE
+@REND
+
+@RMESG 0C
+@@BUTAKO @OPEN Me fale o que voce^ quer pegar! @CLOSE
+@REND 
+
+@RMESG 0D
+@@BUTAKO @OPEN Na~o pode ficar mostrando pra qualquer um! @CLOSE
+@REND 
+
+@RMESG 0E
+@@BUTAKO @OPEN Na~o pode dar isso pra qualquer um! @CLOSE
+@REND 
+
+@RMESG 0F
+@@BUTAKO @OPEN O que voce^ quer fazer? @CLOSE
+@REND 
+
+@RMESG 10
+@@BUTAKO @OPEN Me fale o que voce^ quer olhar! @CLOSE
+@REND 
+
+
+@RMESG 11
+@@BUTAKO @OPEN Me fale o que voce^ quer procurar! @CLOSE
+@REND 
+
+
+@ROOMEND
+
+@ROOMSTART 01B9
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Terra da Pedra Mortal @KCLOSE @CLOSE
+@REND 
+
+@ROOMEND
+
+
+@ROOMSTART 017B
+
+@RMESG 00
+&Tios @OPEN Na~o vou esconder o jogo, eu sou o Tios. @CLOSE @ENTER
+@@YOU @OPEN Voce^ e' estranho. @CLOSE
+@REND 
+
+@RMESG 01
+@@BUTAKO @OPEN O que^ voce^ faz? @CLOSE @ENTER
+&Tios @OPEN As coisas que fa+o sa~o muito perigosas! @WAIT 
+Aqueles que na~o sa~o meus disci'pulos na~o podem aprender. @CLOSE @WAIT
+@@YOU @OPEN Egoi'sta. @CLOSE 
+@REND 
+
+@RMESG 02
+@@BUTAKO @OPEN Voce^ na~o sabe que uma sombra paira sobre o Reino Grego? @WAIT
+Por favor, mostre-nos a sua te'cnica! @CLOSE @WAIT
+&Tios @OPEN Esta' bem. Voce^ me pede com tanto entusiasmo; @WAIT 
+Minha te'cnica e' @ENTER a arte do @ENTER @KOPEN Exorcismo @KCLOSE . @WAIT
+Isso significa que eu posso separar a alma do corpo das pessoas. @WAIT
+Eu fiquei muitos anos estudando essa te'cnica. @CLOSE 
+@REND 
+
+@RMESG 03
+@@BUTAKO @OPEN Por favor, mostre-nos a sua te'cnica! @CLOSE @WAIT
+&Tios @OPEN Eu mostrarei minha te'cnica somente quando for a hora. @CLOSE 
+@REND 
+
+@RMESG 04
+&Tios @OPEN O que voce^ pede e' impossi'vel. @CLOSE 
+@REND 
+
+@RMESG 05
+@@BUTAKO @OPEN Por acaso voce^ se importa em usar sua te'cnica num corpo imortal? @CLOSE @WAIT
+&Tios @OPEN Esta' bem, esta' bem. Me leve ao local onde esta' essa pessoa. @WAIT 
+Pode ir na frente que eu te alcan+o. @CLOSE 
+@REND 
+
+@RMESG 06
+@@YOU @OPEN Obrigado por ajudar aquela vez @CLOSE @ENTER
+&Tios @OPEN Eu tambe'm aprendi bastante. @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 01D5
+
+@RMESG 00
+@@BUTAKO @OPEN Na~o consigo abrir os olhos por causa da tempestade de areia! @CLOSE
+@REND 
+
+@RMESG 01
+@@BUTAKO @OPEN Estou um pouco confusa com esse caminho; @CLOSE
+@REND 
+
+@RMESG 02
+@@BUTAKO @OPEN Na~o sei em que dire+a~o estamos andando! @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 01D7
+
+@RMESG 00
+@@BUTAKO @OPEN Aqui tem tre^s buracos. @CLOSE @ENTER
+@@YOU @OPEN Tre^s buracos;Hm; @CLOSE @WAIT
+@@BUTAKO @OPEN No que voce^ esta' pensando? @CLOSE 
+@REND 
+
+@RMESG 01
+@@BUTAKO @OPEN Aqui e' um castelo em rui'nas. Parece meio suspeito. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0211
+
+@RMESG 00
+@@BUTAKO @OPEN Onde estamos? @CLOSE @ENTER
+@@YOU @OPEN Na~o sei; @CLOSE @ENTER
+@OPEN Tem algue'm ai'i'i'? @CLOSE @WAIT
+@OPEN Ih... Acho que acordamos algue'm. @CLOSE 
+@RWAITEND 19
+
+@RMESG 01
+&Rana @OPEN Eu sou Rana. Quem ousou interromper meu sono? @CLOSE @WAIT
+@@YOU @OPEN Rana? Aquela bruxa que dizem ser imortal? @CLOSE @WAIT
+&Rana @OPEN Voce^ e' o @YOU @NOSPACE . Enfim nos encontramos. @CLOSE @WAIT
+@@YOU @OPEN Por acaso voce^ sabe onde o Gog vai aparecer? @CLOSE @WAIT
+&Rana @OPEN Na~o brinque comigo, seu tolo! @WAIT Voce^ na~o sabia que eu sou um
+dos oito demo^nios enviados pelo Gog? @CLOSE @WAIT
+@@YOU @OPEN O que^!? @CLOSE @WAIT
+&Rana @OPEN Voce^ na~o passa de um inseto insignificante mesmo! @CLOSE @WAIT
+@@YOU @OPEN Inseto insignificante na~o! Talvez um bicho-da-seda; @CLOSE
+@REND 
+
+@RMESG 02
+&Rana @OPEN Eu voltei a` vida! @CLOSE 
+@REND 
+
+@RMESG 03
+@@BUTAKO @OPEN Depois de viver por centenas de anos, as pessoas crescem bastante! @CLOSE 
+@REND 
+
+@RMESG 04
+@@BUTAKO @OPEN Viver por tanto tempo deixa a pele mais enrugada que maracuja' velho. @CLOSE 
+@REND 
+
+@RMESG 05
+/* nao tem nada aqui mesmo */
+@REND 
+
+@RMESG 06
+@@YOU @OPEN Butako, isso vai ser perigoso, fique longe. @CLOSE @ENTER
+@@BUTAKO @OPEN @YOU @NOSPACE ! @CLOSE @WAIT
+&Rana @OPEN Tolo, veja como e' forte a minha magia negra! @CLOSE 
+@RWAITEND 1A
+
+@RMESG 07
+&Rana @OPEN @YOU @NOSPACE , voce^ desiste? @CLOSE @ENTER
+@@YOU @OPEN Desisto! @CLOSE
+@REND 
+
+@RMESG 08
+@@BUTAKO @OPEN Hm? A dire+a~o do movimento mudou; @ENTER
+Esta' formando letras! 
+@RWAITEND 1B
+
+@RMESG 09
+Aga', E^, Ele, Pe^;; HELP? @WAIT @KOPEN Ajuda @KCLOSE ?  @YOU @NOSPACE ,
+foi voce^ que fez esse movimento? @CLOSE @WAIT
+@@YOU @OPEN Na~o! @CLOSE @ENTER
+@@BUTAKO @OPEN Tera' sido a Rana;;? @CLOSE 
+@REND 
+
+@RMESG 0A
+@@BUTAKO @OPEN Sera' que essa mensagem de ajuda na~o revela @WAIT 
+os sentimentos reais dela? @CLOSE @ENTER
+@@YOU @OPEN E', eu tambe'm  acho isso. @WAIT Ela
+fica se vangloriando que pode voltar a` vida, @WAIT
+mas ao inve's de me matar ficou so' me jogando 
+contra a parede. @CLOSE @WAIT
+@@BUTAKO @OPEN Deve ter sido esse o motivo mesmo. @CLOSE @WAIT
+@@YOU @OPEN Ei, Rana! Revele seus sentimentos verdadeiros! @CLOSE @ENTER
+&Rana @OPEN Hmm;; @CLOSE @WAIT
+@@BUTAKO @OPEN Voce^ na~o e' uma pessoa ruim! Mostre como voce^ realmente e'. @CLOSE @WAIT
+&Rana @OPEN ;;eu quero morrer. @CLOSE @ENTER
+@@YOU @OPEN ? @CLOSE @WAIT
+&Rana @OPEN 200 anos atra's, um demo^nio, que se dizia enviado por Gog, falou que @WAIT poderia
+curar a doen+a do meu u'nico filho. O demo^nio disse @WAIT 
+que poderia salvar a vida do meu filho, se eu desse minha alma a ele. @WAIT
+Eu salvaria meu filho se fizesse o que o demo^nio falava! @WAIT
+Mas o demo^nio me traiu. Meu filho acabou morrendo. @WAIT
+E minha alma foi trocada pela alma do demo^nio, que entrou em mim. @WAIT
+Minha alma na~o conseguiu partir, @WAIT e ficou 200 anos vagando pela escurida~o. @WAIT
+Por causa da obra do demo^nio, meu corpo na~o pode mais morrer. @WAIT
+Eu acho que se o demo^nio dentro de mim for expulso, @WAIT
+meu corpo pode voltar a` terra, e @ENTER minha alma ira' ao Parai'so. @WAIT
+Por isso eu digo que quero morrer. @CLOSE @ENTER
+@@YOU @OPEN ;; @CLOSE @WAIT
+&Rana @OPEN Essa e' uma for+a que ningue'm parece ter. Mas esta' tudo bem. @WAIT
+Eu posso esperar eternamente. @CLOSE @ENTER
+@@YOU @OPEN Talvez; @CLOSE 
+@REND 
+
+@RMESG 0B
+&Rana @OPEN Por favor, matem o demo^nio que esta' aqui dentro de mim! @CLOSE 
+@REND 
+
+@RMESG 0C
+@@YOU @OPEN Rana! Aqui esta' uma pessoa que pode ajuda'-la! @CLOSE @WAIT 
+@RETURN Tios @OPEN Vou come+ar minha te'cnica de exorcismo. @WAIT 
+Deus poderoso que mora no ce'u! @WAIT 
+Se voce^ tem piedade de no's, por favor atenda meu pedido! @WAIT
+Por favor, remova o demo^nio que mora no corpo desta senhora! @CLOSE
+@RWAITEND 1C
+
+@RMESG 0D
+&Rana @OPEN @YOU @NOSPACE , Tios, obrigada. @WAIT
+Agora minha alma pode viver em paz no ceu. @WAIT
+Ah, eu ja' ia esquecendo! O local onde o Gog vai aparecer e'; @WAIT
+em algum lugar dentro de uma montanha. @WAIT
+Mas voce^ na~o vai encontra'-lo la'. @WAIT
+A batalha final sera' no interior de um castelo. @WAIT
+@YOU @NOSPACE , o Gog na~o tem medo de voce^. Tome muito cuidado ao lutar! @WAIT
+Adeus! @CLOSE 
+@RWAITEND 1D
+
+@RMESG 0E
+@@BUTAKO @OPEN A Rana se foi. Ela era apenas uma vi'tima de um dos oito demo^nios. @CLOSE @WAIT
+@@YOU @OPEN Os aliados do Gog sa~o pessoas muito ma's. Eu na~o os perdo^o! @CLOSE @WAIT
+@RETURN Tios @OPEN @YOU @NOSPACE , essa e' a minha hora de ir. @CLOSE
+@RWAITEND FC
+
+@RMESG 0F
+@@YOU @OPEN Obrigado. @CLOSE @ENTER
+@@BUTAKO @OPEN Obrigada. @CLOSE 
+@REND 
+
+@RMESG 10
+@@BUTAKO @OPEN A Rana finalmente morreu. @CLOSE 
+@REND 
+
+@RMESG 11
+@RETURN Tios @OPEN @YOU @NOSPACE , espero que na~o tenha me atrasado. @CLOSE
+@REND 
+
+@RMESG 12
+@@BUTAKO @OPEN Me fale o que voce^ quer olhar. @CLOSE @ENTER
+@REND 
+
+@RMESG 13
+@@BUTAKO @OPEN O que voce^ quer examinar? @CLOSE @ENTER
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 005B
+
+@RMESG 00
+&Aden @OPEN Para entrar na Montanha de Diamante, @WAIT
+voce^ precisa for+ar uma entrada com um martelo. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 00FC
+
+@RMESG 00
+@@BUTAKO @OPEN @KOPEN Montanha de Diamante @KCLOSE @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 00FD
+
+@RMESG 00
+@@BUTAKO @OPEN O martelo quebrou essa parte da montanha! @CLOSE
+@RWAITEND 28 
+
+@RMESG 01
+@@BUTAKO @OPEN Conseguimos! Agora podemos prosseguir o caminho. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0213
+
+@RMESG 00
+@@BUTAKO @OPEN Aqui e' o interior da Montanha de Diamante. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 007B
+
+@RMESG 00
+&Yasuo @OPEN Antigamente, diziam que dentro da montanha @WAIT
+morava uma fada que carregava diamantes. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 021E
+
+@RMESG 00
+@@BUTAKO @OPEN Tem algue'm aqui! @CLOSE
+@REND 
+
+@RMESG 01
+&Fada @OPEN Eu sou a fada dos diamantes. @WAIT
+Fui aprisionada aqui pelo demo^nio ha' muito tempo. @WAIT
+Mas @YOU derrotou o demo^nio e me salvou! @CLOSE
+@REND 
+
+@RMESG 02
+@@BUTAKO @OPEN E' a fada dos diamantes. @CLOSE
+@REND 
+
+@RMESG 03
+&Fada @OPEN Como agradecimento por terem me salvado, @WAIT
+gostaria que levassem um diamante da montanha. @WAIT 
+Aqui tem quatro diamantes. @WAIT
+Um de 3 lados, um de 4 lados, um de 6 lados, e uma orbe. @WAIT
+Vou dar apenas um pra voce^. Se voce^ na~o gostar, depois pode trocar. @CLOSE
+@REND 
+
+@RMESG 04
+&Fada @OPEN Eu te ofereco o diamante de tre^s lados. @CLOSE
+@REND 
+
+@RMESG 05
+&Fada @OPEN O de quatro lados e' muito bom. Por favor, aceite. @CLOSE
+@REND 
+
+@RMESG 06
+&Fada @OPEN Por favor, leve com voce^ o de seis lados. @CLOSE
+@REND 
+
+@RMESG 07
+&Fada @OPEN Este diamante e' uma orbe perfeitamente circular. @CLOSE
+@REND 
+
+@RMESG 08
+&Fada @OPEN Voce^ ja' esta' levando um diamante. @WAIT 
+Pra trocar tem que devolver o outro primeiro. @CLOSE
+@REND 
+
+@RMESG 09
+@@YOU @OPEN Quero devolver esse diamante. @CLOSE @WAIT
+&Fada @OPEN Mesmo? Enta~o, por favor, escolha um dos outros. @CLOSE
+@REND 
+
+@RMESG 0A
+&Fada @OPEN Eu sou a fada protetora dos diamantes desta montanha. @CLOSE
+@REND 
+
+@RMESG 0B
+&Fada @OPEN Dentro de um desses diamantes tem um segredo guardado. @WAIT
+Estou certa que foi por isso que o demo^nio me prendeu. @CLOSE
+@REND 
+
+@RMESG 0C
+&Fada @OPEN @YOU esqueceu alguma coisa? @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0227
+
+@RMESG 00
+@@YOU @OPEN Voce^ e' a Chelsea, ne'? @WAIT Infelizmente, eu fui encarregado de te
+passar uma mensagem. @CLOSE @WAIT
+&Princesa @OPEN Voce^ e' a Butako, e voce^ e' o @YOU @NOSPACE . @WAIT Ultimamente
+tenho ouvido rumores sobre voce^s. @WAIT Que mensagem voce^ veio me trazer? @CLOSE @WAIT
+@@YOU @OPEN Por favor, ou+a com aten+a~o. O Dante faleceu. @CLOSE @ENTER
+&Princesa @OPEN ;;! @CLOSE @WAIT
+@@YOU @OPEN O Gog enviou oito demo^nios para nos atacar. @WAIT
+@KOPEN Desculpe por na~o faze^-la feliz. Estarei olhando voce^ la' do ce'u. @KCLOSE @WAIT
+Estas foram suas u'ltimas palavras. @CLOSE @ENTER
+&Princesa @OPEN ;; @CLOSE 
+@REND 
+
+@RMESG 01
+&Princesa @OPEN ;; Agora na~o e' hora de ficar triste. @WAIT
+Como iremos derrotar o Grande Rei dos Demo^nios Gog? @WAIT
+Temos que pensar! A morte do Dante na~o pode passar em va~o.
+@CLOSE
+@REND
+
+@RMESG 02
+&Princesa @OPEN Esse e' o meu colar. @CLOSE @ENTER
+@@YOU @OPEN Eu achei na casa do Dante. @CLOSE
+@REND
+
+@RMESG 03
+&Princesa @OPEN Como voce^ o achou, eu te dou de presente. @CLOSE @WAIT
+@@YOU @OPEN Isso e' importante pra voce^; @WAIT Mas eu aceito o presente, muito obrigado. @CLOSE
+@REND
+
+@RMESG 04
+@@BUTAKO @OPEN Garota bonita, ne'? @CLOSE @WAIT
+@@YOU @OPEN Tirou as palavras da minha boca! @CLOSE
+@REND
+
+@RMESG 05
+&Princesa @OPEN Em algum lugar aqui dentro, tem um documento que fala do Gog. @WAIT
+Vamos procura'-lo! @CLOSE 
+@REND
+
+@RMESG 06
+@@BUTAKO @OPEN Tem alguma coisa aqui! @CLOSE
+@RWAITEND 05
+
+@RMESG 07
+@@YOU @OPEN Que pergaminho velho! Acho que esse e' o documento! @CLOSE
+@REND
+
+@RMESG 08
+@@BUTAKO @OPEN Na~o pode! Aqui e' um lugar sagrado! 
+Pegar as coisas daqui e' pecado.  @CLOSE
+@REND
+
+@RMESG 09
+@@BUTAKO @OPEN Isso e' um documento, na~o um travesseiro!  @CLOSE
+@REND
+
+@RMESG 0A
+@@BUTAKO @OPEN Isso e' um pergaminho antigo, na~o e' papel higie^nico!  @CLOSE
+@REND
+
+@RMESG 0B
+@@YOU @OPEN Isso aqui esta' muito velho e difi'cil de ler; @WAIT
+@KOPEN Na era em que o Reino Grego for governado pelo Rei Pampas, @WAIT
+os desastres causados por Galious recome+ara~o, @WAIT
+com o surgimento neste mundo do Grande Rei dos Demo^nios Gog. @WAIT
+Quando as estrelas do ce'u formarem uma Grande Cruz, @WAIT
+Gog surgira' e massacrara' todos os seres vivos. @WAIT
+Apenas uma pessoa sera' capaz de dete^-lo. @WAIT
+Sera' um visitante de outro mundo, que na~o e' do Reino Grego. @KCLOSE @WAIT
+@KOPEN visitante de outro mundo @KCLOSE ? Na~o e' de mim que esta~o falando, ne'? @CLOSE @WAIT
+@@BUTAKO @OPEN E' voce^, sim. @CLOSE @ENTER
+@@YOU @OPEN Eu tenho uma sensa+a~o ruim sobre isso. @WAIT
+Eu na~o posso proteger do perigo todas as pessoas! @CLOSE @WAIT
+@@BUTAKO @OPEN Agora na~o tem mais jeito, @YOU @NOSPACE . Continue a ler. @CLOSE @WAIT
+@@YOU @OPEN Existem duas Grandes Cruzes, uma no ce'u e outra no espa+o. @WAIT
+Se as duas se sobreporem; @WAIT
+uma rea+a~o ira' mudar o destino e Gog sera' derrotado. @CLOSE @WAIT
+@@BUTAKO @OPEN E depois? @CLOSE @ENTER
+@@YOU @OPEN Depois o papel esta' estragado, na~o da' pra ler. @CLOSE
+@REND
+
+@RMESG 0C
+@@BUTAKO @OPEN Isso e' tudo. @CLOSE @ENTER
+@REND
+
+@RMESG 0D
+&Princesa @OPEN @YOU @NOSPACE , Butako, eu vou partir antes que o mal se aproxime. @WAIT
+Obrigada! @CLOSE
+@RWAITEND 05
+
+@RMESG 0E
+@@BUTAKO @OPEN O que voce^ quer examinar? @CLOSE
+@REND 
+
+@RMESG 0F
+@@BUTAKO @OPEN O que voce^ quer pegar? @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0225
+
+@RMESG 00
+@RETURN Puzzla @OPEN Voce^ e' o @YOU @NOSPACE . 
+Eu sou o u'ltimo dos oito demo^nios, @KOPEN Puzzla @KCLOSE . @WAIT
+Voce^ vai morrer aqui! E na~o sera' uma dessas mortes simples! @WAIT
+Meu problema lhe trara' angu'stia, dor,  e, no final, vai parecer que @WAIT
+sua boca, orelhas, ouvidos e ce'rebro esta~o pulando da cabe+a! @WAIT
+Bwahahaha! @CLOSE @ENTER
+@@YOU @OPEN Que boca grande voce^ tem! @CLOSE @WAIT
+@@BUTAKO @OPEN @YOU @NOSPACE ! A princesa Chelsea esta' presa dentro do Puzzla! @CLOSE @WAIT
+@@YOU @OPEN !! Isso na~o e' lugar pra ficar presa! Chelsea! Vou te ajudar! @CLOSE @WAIT
+@RETURN Princesa @OPEN @YOU @NOSPACE ! Na~o se preocupe comigo! @WAIT
+Eu na~o quero ver sua boca, nariz, orelhas e ce'rebro pulando da cabe+a! @WAIT
+Deve ser bem dolorido! @CLOSE @WAIT
+@RETURN Puzzla @OPEN Enfim. Eu te darei 18 minutos pra resolver meu problema. @WAIT
+Se voce^ conseguir ajudar a princesa, eu responderei suas perguntas. @CLOSE
+@RWAITEND F6
+
+@RMESG 01
+@RETURN Princesa @OPEN @YOU @NOSPACE , obrigada! @CLOSE @WAIT
+@@YOU @OPEN Puzzla! No's temos um trato, responda minhas perguntas! @CLOSE @ENTER
+@RETURN Puzzla @OPEN Uggg; @CLOSE @WAIT
+@@YOU @OPEN Primeiro, quando for a hora da Grande Cruz, 
+onde o Gog ira' surgir? @CLOSE @WAIT
+@RETURN Puzzla @OPEN Dentro da Montanha da Ma'scara; @CLOSE @WAIT
+@RETURN Princesa @OPEN Ma'scara;; @YOU @NOSPACE ! E' perto da casa do Dante! @WAIT
+Eu vou pra la' agora mesmo! @CLOSE @ENTER
+@@YOU @OPEN Tome cuidado! @CLOSE 
+@RWAITEND FC
+
+@RMESG 02
+@@YOU @OPEN Segunda pergunta, o que voce^ sabe sobre 
+a #0 @KOPEN Grande Cruz do Ce'u @KCLOSE @WAIT 
+e a #0 @KOPEN Grande Cruz @ENTER do Espa+o @KCLOSE ? @CLOSE @ENTER
+@RETURN Puzzla @OPEN Sei pouco; @WAIT
+Mas tinha uma dica sobre isso na Montanha dos Diamantes. @WAIT
+Na~o posso mais falar; Uggg; @ENTER Estou acabado; @CLOSE @WAIT
+@@YOU @OPEN ;; A Grande Cruz deve ter se formado. Vamos, Butako! @CLOSE @WAIT
+@@BUTAKO @OPEN So' pra garantir, vamos olhar o ce'u na casa do astro^nomo Galileu @CLOSE 
+@RWAITEND 36
+
+@ROOMEND
+
+@ROOMSTART 012C
+
+@RMESG 00
+&Galileu @OPEN Eu sou o astro^nomo Galileu. @YOU @NOSPACE , 
+olhe pelo visor do telesco'pio! @CLOSE
+@REND
+
+@RMESG 01
+&Galileu @OPEN Esta ma'quina pode olhar as estrelas de uma forma magni'fica! @CLOSE
+@RWAITEND 15
+
+@RMESG 02
+&Galileu @OPEN E' um acontecimento terri'vel, mas na~o podemos evita'-lo. @CLOSE
+@REND
+
+@RMESG 03
+@@YOU @OPEN Ola'a'a'a'a'a'! @CLOSE @ENTER
+@@BUTAKO @OPEN Isso na~o e' um megafone, sua anta! @CLOSE
+@REND
+
+@RMESG 04
+@@YOU @OPEN Sera' que da' para ver mais coisas? @CLOSE
+@RWAITEND 16
+
+@RMESG 05
+@@YOU @OPEN Opa! Animal! @ENTER Que espeta'culo! @CLOSE @WAIT
+@@BUTAKO @OPEN O que voce^ esta' olhando, seu safado? @CLOSE
+@REND
+
+@RMESG 06
+@@YOU @OPEN Vixe! A Grande Cruz! @CLOSE @WAIT
+@RWAITEND 17
+
+@RMESG 07
+@@BUTAKO @OPEN E' isso mesmo que voce^ esta' vendo! @CLOSE @WAIT
+@RWAITEND 18
+
+@RMESG 08
+Ali no centro esta' o planeta Dummy. Ao redor, existem
+va'rios planetas. @WAIT Segundo meus ca'lculos,
+em breve os planetas formara~o uma cruz @CLOSE @WAIT
+@@YOU @OPEN Uma Grande Cruz? @CLOSE 
+&Galileu @OPEN Sim! Uma cruz gigante que paira no ce'u. @CLOSE @WAIT
+@@YOU @OPEN E o que significa isso? @CLOSE @WAIT
+&Galileu @OPEN Isso significa a grande explosa~o, a destrui+a~o e o fim! @WAIT
+Acredito que nesse momento, na~o havera' mais nenhum humano vivo. @CLOSE
+@REND
+
+@RMESG 09
+&Galileu @OPEN Finalmente, chegou a hora! @WAIT O acontecimento terri'vel aconteceu! @CLOSE @ENTER
+@@BUTAKO @OPEN @YOU @NOSPACE !! @CLOSE @WAIT
+@@YOU @OPEN Hm. Mais e mais, aproxima-se o confronto com o Gog. @CLOSE @WAIT
+@@BUTAKO @OPEN A Chelsea partiu na nossa frente. Vamos alcan+a'-la! @CLOSE 
+
+@REND
+
+@ROOMEND
+
+@ROOMSTART 000C
+
+@RMESG 00
+&Gron @OPEN Parece que o monstro quer fazer uma prisioneira importante, @WAIT
+uma princesa mimada que viveu presa entre quatro paredes. @CLOSE @WAIT
+&Rose @OPEN Por que sera'? @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 022F
+
+@RMESG 00
+@@BUTAKO @OPEN @YOU @NOSPACE ! Tem alguma coisa errada! @CLOSE
+@REND 
+
+@RMESG 01
+@@YOU @OPEN Chelsea! Voce^ esta' bem! A Grande Cruz ja' surgiu! O Gog apareceu? @CLOSE @WAIT
+&Princesa @OPEN @YOU @NOSPACE ! Que medo! Eu estava me escondendo sozinha quando Gog surgiu. @WAIT
+Quase na~o consegui escapar com vida! @CLOSE @WAIT
+@@YOU @OPEN Enta~o ele apareceu mesmo! Como voce^ esta'? @CLOSE @WAIT
+&Princesa @OPEN Eu fiquei tremendo, que assustador! @CLOSE @WAIT
+@@YOU @OPEN Acalme-se, Chelsea, agora esta' tudo bem! @WAIT
+Voce^ precisa voltar pro Castelo Grego e avisar os soldados! @CLOSE @WAIT
+&Princesa @OPEN Entendi. Por favor, tome cuidado! @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0230
+
+@RMESG 00
+@@BUTAKO @OPEN Eu ainda sinto alguma coisa errada. Deve ser na sala seguinte. @CLOSE @WAIT
+@@YOU @OPEN Sera' o Gog? Vamos la'! @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 0231
+
+@RMESG 00
+@@YOU @OPEN Chelsea? @CLOSE
+@REND 
+
+@RMESG 01
+@@YOU @OPEN Na~o pode ser a Chelsea! O que ela estaria fazendo aqui? @WAIT
+Ela foi pro Castelo Grego, na~o foi? @CLOSE
+@REND 
+
+@RMESG 02
+@@BUTAKO @OPEN Ela esta' ta~o pa'lida! E com o corpo cheio de feridas! @CLOSE
+@REND 
+
+@RMESG 03
+@@BUTAKO @OPEN O corpo dela esta' gelado! A respira+a~o tambe'm esta' fraca! @WAIT
+@YOU @NOSPACE ! A vida da Chelsea esta' em perigo! @CLOSE
+@REND 
+
+@RMESG 04
+@@YOU @OPEN Chelsea! Aguente firme! @CLOSE
+@REND 
+
+@RMESG 05
+@@BUTAKO @OPEN Ela abriu os olhos. @CLOSE
+@REND 
+
+@RMESG 06
+&Princesa @OPEN Eu estou muito mal. Na~o posso ser salva. @CLOSE @WAIT
+@@YOU @OPEN Na~o diga isso! Resista! @CLOSE
+@REND 
+
+@RMESG 07
+@@YOU @OPEN Chelsea;; @CLOSE @ENTER
+&Princesa @OPEN Voce^ tem a ma~o quentinha; @WAIT 
+O Dante tambe'm tinha; Eu vou para o mesmo lugar que ele esta'. @CLOSE @WAIT
+@@YOU @OPEN Chelsea;; @CLOSE @ENTER
+&Princesa @OPEN @YOU @NOSPACE ; Eu preciso de um favor; @WAIT 
+@@YOU @OPEN O que e'? @CLOSE @ENTER
+&Princesa @OPEN Eu tenho uma crian+a, um bebe^ meu e do Dante. @CLOSE @WAIT 
+@@YOU @OPEN ! @CLOSE @ENTER
+&Princesa @OPEN Eu mandei o bebe^ aos cuidados do Rei Pampas. @WAIT
+Papai ficara' muito triste quando souber da morte do Dante. @WAIT
+Eu esqueci de falar pro Papai o nome da crian+a. @WAIT
+O nome esta' gravado na parte de dentro do colar que eu te dei. @WAIT
+Por favor, fale-o ao meu pai! @CLOSE @ENTER
+@@YOU @OPEN Eu falo sim. @CLOSE 
+@REND 
+
+@RMESG 08
+@@YOU @OPEN Como voce^ ficou assim?! @CLOSE @WAIT
+&Princesa @OPEN Eu estava aqui quando o Gog apareceu. @WAIT
+Um raio trouxe o Gog, acho que foi quando a Grande Cruz surgiu. @WAIT
+Naquele mesmo momento, o Gog me atacou! @WAIT
+E logo a seguir, se disfa+ou, tomando a minha forma. @CLOSE @WAIT
+@@YOU @OPEN Enta~o aquela pessoa com quem conversamos antes era o Gog! @CLOSE @WAIT
+&Princesa @ENTER @OPEN Provavelmente! @CLOSE 
+@REND
+
+@RMESG 09
+&Princesa @OPEN Eu vou morrer em breve. @CLOSE 
+@REND
+
+@RMESG 0A
+&Princesa @OPEN Era isso que eu tinha pra dizer; @CLOSE 
+@REND
+
+@RMESG 0B
+&Princesa @OPEN @YOU @NOSPACE , chegou a hora de me despedir. @WAIT 
+@YOU @NOSPACE , Butako, voce^s sa~o muito importantes. @WAIT
+Eu vou fazer agora a viagem pra me encontrar com o Dante; @WAIT
+@YOU @NOSPACE , derrote o Gog com certeza! @WAIT
+Voce^s dois sa~o o'timos amigos. Obrigado por tudo. @WAIT
+Adeus;; @CLOSE @ENTER
+@@YOU @OPEN Chelsea! @CLOSE @ENTER
+@@BUTAKO @OPEN Chelsea!  @CLOSE
+@RWAITEND 12
+
+@RMESG 0C
+@@BUTAKO @OPEN ;; @YOU @CLOSE @ENTER
+@@YOU @OPEN Eu nunca perdoarei o Gog. @WAIT
+Eu o derrotarei com certeza. @WAIT
+Assim como a Chelsea e o Dante, eu protegerei na~o apenas o Reino, @WAIT
+mas todo o mundo dos homens. @WAIT A morte deles na~o sera' em va~o. 
+Aposto minha vida nisso! @CLOSE @WAIT
+@@BUTAKO @OPEN @YOU @NOSPACE ;; @CLOSE @ENTER
+@@YOU @OPEN Butako, precisamos ir ate' o Castelo Grego. @WAIT
+Cada vez mais se aproxima a hora da batalha final! @CLOSE 
+@REND 
+
+@RMESG 0D
+@@BUTAKO @OPEN No's ja' olhamos o bastante. @CLOSE
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 00F0
+
+@RMESG 00
+@@BUTAKO @OPEN @YOU @NOSPACE , tenho medo @CLOSE @ENTER
+@@YOU @OPEN Eu tambe'm. Mas na~o podemos voltar. @WAIT
+Temos que evitar que o mundo se destrua sob nossos olhos! @CLOSE @WAIT
+@@BUTAKO @OPEN @YOU @NOSPACE ; Se for preciso, morrerei feliz por voce^. @CLOSE @WAIT
+@@YOU @OPEN Voce^ e' uma porquinha de cora+a~o doce. Eu; @CLOSE @WAIT
+@@BUTAKO @OPEN Eu o que^? @CLOSE @ENTER
+@@YOU @OPEN No meu mundo, eu tenho algue'm esperando por mim  @CLOSE @WAIT
+@@BUTAKO @OPEN Por acaso voce^ pode dizer o nome dessa pessoa? @CLOSE @WAIT
+@@YOU @OPEN ;; Ela se chama @GIRL @NOSPACE . @CLOSE @ENTER
+@@BUTAKO @OPEN ;; Como ela e'? @CLOSE @WAIT
+@@YOU @OPEN Antes eu achava que ela era so' mais uma dessas feiosas, @WAIT
+mas preso aqui eu percebi como ela era especial. @CLOSE @ENTER
+@@BUTAKO @OPEN ;; @YOU ;; @CLOSE @WAIT
+@@YOU @OPEN Tambe'm por ela, eu preciso vencer o Gog e voltar pro meu mundo. @CLOSE @WAIT
+@@BUTAKO @OPEN Essa garota chamada @GIRL deve ser muito feliz. @WAIT
+Voce^ a estima tanto; @CLOSE @ENTER
+@@YOU @OPEN Mas na~o foi sempre assim; @WAIT
+Eu agia como um bobo com ela. Ela deve me odiar. @CLOSE @WAIT
+@@BUTAKO @OPEN Eu na~o acho; Ela deve pensar em voce^ com certeza. @CLOSE @WAIT
+@@YOU @OPEN Espero que sim; Mas ela tera' sorte se eu voltar pra casa vivo. @WAIT
+Talvez eu o Gog acertemos um ao outro; @CLOSE @ENTER
+@@BUTAKO @OPEN ;; @YOU @CLOSE @WAIT
+@@YOU @OPEN Mas chega de jogar conversa fora. Vamos la'! @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 00D0
+
+@RMESG 0
+&Marty @OPEN Bem vindo ao Castelo Grego! @CLOSE @ENTER
+@@YOU @OPEN Aqui e' o Castelo Grego? @CLOSE @WAIT
+&Marty @OPEN E' sim. Venha aqui descansar de suas viagens. @CLOSE
+@REND
+
+@RMESG 1
+&Marty @OPEN Pode entrar, na~o fa+a cerimo^nia! @CLOSE 
+@REND
+
+@RMESG 2
+&Marty @OPEN Volte sempre! @CLOSE
+@REND
+
+@RMESG 3
+@@YOU @OPEN No que voce^ esta' pensando? @CLOSE @WAIT
+&Kim @OPEN Dentro desse castelo, ate' agora, tem reinado a paz. @WAIT
+Mas o grande rei dos demo^nios, Gog, pode vir nos atacar! @WAIT
+Que terri'vel! @CLOSE
+@REND
+
+@RMESG 4
+&Kim @OPEN Tome cuidado em suas viagens! @CLOSE
+@REND
+
+@RMESG 5
+@@YOU @OPEN O Reino Grego e' grande? @CLOSE @WAIT
+&Daria @OPEN E' muito grande! Os caminhos sa~o fascinantes! @CLOSE
+@REND
+
+@RMESG 6
+&Pusso @OPEN Aqui dentro e' sala de armas e treinamento. @CLOSE
+@REND
+
+@RMESG 7
+@@YOU @OPEN Voce^ pode me emprestar sua armadura? @CLOSE @WAIT
+&Pusso @OPEN Dentro da sala de armas tem um ferreiro. @ENTER
+Va' falar com ele! @CLOSE
+@REND
+
+@RMESG 8
+@@YOU @OPEN Esse castelo fica dentro de alguma cidade? @CLOSE @WAIT
+&Lyon @OPEN E' claro! No's estamos na cidade de Iriko. @CLOSE
+@REND
+
+@RMESG 9
+&Lyon @OPEN Hoje no's estamos ocupados comemorando seis meses
+de namoro. @CLOSE @WAIT
+@RETURN Lazaro @OPEN Desculpe, na~o podemos falar com 
+voce^ agora. @CLOSE
+@REND 
+
+@RMESG A
+&Melos @OPEN Aqui dentro e' o sala~o de festas. @CLOSE
+@REND
+
+@RMESG B
+@@BUTAKO @OPEN O que e' aquilo boiando na fonte? @CLOSE
+@REND
+
+@RMESG C
+@@YOU @OPEN Parece uma garrafa de vidro. Tem uma carta dentro! Sera' que; @CLOSE
+@REND
+
+@RMESG D
+@@BUTAKO @OPEN E' melhor pegar, so' pra garantir. @CLOSE
+@REND
+
+@RMESG E
+@@BUTAKO @OPEN Na~o tem mais nada para pegar! @CLOSE
+@REND
+
+@RMESG F
+@@BUTAKO @OPEN O que voce^ quer olhar? @CLOSE
+@REND
+
+@RMESG 10
+@@BUTAKO @OPEN O que voce^ quer examinar? @CLOSE
+@REND
+
+@RMESG 11
+&Melos @OPEN Bem vindo ao Castelo Grego! 
+O aniversa'rio do Rei Pampas e' hoje. @CLOSE
+@REND
+
+@RMESG 12
+&Melos @OPEN Entre, por favor. @CLOSE
+@REND
+
+@RMESG 13
+&Pusso @OPEN Hoje tem uma comemora+a~o no sala~o de festas. @CLOSE
+@REND
+
+@ROOMEND
+
+
+@ROOMSTART 00B0
+
+@RMESG 0
+&Mary @OPEN Em breve teremos um baile para comemorar os 100 anos do Rei. @WAIT
+Por isso eu estou limpando a sala. @CLOSE
+@REND
+
+@RMESG 1
+&Mary @OPEN Seria bom se voce^s viessem ao baile! @CLOSE @WAIT
+@@YOU @OPEN Viremos sim, se estivermos vivos ate' la'! @CLOSE 
+@REND
+
+@RMESG 2
+@RETURN Aldeo~es @OPEN Viva o Rei Pampas! Viva a Princesa Chelsea! Glo'ria ao Reino! @CLOSE 
+@REND
+
+@RMESG 3
+&Kurt @OPEN Ouvi dizer que depois da festa no's vamos poder dan+ar! @CLOSE 
+@REND
+
+@RMESG 4
+&Johann @OPEN Quando a Princesa Chelsea voltou, o Rei recuperou a sau'de @CLOSE 
+@REND
+
+@RMESG 5
+&Rei @OPEN @YOU @NOSPACE , Butako, voce^s voltaram! @ENTER
+A Princesa Chelsea ja' me falou tudo. @WAIT
+Ela falou como o Gog surgiu na Montanha da Ma'scara, @WAIT
+e que voce^s lutaram, conseguindo derrota'-lo! @WAIT
+Toda a Gre'cia esta' em de'bito com voce^s. Obrigado! @CLOSE 
+@REND
+
+@RMESG 6
+&Rei @OPEN Hoje os habitantes do Reino Grego esta~o reunidos, @WAIT
+para comemorar meu aniversa'rio de 100 anos, e o retorno da Chelsea. @WAIT
+E na~o esque+a que o bebe^ do finado Dante tambe'm e' herdeiro do Reino! @WAIT
+@YOU @NOSPACE , Butako, voce^s derrotaram o Gog, sa~o hero'is! @WAIT
+Vamos come+ar uma festa maravilhosa! @CLOSE 
+@REND
+
+@RMESG 7
+&Princesa @OPEN @YOU @NOSPACE , Butako, que bom que voltaram. Venceram o Gog? @CLOSE 
+@REND
+
+@RMESG 08
+@@BUTAKO @OPEN Essa Chelsea e' uma imita+a~o. @CLOSE
+@REND
+
+@RMESG 09
+@@BUTAKO @OPEN E' um disfarce perfeito! @CLOSE
+@REND
+
+@RMESG 0A
+@@BUTAKO @OPEN Vamos desmascarar essa impostora! @CLOSE
+@REND
+
+@RMESG 0B
+@@BUTAKO @OPEN Ele esta' corado, ne'? @CLOSE
+@REND
+
+@RMESG 0C
+@@BUTAKO @OPEN Com esse rosto corado, nem parece que fez 100 anos! @CLOSE
+@REND
+
+@RMESG 0D
+@@BUTAKO @OPEN Ele esta' bem idoso. @CLOSE
+@REND
+
+@RMESG 0E
+@OPEN gu gu @CLOSE
+@REND
+
+@RMESG 0F
+@OPEN da' da' @CLOSE
+@REND
+
+@RMESG 10
+@OPEN aa aa @CLOSE
+@REND
+
+@RMESG 11
+@OPEN papi @CLOSE
+@REND
+
+@RMESG 12
+@OPEN mami @CLOSE
+@REND
+
+@RMESG 13
+@@BUTAKO @OPEN Ningue'm percebeu que essa Chelsea e' uma imita+a~o! @WAIT
+Como vamos fazer pra provar que ela na~o e' quem diz ser? @CLOSE 
+@REND
+
+@RMESG 14
+@@YOU @OPEN Esta Chelsea esta' ansiosa demais, ela e' uma impostora! @WAIT
+Na verdade, e' o Gog disfar+ado de Chelsea! @CLOSE @WAIT
+&Rei @OPEN Bwahaha. Pare com as 
+piadas de mau gosto, @YOU @NOSPACE , por favor. @CLOSE @WAIT
+@@YOU @OPEN Na~o e' piada! A verdadeira Chelsea foi morta, @WAIT
+na Montanha da Ma'scara, por essa impostora! @CLOSE @WAIT
+&Rei @OPEN @YOU @NOSPACE ! Voce^ esta' falando besteiras! @CLOSE
+@REND
+
+@RMESG 15
+@@YOU @OPEN Chelsea, por que voce na~o pega no colo seu bebe^? @CLOSE @WAIT
+&Princesa @OPEN E' claro. Vem ca', vem nene^. @CLOSE @ENTER
+@OPEN Gugu? @CLOSE @WAIT
+&Princesa @OPEN Vem ca';; @CLOSE @ENTER
+@OPEN Bua'a'a'a'a' @CLOSE @WAIT
+@@YOU @OPEN Olha! Se ela fosse a ma~e verdadeira, o bebe^ na~o iria chorar! @CLOSE 
+@REND
+
+@RMESG 16
+@@YOU @OPEN O choro do bebe^ e' a prova! Essa Chelsea e' falsa! @CLOSE @WAIT
+&Rei @OPEN Isso so' prova que o bebe^ e' chora~o! @CLOSE 
+@REND
+
+@RMESG 17
+@@BUTAKO @OPEN @YOU @NOSPACE , na~o adianta ficar falando! @WAIT
+O Rei Pampas acredita que a impostora e' a Chelsea real! @CLOSE 
+@REND
+
+@RMESG 18
+@@BUTAKO @OPEN Como provaremos que a Chelsea verdadeira morreu? @CLOSE 
+@REND
+
+@RMESG 19
+@@YOU @OPEN A u'ltima coisa que a Chelsea falou; @WAIT
+e' que na parte de tra's do colar que ela nos deu, @WAIT
+esta' entalhado o nome que ela escolheu para o bebe^, @WAIT
+e que deveri'amos falar para o Rei Pampas. @CLOSE @ENTER
+@@BUTAKO @OPEN Sim, e' isso! @CLOSE 
+@REND
+
+@RMESG 1A
+@@YOU @OPEN A verdadeira Chelsea nos deu esse colar. @WAIT
+Na parte de tra's esta' entalhado o nome que ela deu para o bebe^. @CLOSE @WAIT
+&Rei @OPEN Hm, e' verdade. Eu sempre falava esse nome para a Chelsea. @WAIT
+Eu dizia #0 @KOPEN Chelsea, quando voce^ estiver amando e se casar, @WAIT
+de^ esse nome ao seu futuro bebe^. @KCLOSE @CLOSE @WAIT
+@@YOU @OPEN Enta~o a verdadeira Chelsea sabe qual e' esse nome. @CLOSE @WAIT
+&Rei @OPEN E' claro que ela sabe. @CLOSE @ENTER
+@@YOU @OPEN Vou perguntar pra ela enta~o. @CLOSE 
+@REND
+
+@RMESG 1B
+@@YOU @OPEN Chelsea, voce^ pode me falar o nome do seu bebe^? @CLOSE @ENTER
+&Princesa @OPEN ;; @CLOSE @WAIT
+@@YOU @OPEN Voce^ sempre ouvia do seu pai o nome que deveria dar ao bebe^. @WAIT
+Esse nome esta' entalhado na parte de tra's do colar. Mostre que sabe! @WAIT
+Se voce^ for a Princesa Chelsea, ma~e real do bebe^, sabera' o nome!  @CLOSE @WAIT
+&Princesa @OPEN Hm. Bwahaha! @WAIT
+Na~o da' mais pra esconder. Voce^ estava certo, eu sou o #0 @KOPEN Gog @KCLOSE ! @CLOSE 
+@RWAITEND 0F
+
+
+@RMESG 1C
+@@BUTAKO @OPEN Tem um monte de aldeo~es aqui. @CLOSE 
+@REND
+
+@RMESG 1D
+@@BUTAKO @OPEN Me fale o que voce^ quer examinar. @CLOSE 
+@REND
+
+@RMESG 1E
+@@BUTAKO @OPEN Na~o e' pra mostrar isso! @CLOSE 
+@REND
+
+@RMESG 1F
+@@BUTAKO @OPEN Na~o e' pra dar isso! @CLOSE 
+@REND
+
+
+@ROOMEND
+
+
+@ROOMSTART 0235
+
+@RMESG 00
+@RETURN Gog @OPEN Eu, o #0 @KOPEN Grande Rei dos Demo^nios Gog @KCLOSE , 
+causarei a rui'na deste mundo. @WAIT
+Hoje eu surgi para destruir o amor, a cultura,a religia~o dos humanos. @WAIT
+E enta~o o mal dominara' tudo, criando um novo mundo das sombras. @WAIT
+E eu come+arei com voce^, @YOU @NOSPACE ! Farei picadinho de voce^ @CLOSE 
+@RWAITEND F6
+
+@RMESG 01
+@RETURN Gog @OPEN Voce^ e' muito impertinente. @WAIT 
+Acabarei com sua vida usando um so' golpe! Hahaha! @WAIT
+Adeus @YOU @NOSPACE ! Nos vemos no inferno! @CLOSE @ENTER
+@@BUTAKO @OPEN @YOU @NOSPACE ! Cuidado! @CLOSE
+@RWAITEND FB
+
+@RMESG 02
+Adeus @YOU @NOSPACE ! Nos vemos no inferno! @CLOSE @ENTER
+@@BUTAKO @OPEN @YOU @NOSPACE ! Cuidado! @CLOSE
+@RWAITEND FB
+
+@RMESG 03
+@@BUTAKO @OPEN Oiiiink! @CLOSE
+@REND
+
+@RMESG 04
+@@YOU @OPEN Butako! Esta' tudo bem? @CLOSE @ENTER
+@@BUTAKO @OPEN Ai; Machuquei o bra+o direito. @CLOSE
+@REND
+
+@RMESG 05
+@@YOU @OPEN Que ferida terri'vel! Voce^ se machucou por mim, Butako; @CLOSE 
+@REND
+
+@RMESG 06
+@@BUTAKO @OPEN Eu pulei de repente na frente do Gog e ele se assustou. @WAIT
+Por isso a energia dele acabou ra'pido e eu fiquei so' com uma ferida mi'nima. @WAIT
+Se tivesse sido um ataque total, na~o sei se teria sobrevivido! @CLOSE
+@REND
+
+@RMESG 07
+@@YOU @OPEN Fiz os primeiros socorros. Vou enrolar meu len+o na ferida. @WAIT 
+Mas por que voce^ arriscou sua vida pra me proteger? @CLOSE @ENTER
+@@BUTAKO @OPEN Por que sera', ne'? @CLOSE
+@REND
+
+@RMESG 08
+@@BUTAKO @OPEN Onde esta' o Gog? @CLOSE @ENTER
+@@YOU @OPEN ! @CLOSE @WAIT
+@RETURN Gog @OPEN Bwahaha. Esta histo'ria esta' prestes a terminar. @WAIT 
+Esta' chegando a hora de liberar a luz que trara' o fim da humanidade. @WAIT
+Essa luz ira' matar a todos no mundo dos vivos! @CLOSE @ENTER
+@@YOU @OPEN ;;! @CLOSE @WAIT
+@@BUTAKO @OPEN O Gog esta' subindo aos ce'us; Vamos la' fora! @CLOSE
+@RWAITEND 25
+
+@RMESG 09
+@@BUTAKO @OPEN O Gog subiu aos ce'us; Chegou a hora da decisa~o ne'? 
+@CLOSE @WAIT
+@@YOU @OPEN Na~o vou desistir! Deve ter um jeito de derrotar o Gog! @CLOSE 
+@REND
+
+@RMESG 0A
+@@BUTAKO @OPEN E'; Vamos pensar como derrotaremos o Gog. @CLOSE 
+@REND
+
+@RMESG 0B
+@@BUTAKO @OPEN O Gog foi aos ce'us liberar a luz da destrui+a~o. @CLOSE 
+@REND
+
+@RMESG 0C
+@@BUTAKO @OPEN Por favor, Deus, nos ajude nessa hora difi'cil. @CLOSE @WAIT
+@@YOU @OPEN Ficar rezando na~o vai adiantar nada! @CLOSE @WAIT
+@@BUTAKO @OPEN Se eu na~o rezar na~o vou saber se adianta ou na~o! @WAIT
+;Deus do ce'u! O demo^nio Gog quer destruir o seu mundo! @WAIT
+Por favor, nos de^ uma visa~o! @WAIT Mostre-nos uma dica
+de como derrotar o Gog! @CLOSE 
+@RWAITEND 26
+
+@RMESG 0D
+@@YOU @OPEN A dica e' esse arco-i'ris!? @CLOSE @WAIT
+@@BUTAKO @OPEN Parece que sim; qual sera' o significado? @CLOSE
+@REND
+
+@RMESG 0E
+@@YOU @OPEN O que significa esse arco-i'ris? @CLOSE 
+@REND
+
+@RMESG 0F
+@@BUTAKO @OPEN E' melhor usarmos a cabe+a pra variar; @WAIT
+Quando esta'vamos com a Chelsea, vimos um pergaminho que @WAIT
+ensinava como derrotar o Gog, lembra? @WAIT
+@KOPEN Existem duas Grandes Cruzes, uma no ce'u e outra no espa+o. @WAIT
+Se as duas se sobreporem; @WAIT
+uma rea+a~o ira' mudar o destino e Gog sera' derrotado. @KCLOSE @WAIT
+E' isso! Entendi! @CLOSE 
+@REND
+
+@RMESG 10
+@@BUTAKO @OPEN Entendi! @CLOSE 
+@REND
+
+@RMESG 11
+@@YOU @OPEN Olhe! Apareceu mais um arco-i'ris! Os dois formaram uma cruz! @WAIT
+;;Alguma coisa esta' acontecendo com o Gog! @CLOSE 
+@RWAITEND F6
+
+@RMESG 12
+@RETURN Gog @OPEN Aaarrrrggghhhh! Ouch! Uuuuughhh! Yauuuu--;;;!! @CLOSE @WAIT
+@@YOU @OPEN A cruz dos arco-i'ris e' a @ENTER 
+@KOPEN Grande Cruz do Ce'u @KCLOSE @WAIT
+Como o arco-i'ris precisa ter 7 cores, o prisma correto era @WAIT
+o diamante de 3 faces! @CLOSE @WAIT
+@@BUTAKO @OPEN O Gog finalmente morreu; @CLOSE @ENTER
+@@YOU @OPEN Agora acabou-se tudo. @CLOSE
+@RWAITEND FB
+
+@RMESG 13
+@@BUTAKO @OPEN Na~o; Na~o deu certo!! O Gog liberou a luz da destrui+a~o! @CLOSE 
+@RWAITEND 27
+
+@RMESG 14
+@@BUTAKO @OPEN Aaaahhhh; @CLOSE @ENTER
+@@YOU @OPEN Aaaahhhh; @CLOSE 
+@RWAITEND FB
+
+@RMESG 15
+@@BUTAKO @OPEN E' melhor olhar antes. @CLOSE
+@REND
+
+@RMESG 16
+@@BUTAKO @OPEN O que voce^ quer usar? @CLOSE
+@REND
+
+@RMESG 17
+@@BUTAKO @OPEN O que voce^ quer examinar? @CLOSE
+@REND
+
+@ROOMEND
+
+@ROOMSTART 0236
+
+@RMESG 00
+@@YOU @OPEN Aaaahhh; @CLOSE 
+@REND
+
+@RMESG 01
+@@YOU @OPEN Onde;onde estou? @CLOSE @ENTER
+@@GIRL @OPEN Aqui e' a sala do clube de computadores. @CLOSE @WAIT
+@@YOU @OPEN @GIRL @NOSPACE ! E' voce^? Ha' quanto tempo! @CLOSE @WAIT
+@@GIRL @OPEN Do que voce^ esta' falando? @CLOSE 
+@RWAITEND FC
+
+@RMESG 02
+@@YOU @OPEN Enta~o; era mesmo um sonho. 
+E' claro que na~o da' pra entrar num jogo; @CLOSE @WAIT
+@@GIRL @OPEN Ora ora, na~o e' que o @YOU voltou mesmo? @CLOSE @ENTER
+@@YOU @OPEN ? @CLOSE
+@REND
+
+@RMESG 03
+@@GIRL @OPEN O que voce^ esta' olhando? @WAIT Na~o temos tempo
+para ficar nos distrai'ndo! @CLOSE @WAIT
+@@YOU @OPEN Sou distrai'do com orgulho! @WAIT
+Perai'; Eu ja' ouvi essas palavras antes; @CLOSE
+@REND
+
+@RMESG 04
+@@GIRL @OPEN Voce^ quer me examinar? @WAIT Na sua idade e' 
+meio esquisito brincar de me'dico, na~o acha? @CLOSE @WAIT
+@@YOU @OPEN Na~o; @ENTER A`s vezes e' bom; @WAIT 
+Ue'; Eu lembro dessas palavras;  @CLOSE
+@REND
+
+@RMESG 05
+@@YOU @OPEN @GIRL @NOSPACE , o que aconteceu com a sua ma~o? @CLOSE
+@RWAITEND F9
+
+@RMESG 06
+@@GIRL @OPEN Isso; isso na~o e' nada! Na~o precisa se preocupar. @CLOSE
+@REND
+
+@RMESG 07
+@@YOU @OPEN Quando falam pra na~o me preocupar, ai' e' que eu me 
+preocupo mais; @WAIT
+Ei! Esse na~o e';
+@RWAITEND 49
+
+@RMESG 08
+Esse e' o meu len+o;;?! @WAIT
+Na luta final com o Gog, a Butako machucou o bra+o pra me defender. @WAIT
+E ai' eu amarrei o len+o no bra+o dela. @WAIT
+Enta~o; @GIRL @NOSPACE ; Quer dizer que voce^; @CLOSE
+@REND
+
+@RMESG 9
+@@YOU @OPEN @GIRL @NOSPACE , sua verdadeira identidade e'; @ENTER
+um porco? @CLOSE @WAIT
+@@GIRL @OPEN Deixa de ser burro! Na~o e' isso! E' o contra'rio! @WAIT
+A verdadeira identidade da Butako sou eu! @CLOSE @WAIT
+@@YOU @OPEN !! Enta~o tudo aquilo aconteceu de verdade! @WAIT
+Mas enta~o, por que voce^; @CLOSE @WAIT
+@@GIRL @OPEN Eu tambe'm fiquei surpresa quando o jogo come+ou; @WAIT
+O jogo e a realidade se misturaram, ficou tudo confuso; @WAIT
+Depois disso so' lembro que voce^ e eu estava'mos @WAIT
+presos no Reino Grego por causa da maldi+a~o do Gog. @WAIT
+Voce^ era o hero'i que ia derrotar Gog, e eu era a ajudante Butako. @WAIT
+Se o hero'i  conseguisse derrotar o Gog, @WAIT
+e se a Butako na~o revelasse sua verdadeira identidade, @WAIT
+enta~o no's dois retornari'amos ao nosso mundo! @WAIT
+Tudo aquilo que aconteceu no jogo era verdade; @CLOSE @WAIT
+@@YOU @OPEN Aah; A sua ferida no bra+o foi real enta~o; @WAIT
+Se a Butako na~o tivesse usado o pro'prio corpo como escudo, @WAIT
+eu teria perdido a vida aquela hora; @WAIT
+@GIRL @NOSPACE , voce^ tambe'm se importa tanto comigo?; @CLOSE @WAIT
+@@GIRL @OPEN ;; @CLOSE @WAIT
+@@YOU @OPEN @GIRL @NOSPACE ; fora do jogo, voce^ tambe'm quer 
+ser minha porquinha? @CLOSE @WAIT
+@@GIRL @OPEN ;; @CLOSE
+@RWAITEND FC
+
+@RMESG A
+@@YOU @OPEN ;; @CLOSE 
+@RWAITEND F9
+
+@RMESG B
+@@GIRL @OPEN ;; @CLOSE 
+@REND
+
+@RMESG C
+@@YOU @OPEN @GIRL @CLOSE 
+@RWAITEND F9
+
+@RMESG D
+@@GIRL @OPEN Olhe ali na tela! Vai passar o final do jogo! @CLOSE
+@RWAITEND F6
+
+@RMESG E
+@RETURN Popolon @OPEN @YOU @NOSPACE , sua coragem e bravura sera~o
+lembradas no Reino Grego @WAIT por gera+o~es e gera+o~es. @CLOSE
+@RWAITEND F6
+
+@RMESG F
+@RETURN Afrodite @OPEN Sim, voce^ e' o verdadeiro hero'i da
+lenda de Knightmare. @CLOSE
+@RWAITEND F6
+
+@RMESG 10
+@RETURN Dante @OPEN No's fazemos parte do passado. @YOU @NOSPACE , 
+@GIRL @NOSPACE , voce^s sa~o o futuro. @WAIT
+Vivam intensamente o seu tempo. @CLOSE
+@RWAITEND F6
+
+@RMESG 11
+@RETURN Chelsea @OPEN @YOU @NOSPACE , a
+@GIRL e' uma pessoa muito especial. 
+Fa+a ela muito feliz. @CLOSE
+@RWAITEND F6
+
+@RMESG 12
+@RETURN Pampas @OPEN Gra+as aos ce'us, @YOU conseguiu vencer. @WAIT
+A saga de Knightmare chegou agora ao fim. @WAIT
+Mas escute bem isso: embora por aqui tudo tenha acabado, @WAIT
+no seu mundo, Sata~ tenta entrar no cora+a~o das pessoas. @WAIT
+O'dio, trai+a~o, cobi+a; sa~o truques dele pra tentar os humanos. @WAIT
+Este desafio sera' a mais hero'ica batalha que os homens lutara~o. @WAIT
+Mas na~o precisa ter medo. Reze para os ce'us com muito amor. @WAIT
+No fim, dependera' do cora+a~o de cada pessoa resistir ou na~o a Sata~. 
+@RWAITEND 0A
+
+@RMESG 13
+;O nome do bebe^ que Chelsea nos deixou e' #0 @KOPEN Shalom @KCLOSE . @WAIT
+Este nome simboliza o que desejamos para todos. @WAIT
+Criaremos esta fra'gil crian+a chamada #0 @KOPEN Shalom @KCLOSE @ENTER com muito amor. @WAIT
+Deus aben+oara' todas as pessoas que compartilharem o amor! @WAIT
+E quando isso acontecer, todos vamos dizer; Shalom! 
+@RWAITEND F9
+
+@RMESG 14
+@@GIRL @OPEN Seu indecente! @ENTER Tira a ma~o! @CLOSE @ENTER SOCK! POW! CRACK! 
+@RWAITEND FC
+
+@RMESG 15
+@@YOU @OPEN Ela na~o mudou nada; @CLOSE
+@RWAITEND A0
+
+@ROOMEND
+
+@ROOMSTART 0228
+@ROOMSTART 0229
+
+@RMESG 00
+@@BUTAKO @OPEN Em todo lugar que olho so' vejo a'gua! @CLOSE
+@REND 
+
+@RMESG 01
+@@BUTAKO @OPEN E' incri'vel a quantidade de a'gua! Parece um dilu'vio! @CLOSE
+@REND 
+
+@RMESG 02
+@@BUTAKO @OPEN A luz que o Gog liberou fez toda a a'gua dos ce'us cair! @WAIT 
+Parece que era verdade aquilo sobre todos morrerem; @CLOSE
+@REND 
+
+@RMESG 03
+@@BUTAKO @OPEN Aah! A profecia dos demo^nios matarem o mundo se cumpriu! @WAIT
+Tudo foi engolido pelas a'guas! @CLOSE
+@REND 
+
+@RMESG 04
+@@BUTAKO @OPEN Acabou-se tudo. Agora tudo que da' pra fazer e' @WAIT
+carregar um save game e dar um continue. @CLOSE
+@REND 
+
+@RMESG 05
+@@YOU @OPEN Algue'm mais sobreviveu ale'm de voce^? @CLOSE @WAIT
+&Avatar @OPEN Ningue'm sobreviveu. Eu tambe'm estou morto. @WAIT
+A humanidade acabou. @CLOSE 
+@REND 
+
+@RMESG 06
+&Avatar @OPEN Andar por ai' e' inu'til. A morte veio para todos. @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 022A
+@ROOMSTART 022B
+
+@RMESG 00
+@@BUTAKO @OPEN Que deserto enorme! Parece que na~o tem fim. @CLOSE
+@REND 
+
+@RMESG 01
+@@YOU @OPEN Sera' que a destrui+a~o que o Gog prometeu criou o deserto? @CLOSE
+@REND 
+
+@RMESG 02
+@@BUTAKO @OPEN So' pode ter sido o Gog que fez toda essa areia cair. @WAIT
+Foi uma tempestade de areia gigante que enterrou o mundo todo! @CLOSE
+@REND 
+
+@RMESG 03
+@@YOU @OPEN Droga! Tanto trabalho pra nada! @CLOSE
+@REND 
+
+@RMESG 04
+@@BUTAKO @OPEN Acabou-se tudo. Agora tudo que da' pra fazer e' @WAIT
+carregar um save game e dar um continue. @CLOSE
+@REND 
+
+@RMESG 05
+@@YOU @OPEN Algue'm mais sobreviveu ale'm de voce^? @CLOSE @WAIT
+&Avatar @OPEN Ningue'm sobreviveu. Eu tambe'm estou morto. @WAIT
+A humanidade acabou. @CLOSE 
+@REND 
+
+@RMESG 06
+&Avatar @OPEN Andar por ai' e' inu'til. A morte veio para todos. @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 022C
+@ROOMSTART 022D
+
+@RMESG 00
+@@BUTAKO @OPEN Esta' tudo escuro, na~o consigo ver nada! @CLOSE
+@REND 
+
+@RMESG 01
+@@BUTAKO @OPEN Tenho uma sensa+a~o de estar imersa na maldade. @CLOSE
+@REND 
+
+@RMESG 02
+@@BUTAKO @OPEN A destrui+a~o causada pelo Gog fez a luz do Sol sumir! @WAIT
+A humanidade na~o tem como viver no escuro completo! @CLOSE
+@REND 
+
+@RMESG 03
+@@YOU @OPEN Aaah!! Que escuro! Que medo! @CLOSE @WAIT
+@@BUTAKO @OPEN Agora na~o adianta berrar; isso afetou a todos. @CLOSE
+@REND 
+
+@RMESG 04
+@@BUTAKO @OPEN Acabou-se tudo. Agora tudo que da' pra fazer e' @WAIT
+carregar um save game e dar um continue. @CLOSE
+@REND 
+
+@RMESG 05
+@@YOU @OPEN Algue'm mais sobreviveu ale'm de voce^? @CLOSE @WAIT
+&Avatar @OPEN Ningue'm sobreviveu. Eu tambe'm estou morto. @WAIT
+A humanidade acabou. @CLOSE 
+@REND 
+
+@RMESG 06
+&Avatar @OPEN Andar por ai' e' inu'til. A morte veio para todos. @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 001E
+
+@RMESG 00
+&Ricbit @OPEN So' entra no pre'dio quem trabalha na Konami. @WAIT
+Tradutor eles na~o deixam entrar! @CLOSE 
+@REND 
+
+@ROOMEND
+
+@ROOMSTART 003E
+
+@RMESG 00
+@@BUTAKO @OPEN Que rosto cansado! Os olhos esta~o quase fechando. @CLOSE 
+@REND 
+
+@RMESG 01
+@@BUTAKO @OPEN For+a no corpo, for+a no espi'rito, moral de ferro, @WAIT
+todos esses sa~o os objetivos que eles buscam. Mas na~o passem da conta! @CLOSE 
+@REND 
+
+@RMESG 02
+@@SOMEONE @ENTER
+@OPEN Eu queria que me deixassem pegar no sono; @CLOSE 
+@REND 
+
+@RMESG 03
+@@SOMEONE @ENTER 
+@OPEN Temos que usar a criatividade para consertar os bugs @CLOSE 
+@REND 
+
+@RMESG 04
+@@SOMEONE @ENTER
+@OPEN Ei! Esse jogo esta' ficando legal! @CLOSE 
+@REND 
+
+@RMESG 05
+@@SOMEONE @ENTER
+@OPEN Na~o quer dar uma ajudinha pra gente? @CLOSE 
+@REND 
+
+@RMESG 06
+@@SOMEONE @ENTER
+@OPEN Pedem tanto pra fazer corre+o~es nos bugs,
+@WAIT que ja' tem gente pensando em desistir! @CLOSE 
+@REND 
+
+@RMESG 07
+&Nagata @OPEN Eu sou o produtor, Nagata, mas por aqui me chamam de Ermita~o @CLOSE 
+@REND 
+
+@RMESG 08
+&Chie @OPEN Tenho que acordar o pessoal, limpar, fazer comida, @WAIT
+e ainda querem que eu me apresente! @CLOSE 
+@REND 
+
+@RMESG 09
+&Maiko @OPEN O que eu tenho que fazer agora? Algue'm me ensine, por favor! @CLOSE 
+@REND 
+
+@ROOMEND
+
+
+@ROOMSTART 0232
+
+@RMESG 00
+@@BUTAKO @OPEN Que rosto cansado! Os olhos esta~o quase fechando. @CLOSE 
+@REND 
+
+@RMESG 01
+@@BUTAKO @OPEN For+a no corpo, for+a no espi'rito, moral de ferro, @WAIT
+todos esses sa~o os objetivos que eles buscam. Mas na~o passem da conta! @CLOSE 
+@REND 
+
+@RMESG 02
+@@SOMEONE @ENTER
+@OPEN Eu queria que me deixassem pegar no sono; @CLOSE 
+@REND 
+
+@RMESG 03
+@@SOMEONE @ENTER 
+@OPEN Temos que usar a criatividade para consertar os bugs @CLOSE 
+@REND 
+
+@RMESG 04
+@@SOMEONE @ENTER
+@OPEN Ei! Esse jogo esta' ficando legal! @CLOSE 
+@REND 
+
+@RMESG 05
+@@SOMEONE @ENTER
+@OPEN Na~o quer dar uma ajudinha pra gente? @CLOSE 
+@REND 
+
+@RMESG 06
+@@SOMEONE @ENTER
+@OPEN Pedem tanto pra fazer corre+o~es nos bugs,
+@WAIT que ja' tem gente pensando em desistir! @CLOSE 
+@REND 
+
+@RMESG 07
+&Nagae @OPEN Aqui e' a sala dos programadores @CLOSE 
+@REND 
+
+@RMESG 08
+&Toshinari @OPEN Yoko! Eu te amo! @CLOSE 
+@REND 
+
+@RMESG 09
+&Kikkawa @OPEN Lerdo, com sono, triste, querendo voltar pra casa. @CLOSE 
+@REND 
+
+@RMESG 0A
+&Fukui @OPEN Estou quase morrendo; tudo que comi ontem foram uns vegetais; @WAIT
+Acho que vou desistir antes de acabar o jogo; @WAIT Mas antes, quero dizer
+que sou um grande fa~ da Minako.Oi Minako! @CLOSE 
+@REND 
+
+
+@ROOMEND
+
+@ROOMSTART 0233
+
+@RMESG 00
+@@BUTAKO @OPEN Que rosto cansado! Os olhos esta~o quase fechando. @CLOSE 
+@REND 
+
+@RMESG 01
+@@BUTAKO @OPEN For+a no corpo, for+a no espi'rito, moral de ferro, @WAIT
+todos esses sa~o os objetivos que eles buscam. Mas na~o passem da conta! @CLOSE 
+@REND 
+
+@RMESG 02
+@@SOMEONE @ENTER
+@OPEN Eu queria que me deixassem pegar no sono; @CLOSE 
+@REND 
+
+@RMESG 03
+@@SOMEONE @ENTER 
+@OPEN Temos que usar a criatividade para consertar os bugs @CLOSE 
+@REND 
+
+@RMESG 04
+@@SOMEONE @ENTER
+@OPEN Ei! Esse jogo esta' ficando legal! @CLOSE 
+@REND 
+
+@RMESG 05
+@@SOMEONE @ENTER
+@OPEN Na~o quer dar uma ajudinha pra gente? @CLOSE 
+@REND 
+
+@RMESG 06
+@@SOMEONE @ENTER
+@OPEN Pedem tanto pra fazer corre+o~es nos bugs,
+@WAIT que ja' tem gente pensando em desistir! @CLOSE 
+@REND 
+
+@RMESG 07
+&Sasaki @OPEN Hei, hei! Eu sou o lenda'rio Moai! @CLOSE 
+@REND 
+
+@RMESG 08
+&Yamako @OPEN Eu adorei as falas esquisitas da Butako. O final e' ta~o comovente; @CLOSE 
+@REND 
+
+@RMESG 09
+&Uehara @OPEN Muito prazer, eu sou o Uehara. Sempre fui um grande fa~ do  @WAIT
+Sr.Moai e foi um prazer trabalhar com ele. @CLOSE 
+@REND 
+
+@RMESG 0A
+&Iku @OPEN Aqui tem bacte'rias que me da~o prisa~o de ventre;; @CLOSE 
+@REND 
+
+
+@ROOMEND
+
+@ROOMSTART 0234
+
+@RMESG 00
+@@BUTAKO @OPEN Que rosto cansado! Os olhos esta~o quase fechando. @CLOSE 
+@REND 
+
+@RMESG 01
+@@BUTAKO @OPEN For+a no corpo, for+a no espi'rito, moral de ferro, @WAIT
+todos esses sa~o os objetivos que eles buscam. Mas na~o passem da conta! @CLOSE 
+@REND 
+
+@RMESG 02
+@@SOMEONE @ENTER
+@OPEN Eu queria que me deixassem pegar no sono; @CLOSE 
+@REND 
+
+@RMESG 03
+@@SOMEONE @ENTER 
+@OPEN Temos que usar a criatividade para consertar os bugs @CLOSE 
+@REND 
+
+@RMESG 04
+@@SOMEONE @ENTER
+@OPEN Ei! Esse jogo esta' ficando legal! @CLOSE 
+@REND 
+
+@RMESG 05
+@@SOMEONE @ENTER
+@OPEN Na~o quer dar uma ajudinha pra gente? @CLOSE 
+@REND 
+
+@RMESG 06
+@@SOMEONE @ENTER
+@OPEN Pedem tanto pra fazer corre+o~es nos bugs,
+@WAIT que ja' tem gente pensando em desistir! @CLOSE 
+@REND 
+
+@RMESG 07
+&Ryu @OPEN 7! @CLOSE 
+@REND 
+
+@RMESG 08
+&Shu @OPEN 8! @CLOSE 
+@REND 
+
+@RMESG 09
+&Takemasa @OPEN Eu quero voltar pra casa! Preciso de liberdade! @WAIT
+Preciso comer alguma coisa! Quero relaxar e jogar! @CLOSE 
+@REND 
+
+@RMESG 0A
+&Makki @OPEN Vou acabar isso ra'pido, já que tenho um encontro em duas horas! @CLOSE 
+@REND 
+
+
+@ROOMEND
+
+
+@ROOMMODEEND
+ 
