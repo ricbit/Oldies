@@ -201,6 +201,10 @@ Description: 3D tic tac toe as a java applet. This game differs from classic
 3d tic tac toe, since it's played on a board topologically equivalent to
 a toroid.
 
+Name: 2000-03-smsx
+Language: Assembly Z80
+Description: Reads a BrSMS savestate and renders the screenshot on a MSX.
+
 Name: 2000-04-advram
 Language: Assembly Z80
 Description: Benchmark to evaluate three methods of video blitting on MSX2

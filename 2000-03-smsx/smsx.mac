@@ -1,0 +1,715 @@
+; -----------------------------------------------------------------------
+;
+;    TMNT 1.0
+;    Copyright (C) 1999 by Ricardo Bittencourt
+;
+;    Project started at 18/12/1999. Last modification was on 23/12/1999.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@lsi.usp.br
+;        http://www.lsi.usp.br/~ricardo
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+; 
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+	ORG     0100h
+	 
+BDOS     EQU     00005h
+OPEN     EQU     0000Fh
+CLOSE    EQU     00010h
+RDSEQ    EQU     00014h
+PRINT    EQU     00009h
+DTA      EQU     00080h
+INIMLT   EQU     00075h
+INIT32   EQU     0006Fh
+INITXT   EQU     0006Ch
+INIGRP   EQU     00072h
+FILVRM   EQU     00056h
+LDIRMV   EQU     0005Ch
+CLRSPR   EQU     00069h
+PRTCHR   EQU     00002h
+ENASLT   EQU     00024h
+RSLREG   EQU     00138h
+TOTEXT   EQU     000D2h
+BDRCLR   EQU     0F3EBh
+CHGCLR   EQU     00062h
+DISSCR   EQU     00041h
+ENASCR   EQU     00044h
+EXPTBL   EQU     0FCC1h
+RG1SAV   EQU     0F3E0h
+RDBLK    EQU     00027h
+SETDTA   EQU     0001Ah
+CHGET    EQU     0009Fh
+RDSLT    EQU     0000Ch
+SNSMAT   EQU     00141h
+CLIKSW   EQU     0F3DBh
+GETPNT   EQU     0F3FAh
+PUTPNT   EQU     0F3F8h
+HKEYI    EQU     0FD9Fh
+
+CHGMOD   EQU     000D1h
+CLSSUB   EQU     00115h
+WRTVDP   EQU     0012Dh
+RG8SAV   EQU     0FFE7h
+RG25SAV  EQU     0FFFAh
+
+BG_SIZE  EQU     20736
+
+ALIGNF  DEFL    0
+
+; -----------------------------------------------------------------------
+; ALIGN - align the code in 100h bytes boundaries
+
+ALIGNX          MACRO  X
+
+VOID&X:
+		DS      256*(HIGH (VOID&X+255))-VOID&X
+
+		ENDM
+
+ALIGN           MACRO
+
+		ALIGNX  %ALIGNF
+		ALIGNF  DEFL    ALIGNF+1
+
+		ENDM
+
+; -----------------------------------------------------------------------
+; CUSTOM_SNSMAT - read a keyboard line through the PPI I/O ports
+
+CUSTOM_SNSMAT   MACRO   LINE
+
+	IN      A,(0AAh)
+	AND     0F0h
+	OR      LINE
+	OUT     (0AAh),A
+	IN      A,(0A9h)
+
+		ENDM
+	
+; -----------------------------------------------------------------------
+
+START:
+	CALL    COMMAND_LINE
+	
+	; prepare compatibility
+
+	CALL    PREPARE
+
+	; set up screen 11
+	CALL    SCREEN8
+
+	; turn off the keyboard click
+	XOR     A
+	LD      (CLIKSW),A
+
+	CALL    READ_TILES
+
+	; disable BIOS interrupt
+	DI
+	LD      A,(038h)
+	LD      (SAVE_IRQ),A
+	LD      HL,(039h)
+	LD      (SAVE_IRQ+1),HL
+	LD      HL,MY_IRQ_HANDLER
+	LD      (039h),HL
+	EI
+
+	CALL    DECODE_PALETTE
+	CALL    DECODE
+	CALL    DECODE_NAME
+
+	; install old irq handler
+	DI
+	LD      A,(SAVE_IRQ)
+	LD      (038h),A
+	LD      HL,(SAVE_IRQ+1)
+	LD      (039h),HL
+	EI
+
+	LD      IX,CHGET
+	CALL    CALLBIOS
+
+; -----------------------------------------------------------------------
+
+EXIT_NOW:
+	; exit the program
+
+	; clear keyboard buffer
+	LD      HL,(GETPNT)
+	LD      (PUTPNT),HL
+
+	; return to text mode
+	LD      IX,TOTEXT
+	CALL    CALLBIOS
+
+	LD      A,(IRQ_RTC)
+	LD      L,A
+	LD      H,0
+	ADD     HL,HL
+	ADD     HL,HL
+	ADD     HL,HL
+	ADD     HL,HL
+	CALL    PRINTDECIMAL
+
+	; return to dos
+	JP      0
+
+MY_IRQ_HANDLER:
+	PUSH    AF
+	IN      A,(099h)
+	LD      A,(IRQ_RTC)
+	INC     A
+	LD      (IRQ_RTC),A
+	POP     AF
+	RET
+
+; -----------------------------------------------------------------------
+; PRINTDECIMAL - print a 16-bit number in decimal
+; enter: HL = number
+; destroy: all
+
+PRINTDECIMAL:
+	; convert to decimal
+	LD      B,5
+	LD      IX,DECIMAL_TABLE
+	LD      IY,DECIMAL_STRING
+
+PRINTDECIMAL_OUTER:
+	XOR     A
+	LD      E,(IX+0)
+	LD      D,(IX+1)
+
+PRINTDECIMAL_INNER:
+	INC     A
+	SBC     HL,DE
+	JR      NC,PRINTDECIMAL_INNER
+
+	ADD     HL,DE
+	ADD     A,'0'-1
+	LD      (IY),A
+	INC     IY
+	INC     IX
+	INC     IX
+	DJNZ    PRINTDECIMAL_OUTER
+
+	; skip zeros at beginning
+
+	LD      B,4
+	LD      DE,DECIMAL_STRING
+
+PRINTDECIMAL_SKIP:
+	LD      A,(DE)
+	CP      '0'
+	JR      NZ,PRINTDECIMAL_NOW
+	INC     DE
+	DJNZ    PRINTDECIMAL_SKIP
+
+PRINTDECIMAL_NOW:
+	LD      C,PRINT
+	JP      BDOS
+
+DECIMAL_TABLE:
+	DW      10000
+	DW      1000
+	DW      100
+	DW      10
+	DW      1
+
+DECIMAL_STRING:
+	DB      '12345$'
+
+; -----------------------------------------------------------------------
+
+DECODE_NAME:
+	LD      DE,0
+	LD      IX,04000H+03800H
+
+	LD      B,0
+NAME_OUTER:
+	PUSH    BC
+
+	LD      A,B
+	SRL     A
+	SRL     A
+	SRL     A
+	OUT     (099h),A
+	LD      A,80h+14
+	OUT     (099h),A
+
+	LD      B,32
+NAME_MEDIUM:
+	PUSH    BC
+
+	LD      L,(IX)
+	INC     IX
+	LD      H,080h/64
+	ADD     HL,HL
+	ADD     HL,HL
+	ADD     HL,HL
+	ADD     HL,HL
+	ADD     HL,HL
+	ADD     HL,HL
+		
+	EXX
+	LD      L,(IX)
+	INC     IX
+	LD      H,HIGH (SELECT_PALETTE)
+	LD      A,(HL)
+	LD      H,HIGH (FLIP_TABLE)
+	LD      H,(HL)
+	LD      L,0
+	DI
+	JP      (HL)
+
+FLIP_CONTINUE:
+	EI
+
+	LD      BC,8-256*8
+	EX      DE,HL
+	ADD     HL,BC
+	EX      DE,HL
+
+	POP     BC
+	DJNZ    NAME_MEDIUM
+	
+	LD      BC,8*256-256
+	EX      DE,HL
+	ADD     HL,BC
+	EX      DE,HL
+	LD      A,D
+	AND     03Fh
+	LD      D,A
+
+	POP     BC
+	INC     B
+	LD      A,B
+	CP      24
+	JR      NZ,NAME_OUTER
+
+	EI
+	RET
+
+ALIGN        
+FLIP_0:
+	
+	EXX
+	LD      B,A
+
+	REPT    8
+	
+	LD      A,E
+	OUT     (099h),A
+	LD      A,D
+	OR      040h
+	OUT     (099h),A
+
+	;LD      BC,0898h
+	;OTIR
+
+	REPT    8
+	LD      C,(HL)
+	LD      A,(BC)
+	OUT     (098h),A
+	INC     HL
+	ENDM
+
+	;LD      BC,256
+	;EX      DE,HL
+	;ADD     HL,BC
+	;EX      DE,HL
+	INC     D
+
+	ENDM
+
+	JP      FLIP_CONTINUE
+
+ALIGN
+FLIP_1:
+	EXX
+
+	LD      BC,7
+	ADD     HL,BC
+	LD      B,A
+
+	REPT    8
+	
+	LD      A,E
+	OUT     (099h),A
+	LD      A,D
+	OR      040h
+	OUT     (099h),A
+
+	;LD      BC,0898h
+	;OTDR
+
+	REPT    8
+	LD      C,(HL)
+	LD      A,(BC)
+	OUT     (098h),A
+	DEC     HL
+	ENDM
+
+	PUSH    BC
+	LD      BC,8+8
+	ADD     HL,BC
+	POP     BC
+
+	;LD      BC,256
+	;EX      DE,HL
+	;ADD     HL,BC
+	;EX      DE,HL
+	INC     D
+
+	ENDM
+
+	JP      FLIP_CONTINUE
+
+ALIGN        
+FLIP_2:
+	EXX
+
+	LD      BC,64-8
+	ADD     HL,BC
+	LD      B,A
+
+	REPT    8
+	
+	LD      A,E
+	OUT     (099h),A
+	LD      A,D
+	OR      040h
+	OUT     (099h),A
+
+	;LD      BC,0898h
+	;OTIR
+
+	REPT    8
+	LD      C,(HL)
+	LD      A,(BC)
+	OUT     (098h),A
+	INC     HL
+	ENDM
+
+	PUSH    BC
+	LD      BC,-8-8
+	ADD     HL,BC
+	POP     BC
+
+	;LD      BC,256
+	;EX      DE,HL
+	;ADD     HL,BC
+	;EX      DE,HL
+	INC     D
+
+	ENDM
+
+	JP      FLIP_CONTINUE
+
+ALIGN        
+FLIP_3:
+	EXX
+
+	LD      BC,64-8+7
+	ADD     HL,BC
+	LD      B,A
+
+	REPT    8
+	
+	LD      A,E
+	OUT     (099h),A
+	LD      A,D
+	OR      040h
+	OUT     (099h),A
+
+	;LD      BC,0898h
+	;OTDR
+
+	REPT    8
+	LD      C,(HL)
+	LD      A,(BC)
+	OUT     (098h),A
+	DEC     HL
+	ENDM
+
+	;LD      BC,256
+	;EX      DE,HL
+	;ADD     HL,BC
+	;EX      DE,HL
+	INC     D
+
+	ENDM
+
+	JP      FLIP_CONTINUE
+
+; -----------------------------------------------------------------------
+
+READ_TILES:
+
+	; open the file
+	LD      C,OPEN  
+	LD      DE,FCB
+	CALL    BDOS
+
+	; set the DTA
+	LD      HL,1
+	LD      (FCBSIZE),HL
+	LD      DE,04000h
+	LD      C,SETDTA
+	CALL    BDOS
+
+	; read 0C007h bytes from the file
+	LD      C,RDBLK
+	LD      DE,FCB
+	LD      HL,40+16+16+3+8192-1
+	CALL    BDOS
+
+	; read 0C007h bytes from the file
+	LD      C,RDBLK
+	LD      DE,FCB
+	LD      HL,16384+64
+	CALL    BDOS
+
+	; close the file
+	LD      C,CLOSE
+	LD      DE,FCB
+	CALL    BDOS
+
+	RET
+
+; -----------------------------------------------------------------------
+
+DECODE:
+	LD      IX,4000h
+	LD      HL,8000h
+	EXX
+	LD      BC,8*256
+DECODE_INNER:
+	EXX
+
+	LD      D,(IX+0)
+	LD      E,(IX+1)
+	LD      B,(IX+2)
+	LD      C,(IX+3)
+
+	IRP     I,<0,1,2,3,4,5,6,7>
+	XOR     A
+	RL      C
+	RLA
+	RL      B
+	RLA
+	RL      E
+	RLA
+	RL      D
+	RLA
+	LD      (HL),A
+	INC     HL
+	ENDM
+
+	LD      BC,4
+	ADD     IX,BC
+
+	EXX
+	DEC     BC
+	LD      A,B
+	OR      C
+	JP      NZ,DECODE_INNER
+
+	RET
+
+; -----------------------------------------------------------------------
+
+DECODE_PALETTE:
+	LD      B,16
+	LD      IX,08000h
+	LD      DE,PALETTE0
+	LD      H,HIGH (COLOR_CONVERSION)
+
+DECODE_PAL_OUTER:
+	LD      L,(IX)
+	LD      A,(HL)
+	LD      (DE),A
+	INC     DE
+	INC     IX
+	DJNZ    DECODE_PAL_OUTER
+
+	LD      B,16
+	LD      DE,PALETTE1
+
+DECODE_PAL_2:
+	LD      L,(IX)
+	LD      A,(HL)
+	LD      (DE),A
+	INC     DE
+	INC     IX
+	DJNZ    DECODE_PAL_2
+
+	RET
+
+; -----------------------------------------------------------------------
+; COMMAND_LINE: parse the command line and place the file name in FCB
+
+COMMAND_LINE:
+	LD      HL,081H
+	LD      DE,FCB+1
+STARTSKIP:
+	LD      A,(HL)
+	CP      0Dh
+	JR      Z,STARTSKIP1
+	CP      32
+	JR      NZ,START0
+STARTSKIP1:
+	INC     HL
+	JR      STARTSKIP
+START0:
+	LD      A,(HL)
+	CP      0DH
+	RET     Z
+	CP      00H
+	RET     Z
+	CP      32
+	RET     Z
+	LD      (DE),A
+	INC     DE
+START2:
+	INC     HL
+	JR      START0
+	
+; -----------------------------------------------------------------------
+; CALLBIOS - call a bios routine
+; enter: IX = address
+
+CALLBIOS:
+	LD      (CALLBIOS1),IX
+	RST     030h
+CALLBIOS0:
+	DB      0
+CALLBIOS1:
+	DW      0
+	RET
+
+; -----------------------------------------------------------------------
+; PREPARE - prepare compatibility
+
+PREPARE:
+	LD      A,(EXPTBL)
+	LD      (CALLBIOS0),A
+	RET
+
+; -----------------------------------------------------------------------
+; PRINTHEX - print a byte in hexadecimal format
+; enter: A = byte
+
+PRINTHEX:
+	PUSH    AF
+	RRCA
+	RRCA
+	RRCA
+	RRCA
+	AND     0Fh
+	CALL    PRINTDIG
+	POP     AF
+	AND     0Fh
+PRINTDIG:
+	CP      10
+	JR      C,PRINTDIG0
+	ADD     A,'A'-10
+	JR      PRINTDIG1
+PRINTDIG0:
+	ADD     A,'0'
+PRINTDIG1:
+	LD      C,PRTCHR
+	LD      E,A
+	CALL    BDOS
+	RET
+
+; -----------------------------------------------------------------------
+; CALLSUB - call the subrom
+; enter: IX = address 
+
+CALLSUB:
+	LD      IY,(0FAF7h)
+	CALL    001Ch
+	RET
+
+; -----------------------------------------------------------------------
+; SCREEN8 - set up SCREEN 8 using the BIOS
+
+SCREEN8:
+	; change to screen 8
+	LD      IX,CHGMOD
+	LD      A,8
+	CALL    CALLSUB
+
+	; clear SCREEN
+	LD      IX,CLSSUB
+	CALL    CALLSUB
+
+	; turn off sprites && set color 0 as opaque
+	LD      A,(RG8SAV)
+	OR      2+32
+	LD      B,A
+	LD      C,8
+	LD      IX,WRTVDP
+	CALL    CALLSUB
+
+	RET
+
+; -----------------------------------------------------------------------
+; Work Area
+
+FCB:
+	DB      0               ; 0: drive number
+	DB      '        '      ; 1: file name
+	DB      'STA'           ; 9: file extension
+FCB_FILLER_START:
+	DB      0,0             ; 12: reserved
+FCBSIZE:
+	DB      0,0             ; 14: size of random access register
+	DB      0,0,0,0         ; 16: file length
+	DB      0,0             ; 20: date
+	DB      0,0             ; 22: time
+	DB      0,0,0,0,0,0,0,0 ; 24: reserved
+	DB      0               ; 32: reserved
+	DB      0,0,0,0         ; 33: current random access register
+FCB_FILLER_END:
+
+; higher bits of vram page
+VRAM_PAGE:      DB      0
+
+; old irq handler
+SAVE_IRQ:        DB      0,0,0
+
+; counter: incremented on each IRQ (60Hz)
+IRQ_RTC:        DB      0
+
+ALIGN
+PALETTE0:        DS      64
+ALIGN
+PALETTE1:        DS      64
+
+ALIGN                
+INCLUDE COLOR.INC
+INCLUDE JUMP.INC
+INCLUDE SELECT.INC
+
+ENDOFCODE:
+
+	IF      ENDOFCODE GT 02D00h
+	.PRINTX . You must implement the megaram support !!! .
+	ENDIF
+
+	END     START
+
+
+
+
