@@ -344,7 +344,7 @@ Description: Cylon visor for the Digilent FPGA board.
 
 Name: 2010-04-zenoreduce
 Language: Python
-Description: Zeno machine emluator.
+Description: Zeno machine emulator.
 
 Name: 2011-05-torto
 Language: Prolog
