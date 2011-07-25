@@ -334,6 +334,10 @@ Name: 2008-03-roman
 Language: C
 Description: Roman numbers using preprocessor metaprogramming.
 
+Name: 2010-04-zenoreduce
+Language: Python
+Description: Zeno machine emluator.
+
 Name: 2011-05-torto
 Language: Prolog
 Description: Solution of the Torto Reverso puzzle using prolog.
