@@ -330,6 +330,10 @@ Name: 2006-12-bignumfac
 Language: C++
 Description: Bignum factorial using template metaprogramming.
 
+Name: 2007-12-spojdashboard
+Language: Python
+Description: A dashboard displaying info about spoj users.
+
 Name: 2008-03-roman
 Language: C
 Description: Roman numbers using preprocessor metaprogramming.
