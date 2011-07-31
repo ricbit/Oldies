@@ -187,6 +187,10 @@ Language: Assembly Z80
 Description: Web browser for MSX. Browses over pre-rendered html pages loaded
 from disk.
 
+Name: 1999-05-wise
+Language: C, Lex, Yacc
+Description: Converts html files into the htz format used by fudebrowser.
+
 Name: 1999-10-fourfours
 Language: C
 Description: Solve the four fours puzzle using forward chaining.
