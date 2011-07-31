@@ -1,0 +1,4045 @@
+; -----------------------------------------------------------------------
+;
+;    FudeBrowser 1.9
+;    Copyright (C) 1999,2000 by Ricardo Bittencourt
+;
+;    Project started at 1/5/1999. Last modification was on 20/5/2000.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@lsi.usp.br
+;        http://www.lsi.usp.br/~ricardo
+;
+; -----------------------------------------------------------------------        
+;
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+VERSION         EQU     9
+FUDEBROWSER     EQU     0
+FLYBROWSER      EQU     1
+NAMEBROWSER     EQU     FLYBROWSER
+
+; Memory Map of FudeBrowser
+;
+; 0000-00FF     system
+; 0100-3FFF     FudeBrowser code
+; 4000-7FFF     HTZ page
+; 8000-97FF     pattern buffer
+; 9800-AFFF     color buffer
+; B000-B2FF     link buffer
+; B300-BAFF     normal font
+; BB00-C2FF     bold font
+; C300-C6FF     memory pages
+; C700-CEFF     code font
+; CEFF-CFFF     free !
+; D000-D7FF     FudeBrowser variables
+; D800-FFFF     system
+
+; -----------------------------------------------------------------------        
+
+	ASEG
+	ORG     0100h
+
+BDOS    EQU     00005h
+OPEN    EQU     0000Fh
+CLOSE   EQU     00010h
+RDSEQ   EQU     00014h
+PRINT   EQU     00009h
+DTA     EQU     00080h
+INIMLT  EQU     00075h
+INIT32  EQU     0006Fh
+INITXT  EQU     0006Ch
+INIGRP  EQU     00072h
+FILVRM  EQU     00056h
+LDIRMV  EQU     0005Ch
+LDIRVM  EQU     00059h
+CLRSPR  EQU     00069h
+PRTCHR  EQU     00002h
+ENASLT  EQU     00024h
+RSLREG  EQU     00138h
+TOTEXT  EQU     000D2h
+BDRCLR  EQU     0F3EBh
+CHGCLR  EQU     00062h
+DISSCR  EQU     00041h
+ENASCR  EQU     00044h
+EXPTBL  EQU     0FCC1h
+RG1SAV  EQU     0F3E0h
+WRTVDP  EQU     00047h
+RDBLK   EQU     00027h
+SETDTA  EQU     0001Ah
+CHGET   EQU     0009Fh
+RDSLT   EQU     0000Ch
+SNSMAT  EQU     00141h
+CLIKSW  EQU     0F3DBh
+GETPNT  EQU     0F3FAh
+PUTPNT  EQU     0F3F8h
+HKEYI   EQU     0FD9Fh
+
+SCROLL_DDA_ORIG EQU     04009h
+DEFAULT_COLORS  EQU     0400Dh
+START_LINK      EQU     04011h
+
+LINKBUFFER      EQU     0B000h
+FONT_NORMAL     EQU     0B300H 
+FONT_BOLD       EQU     0BB00H 
+MEMORY_PAGES    EQU     0C300h
+FONT_CODE       EQU     0C700H 
+
+NUMBER_SPRITES  EQU     10
+
+; -----------------------------------------------------------------------
+; ALIGN - align the code in 100h bytes boundaries
+
+ALIGN           MACRO
+LOCAL VOID
+
+VOID:
+		DS      256*(HIGH (VOID+255))-VOID
+
+		ENDM
+
+; -----------------------------------------------------------------------
+; CUSTOM_SNSMAT - read a keyboard line through the PPI I/O ports
+
+CUSTOM_SNSMAT   MACRO   LINE
+
+	IN      A,(0AAh)
+	AND     0F0h
+	OR      LINE
+	OUT     (0AAh),A
+	IN      A,(0A9h)
+
+		ENDM
+	
+; -----------------------------------------------------------------------
+; BIG_SHIFT - promote the accumulator to 16-bit and shift left by N
+
+BIG_SHIFT       MACRO   REGH,REGL,N
+
+	REPT    N
+	RLCA
+	ENDM
+	LD      REGL,A
+	AND     (1 SHL N)-1
+	LD      REGH,A
+	XOR     REGL
+	LD      REGL,A
+
+		ENDM
+
+; -----------------------------------------------------------------------
+; BLIT_LINE - blit a region of ram to vram from HL+INCHL to HL+INCDE
+; Warning: INCHL and INCDE must be multiples of 0100h
+
+BLIT_LINE       MACRO   INCHL,INCDE
+	
+	LD      E,L
+	LD      A,H
+	ADD     A,HIGH (INCHL)
+	LD      H,A
+	ADD     A,HIGH (INCDE)-HIGH (INCHL)
+	LD      D,A
+	LD      BC,100h
+	PUSH    HL
+	CALL    CUSTOM_LDIRMV
+	POP     HL
+	LD      E,L
+	LD      A,H
+	ADD     A,018h
+	LD      H,A
+	ADD     A,020h+HIGH (INCDE)-018h-HIGH (INCHL)
+	LD      D,A
+	LD      BC,100h
+	CALL    CUSTOM_LDIRMV
+
+		ENDM
+
+; -----------------------------------------------------------------------
+; COPY_LINE - copy a region of memory from HL+INCHL to HL+INCDE
+; Warning: INCHL and INCDE must be multiples of 0100h
+
+COPY_LINE       MACRO   INCHL,INCDE
+	
+	; copy the pattern
+	LD      E,L
+	LD      A,H
+	ADD     A,HIGH (INCDE)
+	LD      D,A
+	ADD     A,HIGH (INCHL)-HIGH (INCDE)
+	LD      H,A
+	LD      BC,100h
+	CALL    SMART_LDIR
+
+	; copy the color
+	ADD     A,018h
+	LD      H,A
+	ADD     A,HIGH (INCDE)-HIGH (INCHL)
+	LD      D,A
+	LD      B,01h
+	CALL    SMART_LDIR
+
+	; copy the link buffer
+	ADD     A,HIGH (INCHL)-HIGH (INCDE)-018h-080h
+	RRCA
+	RRCA
+	RRCA
+	LD      H,A
+	AND     0E0h
+	LD      L,A
+	XOR     H
+	ADD     A,HIGH (LINKBUFFER)
+	LD      H,A
+	ADD     A,HIGH ((INCDE-INCHL)/8)
+	LD      D,A
+	LD      E,L
+	LD      C,32
+	LDIR
+
+		ENDM
+
+; -----------------------------------------------------------------------
+; CUSTOM_JOYREAD - read the joystick 1 status from PSG I/O ports
+
+CUSTOM_JOYREAD   MACRO   
+
+	LD      A,15
+	OUT     (0A0h),A
+	IN      A,(0A2h)
+	AND     10111111b
+	OUT     (0A1h),A
+	LD      A,14
+	OUT     (0A0h),A
+	IN      A,(0A2h)
+
+	ENDM
+
+; -----------------------------------------------------------------------
+; ENLARGE_SLICE - enlarge one single line of a character
+	
+ENLARGE_SLICE   MACRO I
+	
+	LD      C,E                     ; 5
+	LD      E,L                     ; 5
+	LD      L,(IX+I+1)              ; 21
+	LD      B,HIGH (ENLARGE__OO)    ; 8
+	LD      A,(BC)                  ; 8
+	LD      B,A                     ; 5
+	LD      D,HIGH (ENLARGE_OOX)    ; 8
+	LD      A,(DE)                  ; 8
+	LD      H,HIGH (ENLARGE_OXO)    ; 8
+	AND     (HL)                    ; 8
+	AND     B                       ; 5
+	LD      D,A                     ; 5
+					;
+	LD      B,HIGH (ENLARGE_OO_)    ; 8
+	LD      A,(BC)                  ; 8
+	AND     (HL)                    ; 8
+	LD      H,A                     ; 5
+	LD      B,D                     ; 5
+	LD      D,HIGH (ENLARGE_XOO)    ; 8
+	LD      A,(DE)                  ; 8
+	AND     H                       ; 5
+	OR      B                       ; 5
+	OR      E                       ; 5
+	LD      (IY+2*I+1),A            ; 21
+					;
+	LD      H,HIGH (ENLARGE__OO)    ; 8
+	LD      D,HIGH (ENLARGE_XOO)    ; 8
+	LD      A,(DE)                  ; 8
+	AND     (HL)                    ; 8
+	LD      D,A                     ; 5
+	LD      B,HIGH (ENLARGE_OXO)    ; 8
+	LD      A,(BC)                  ; 8
+	AND     D                       ; 5
+	LD      H,A                     ; 5
+					;
+	LD      A,(BC)                  ; 8
+	LD      B,A                     ; 5
+	LD      D,HIGH (ENLARGE_OOX)    ; 8
+	LD      A,(DE)                  ; 8
+	AND     B                       ; 5
+	LD      B,H                     ; 5
+	LD      H,HIGH (ENLARGE__OO)    ; 8
+	AND     (HL)                    ; 8
+	OR      B                       ; 5
+	OR      E                       ; 5
+	LD      (IY+2*I+0),A            ; 21 
+	
+	ENDM
+
+; -----------------------------------------------------------------------
+
+START:
+	; retrieve file name from command line
+	CALL    COMMAND_LINE
+
+	; prepare compatibility
+	CALL    PREPARE
+
+	; init the memory system
+	CALL    WHEREAMI
+	LD      (MAINSLOT),A
+
+	CALL    CHECK_SYSTEM
+	CALL    FIND_MAPPER
+	CALL    CHECK_ADVRAM
+	CALL    PRINT_MEMORY
+
+	; read the fonts from disk
+	CALL    READ_FONTS
+
+	; open the file
+	CALL    READ_HTZ_FILE
+
+; -----------------------------------------------------------------------
+
+	; border color = light yellow
+	LD      A,0Bh
+	CALL    SCREEN2
+
+DRAW_PAGE_FROM_START:
+	; disable screen
+	LD      IX,DISSCR
+	CALL    CALLBIOS
+	
+	; init the histogram buffer
+	LD      HL,04002h
+	LD      DE,HIST_BUFFER+8
+	LD      BC,7
+	LDIR
+
+	; draw the sprites
+	LD      HL,SPRITE_PATT
+	LD      DE,0D000h
+	LD      BC,8*NUMBER_SPRITES
+	LDIR
+	LD      HL,0D000h
+	LD      DE,03800h
+	LD      BC,8*NUMBER_SPRITES
+	LD      IX,LDIRMV
+	CALL    CALLBIOS
+
+	LD      HL,SPRITE_ATTR
+	LD      DE,0D000h
+	LD      BC,4*(NUMBER_SPRITES+1)
+	LDIR
+	LD      HL,0D000h
+	LD      DE,01B00h
+	LD      BC,4*(NUMBER_SPRITES+1)
+	LD      IX,LDIRMV
+	CALL    CALLBIOS
+
+	; draw the scroll bar
+	LD      HL,INIT_SCROLL_BAR
+	LD      DE,SCROLL_BAR
+	LD      BC,4
+	LDIR
+	CALL    UPDATE_SCROLL_BAR
+
+	; init the default colors
+	LD      A,(DEFAULT_COLORS+0)
+	LD      (COLOR_TEXT),A
+	LD      (COLOR_CODE),A
+	LD      A,(DEFAULT_COLORS+1)
+	LD      (COLOR_TEXT_UND),A
+	LD      (COLOR_UNDER),A
+	LD      A,(DEFAULT_COLORS+2)
+	LD      (COLOR_LINK),A
+	LD      A,(DEFAULT_COLORS+3)
+	LD      (COLOR_LINK_UND),A
+
+	; paint the clear buffer
+	LD      A,(COLOR_TEXT_UND)
+	EX      AF,AF'
+	LD      A,(COLOR_TEXT)
+	LD      B,256/8-8/8
+	LD      HL,CLEAR_BUFFER+256
+PAINT_CLEAR_BUFFER:
+	REPT    7
+	LD      (HL),A
+	INC     HL
+	ENDM
+	EX      AF,AF'
+	LD      (HL),A
+	INC     HL
+	EX      AF,AF'
+	DJNZ    PAINT_CLEAR_BUFFER
+
+	CALL    SETUP_SCROLLBUF
+
+	; retrieve initial value of START_TEXT
+	CALL    INIT_START_TEXT
+	LD      (START_SCREEN),HL
+	LD      (TOP_START),HL
+
+	; draw initial screen
+	CALL    DRAW_ENTIRE_SCREEN
+
+	; save the pointer to the end and beginning of screen
+	LD      (END_SCREEN),HL
+	LD      (TOP_END),HL
+
+	; blit the pattern
+	LD      IX,LDIRMV
+	LD      HL,08000h
+	LD      DE,0
+	LD      BC,32*24*8
+	CALL    CALLBIOS
+
+	; blit the color
+	LD      IX,LDIRMV
+	LD      HL,09800h
+	LD      DE,02000h
+	LD      BC,32*24*8
+	CALL    CALLBIOS
+
+	; init the offset tables
+	XOR     A
+	LD      (SCROLLBUF),A
+	
+	; blit the name table
+	IRP     I,<0,1,2>
+	LD      IX,LDIRMV
+	LD      HL,(SCROLLBUF)
+	LD      DE,01800h+I*256
+	LD      BC,256
+	CALL    CALLBIOS
+	ENDM
+	
+	; update cursor sprite
+	CALL    CHANGE_CURSOR
+
+	; turn off the keyboard click
+	XOR     A
+	LD      (CLIKSW),A
+
+	; enable screen
+	LD      IX,ENASCR
+	CALL    CALLBIOS
+
+	; disable BIOS interrupt
+	DI
+	LD      A,(038h)
+	LD      (SAVE_IRQ),A
+	LD      HL,(039h)
+	LD      (SAVE_IRQ+1),HL
+	LD      HL,MY_IRQ_HANDLER
+	LD      (039h),HL
+	EI
+
+; -----------------------------------------------------------------------
+
+MAIN_LOOP:
+	EI
+
+	LD      A,(CURSOR_MOVED)
+	AND     A
+	CALL    NZ,CHANGE_CURSOR
+
+	; read line 6 [ f3 f2 f1 code caps graph ctrl shift ]
+	CUSTOM_SNSMAT   6
+	LD      (KEYLINE_6),A
+
+	; read line 7 [ ret slct bs stop tab esc f5 f4 ]
+	CUSTOM_SNSMAT   7
+	LD      (KEYLINE_7),A
+
+	; read line 8 [ right down up left del ins home space ]
+	CUSTOM_SNSMAT   8
+	LD      (KEYLINE_8),A
+
+	; read joystick 1 status
+	CUSTOM_JOYREAD
+	LD      (JOYLINE),A
+
+	; cursor down 
+	LD      A,(KEYLINE_8)
+	AND     64
+	JP      Z,SCROLL_DOWN
+
+	; cursor up
+	LD      A,(KEYLINE_8)
+	AND     32
+	JP      Z,SCROLL_UP
+
+	; ESC
+	LD      A,(KEYLINE_7)
+	AND     4
+	JP      Z,EXIT_NOW
+
+	; SELECT
+	LD      A,(KEYLINE_7)
+	AND     64
+	JP      Z,CURSOR_SPEED
+
+	; F1
+	LD      A,(KEYLINE_6)
+	AND     32
+	JP      Z,LOAD_HELP_PAGE
+
+	; STOP
+	LD      A,(KEYLINE_7)
+	AND     16
+	JP      Z,CHANGE_BORDER
+
+	; ENTER
+	LD      A,(KEYLINE_7)
+	AND     128
+	JP      Z,CURSOR_ACTION
+
+	; joystick button A
+	LD      A,(JOYLINE)
+	AND     16
+	JP      Z,CURSOR_ACTION
+
+	; HOME
+	LD      A,(KEYLINE_8)
+	AND     2
+	JP      Z,LOAD_HOME_PAGE
+
+	; BACKSPACE
+	LD      A,(KEYLINE_7)
+	AND     32
+	JP      Z,BACK_PAGE
+
+	; joystick button B
+	LD      A,(JOYLINE)
+	AND     32
+	JP      Z,BACK_PAGE
+
+	JP      MAIN_LOOP
+
+; -----------------------------------------------------------------------
+; CALLBIOS - call a bios routine
+; enter: IX = address
+
+CALLBIOS:
+	LD      (CALLBIOS1),IX
+	RST     030h
+CALLBIOS0:
+	DB      0
+CALLBIOS1:
+	DW      0
+	RET
+
+; -----------------------------------------------------------------------
+; PREPARE - prepare compatibility
+
+PREPARE:
+	LD      A,(EXPTBL)
+	LD      (CALLBIOS0),A
+	RET
+
+; -----------------------------------------------------------------------
+; PRINTHEX - print a byte in hexadecimal format
+; enter: A = byte
+
+PRINTHEX:
+	PUSH    AF
+	RRCA
+	RRCA
+	RRCA
+	RRCA
+	AND     0Fh
+	CALL    PRINTDIG
+	POP     AF
+	AND     0Fh
+PRINTDIG:
+	CP      10
+	JR      C,PRINTDIG0
+	ADD     A,'A'-10
+	JR      PRINTDIG1
+PRINTDIG0:
+	ADD     A,'0'
+PRINTDIG1:
+	LD      C,PRTCHR
+	LD      E,A
+	CALL    BDOS
+	RET
+
+; -----------------------------------------------------------------------
+; PRINTSLOT - print a slot id
+; enter: A = slot id
+
+PRINTSLOT:
+	PUSH    AF
+	AND     3
+	CALL    PRINTDIG
+	POP     AF
+	BIT     7,A
+	RET     Z
+	PUSH    AF
+	LD      C,PRTCHR
+	LD      E,'.'
+	CALL    BDOS
+	POP     AF
+	RRCA
+	RRCA
+	AND     3
+	JP      PRINTDIG
+
+; -----------------------------------------------------------------------
+; PRINTDECIMAL - print a 16-bit number in decimal
+; enter: HL = number
+; destroy: all
+
+PRINTDECIMAL:
+	; convert to decimal
+	LD      B,5
+	LD      IX,DECIMAL_TABLE
+	LD      IY,DECIMAL_STRING
+
+PRINTDECIMAL_OUTER:
+	XOR     A
+	LD      E,(IX+0)
+	LD      D,(IX+1)
+
+PRINTDECIMAL_INNER:
+	INC     A
+	SBC     HL,DE
+	JR      NC,PRINTDECIMAL_INNER
+
+	ADD     HL,DE
+	ADD     A,'0'-1
+	LD      (IY),A
+	INC     IY
+	INC     IX
+	INC     IX
+	DJNZ    PRINTDECIMAL_OUTER
+
+	; skip zeros at beginning
+
+	LD      B,4
+	LD      DE,DECIMAL_STRING
+
+PRINTDECIMAL_SKIP:
+	LD      A,(DE)
+	CP      '0'
+	JR      NZ,PRINTDECIMAL_NOW
+	INC     DE
+	DJNZ    PRINTDECIMAL_SKIP
+
+PRINTDECIMAL_NOW:
+	LD      C,PRINT
+	JP      BDOS
+
+DECIMAL_TABLE:
+	DW      10000
+	DW      1000
+	DW      100
+	DW      10
+	DW      1
+
+DECIMAL_STRING:
+	DB      '12345$'
+
+; -----------------------------------------------------------------------
+; PRINTBLOCKS - convert number of blocks to kbytes and print it
+; enter: HL = number of 16kb blocks
+
+PRINTBLOCKS:
+	; multiply HL by 16 (=16384/1024)                
+	ADD     HL,HL
+	ADD     HL,HL
+	ADD     HL,HL
+	ADD     HL,HL
+	JP      PRINTDECIMAL
+
+; -----------------------------------------------------------------------
+; CHECK_ADVRAM - check if the system has an ADVRAM
+
+CHECK_ADVRAM:
+	; read 10h bytes from the VRAM
+	LD      HL,03FF0h
+	LD      DE,0C000h
+	LD      BC,10h
+	LD      IX,LDIRVM
+	CALL    CALLBIOS
+
+	; select slot 0 
+	LD      A,(EXPTBL)
+	LD      HL,08000h
+	CALL    ENASLT
+
+	; init ADVRAM
+	LD      A,11000000b
+	IN      A,(09Ah)
+	XOR     A
+	OUT     (0FEh),A
+
+	; write a known string in the ADVRAM
+	LD      HL,MSG0
+	LD      DE,08000h+03FF0h
+	LD      BC,10h
+	LDIR
+
+	; read 10h bytes from the VRAM again
+	LD      HL,03FF0h
+	LD      DE,0C010h
+	LD      BC,10h
+	LD      IX,LDIRVM
+	CALL    CALLBIOS
+
+	; compare the two strings
+	LD      HL,0C010h
+	LD      DE,MSG0
+	LD      B,10h
+CHECK_ADVRAM_LOOP:
+	LD      A,(DE)
+	CP      (HL)
+	JP      NZ,CHECK_ADVRAM_EXIT
+	DJNZ    CHECK_ADVRAM_LOOP
+
+	; enable ADVRAM optimizations, only if the system has mapper
+	LD      A,(HASMAPPER)
+	AND     A
+	JR      Z,CHECK_ADVRAM_SKIP
+
+	LD      A,1
+	LD      (ADVRAM),A
+
+	LD      HL,CUSTOM_LDIRMV_ADVRAM
+	LD      DE,CUSTOM_LDIRMV
+	LD      BC,CUSTOM_LDIRMV_END-CUSTOM_LDIRMV_ADVRAM
+	LDIR
+
+CHECK_ADVRAM_SKIP:
+
+	; print ADVRAM message if needed
+	LD      A,(PRINTSYSTEM)
+	AND     A
+	JR      Z,CHECK_ADVRAM_EXIT
+
+	LD      DE,ADVRAM_FOUND
+	LD      C,PRINT
+	CALL    BDOS
+
+CHECK_ADVRAM_EXIT:
+	; restore initial settings
+	XOR     A
+	IN      A,(09Ah)
+	LD      A,1
+	OUT     (0FEh),A
+
+	LD      HL,0C000h
+	LD      DE,03FF0h
+	LD      BC,10h
+	LD      IX,LDIRMV
+	CALL    CALLBIOS
+
+	LD      A,(MAINSLOT)
+	LD      HL,08000h
+	CALL    ENASLT
+
+	RET
+
+; -----------------------------------------------------------------------
+; FIND_MAPPER - search for a memory mapper in all slots
+
+FIND_MAPPER:
+	LD      C,0
+
+FIND_MAPPER_PRIMARY:
+	LD      H,HIGH (EXPTBL)
+	LD      A,LOW (EXPTBL)
+	ADD     A,C
+	LD      L,A
+	LD      A,(HL)
+	OR      C
+	LD      D,A
+	BIT     7,A
+	JR      NZ,FIND_MAPPER_EXPANDED
+
+	; primary slot
+	PUSH    BC
+	PUSH    DE
+	LD      HL,4000h
+	CALL    ENASLT
+	POP     DE
+	POP     BC
+	CALL    CHECKRAM
+
+	JP      FIND_MAPPER_NEXT
+
+FIND_MAPPER_EXPANDED:
+	LD      B,0
+FIND_MAPPER_EXP_LOOP:
+	LD      A,D
+	AND     11110011b
+	OR      B
+	LD      D,A
+
+	PUSH    BC
+	PUSH    DE
+	LD      HL,4000h
+	CALL    ENASLT
+	POP     DE
+	POP     BC
+	CALL    CHECKRAM
+
+	LD      A,B
+	ADD     A,4
+	LD      B,A
+	CP      16
+	JR      NZ,FIND_MAPPER_EXP_LOOP
+
+FIND_MAPPER_NEXT:
+	INC     C
+	LD      A,C
+	CP      4
+	JR      NZ,FIND_MAPPER_PRIMARY
+
+	; return page 1 to main ram
+	LD      A,(MAINSLOT)
+	LD      HL,04000h
+	CALL    ENASLT
+
+	EI
+	RET
+
+; -----------------------------------------------------------------------
+; CHECKRAM - check if a slot has RAM
+; must preserve register C
+
+CHECKRAM:
+	DI
+	
+	; disable megaram
+	OUT     (08Eh),A
+
+	; check if slot has ram
+
+	LD      A,(4000h)
+	LD      E,A
+
+	IRP     I,<0,0FFh,055h,0AAh>
+	LD      A,I
+	LD      (4000h),A
+	LD      A,(4000h)
+	CP      I
+	LD      A,E
+	LD      (4000h),A
+	RET     NZ
+	ENDM
+
+; -----------------------------------------------------------------------
+
+	; now must check if the ram is mapped
+
+	LD      A,(4000h)
+	LD      E,A
+
+	LD      A,1
+	OUT     (0FDh),A
+	LD      A,(4000h)
+	LD      L,A
+	LD      A,E
+	CPL
+	LD      (4000h),A
+
+	LD      A,2
+	OUT     (0FDh),A
+	LD      A,(4000h)
+	CP      E
+	LD      A,E
+	LD      (4000h),A
+	;JP      NZ,CHECK_MEGARAM
+	RET     NZ
+
+	LD      A,1
+	OUT     (0FDh),A
+	LD      A,L
+	LD      (4000h),A
+	LD      A,2
+	OUT     (0FDh),A
+
+	LD      A,D
+	LD      (MAPPERSLOT),A
+	LD      A,1
+	LD      (BIGMEMORY),A
+	LD      (HASMAPPER),A
+
+; -----------------------------------------------------------------------
+
+	; check size of mapper
+
+	PUSH    BC
+	PUSH    DE
+
+	; write 00 in all pages
+	LD      HL,0C000h
+	LD      B,0
+MAPPER_LOOP_1:
+	LD      A,B
+	OUT     (0FDh),A
+	LD      A,(07FFFh)
+	LD      (HL),A
+	XOR     A
+	LD      (07FFFh),A
+	INC     HL
+	INC     B
+	JR      NZ,MAPPER_LOOP_1
+
+	; write FF in all pages and check for loop
+	LD      HL,0
+MAPPER_LOOP_2:
+	LD      A,B
+	OUT     (0FDh),A
+	LD      A,(07FFFh)
+	CP      0FFh
+	JR      Z,SIZE_FOUND
+	LD      A,0FFh
+	LD      (07FFFh),A
+	INC     B
+	INC     HL
+	JR      MAPPER_LOOP_2
+
+	; restore memory to initial conditions
+SIZE_FOUND:
+	LD      (MAPPERSIZE),HL
+	LD      HL,0C000h
+	LD      B,0
+MAPPER_LOOP_3:
+	LD      A,B
+	OUT     (0FDh),A
+	LD      A,(HL)
+	LD      (07FFFh),A
+	INC     HL
+	INC     B
+	JR      NZ,MAPPER_LOOP_3
+
+	LD      A,2
+	OUT     (0FDh),A
+
+	POP     DE
+	POP     BC
+
+; -----------------------------------------------------------------------
+
+	; fill the memory pages
+
+	PUSH    BC
+	PUSH    DE
+
+	LD      A,(MAINSLOT)
+	LD      D,A
+	LD      A,(MAPPERSLOT)
+	CP      D
+	JR      Z,FILL_INTERNAL
+
+	LD      A,0
+	LD      DE,(MAPPERSIZE)
+	JR      FILL_CONTINUE
+
+FILL_INTERNAL:
+	LD      A,4
+	LD      HL,(MAPPERSIZE)
+	LD      DE,4
+	OR      A
+	SBC     HL,DE
+	EX      DE,HL
+
+FILL_CONTINUE:
+	LD      HL,(CURRENT_PAGE)
+	LD      BC,(TOTAL_PAGES)
+	EX      AF,AF'
+	LD      A,D
+	OR      E
+	JR      Z,FILL_EXIT
+
+FILL_LOOP:
+	LD      A,(MAPPERSLOT)
+	LD      (HL),A
+	EX      AF,AF'
+	INC     HL
+	LD      (HL),A
+	INC     A
+	EX      AF,AF'
+	INC     HL
+	DEC     DE
+	INC     BC
+	LD      A,D
+	OR      E
+	JR      NZ,FILL_LOOP
+
+	LD      (TOTAL_PAGES),BC
+	LD      (CURRENT_PAGE),HL
+
+FILL_EXIT:
+	POP     DE
+	POP     BC
+
+; -----------------------------------------------------------------------
+
+	; print the slot contents if needed
+
+	LD      A,(PRINTSYSTEM)
+	OR      A
+	RET     Z
+
+	PUSH    BC
+	PUSH    DE
+	LD      A,(MAPPERSLOT)
+	LD      D,A
+	LD      A,(MAINSLOT)
+	CP      D
+	JR      Z,MAPPER_INTERNAL
+
+	LD      DE,EXTERNAL
+	JR      PRINT_MAPPER_TYPE
+
+MAPPER_INTERNAL:
+	LD      DE,INTERNAL
+PRINT_MAPPER_TYPE:
+
+	LD      C,PRINT
+	CALL    BDOS
+
+	LD      DE,MAPPERINSLOT
+	LD      C,PRINT
+	CALL    BDOS
+
+	LD      A,(MAPPERSLOT)
+	CALL    PRINTSLOT
+
+	LD      DE,SIZE_MSG
+	LD      C,PRINT
+	CALL    BDOS
+
+	LD      HL,(MAPPERSIZE)
+	CALL    PRINTBLOCKS
+
+	LD      DE,P_CRLF
+	LD      C,PRINT
+	CALL    BDOS
+
+	POP     DE
+	POP     BC
+	RET
+
+; -----------------------------------------------------------------------
+; PRINT_MEMORY - print total memory available to pages
+
+PRINT_MEMORY:
+	LD      A,(PRINTSYSTEM)
+	OR      A
+	RET     Z
+
+	LD      DE,MEMORY_AVAILABLE
+	LD      C,PRINT
+	CALL    BDOS
+
+	LD      HL,(TOTAL_PAGES)
+	LD      A,H
+	OR      L
+	JR      NZ,PRINT_MEM_CONTINUE
+	LD      HL,1
+PRINT_MEM_CONTINUE:
+	CALL    PRINTBLOCKS
+
+	LD      DE,KB_CRLF
+	LD      C,PRINT
+	CALL    BDOS
+
+	JP      0
+
+; -----------------------------------------------------------------------
+; CHECK_SYSTEM - check for the /s switch and print memory info if found
+
+CHECK_SYSTEM:
+	; check for /s switch
+	LD      HL,(FCB+1)
+	LD      DE,'s/'
+	OR      A
+	SBC     HL,DE
+	JR      Z,PRINT_SYSTEM
+
+	LD      HL,(FCB+1)
+	LD      DE,'S/'
+	OR      A
+	SBC     HL,DE
+	RET     NZ
+
+PRINT_SYSTEM:
+	LD      A,1
+	LD      (PRINTSYSTEM),A
+
+	LD      DE,MAINRAMIN
+	LD      C,PRINT
+	CALL    BDOS
+
+	LD      A,(MAINSLOT)
+	CALL    PRINTSLOT
+
+	LD      DE,CRLF
+	LD      C,PRINT
+	CALL    BDOS
+
+	RET
+
+; -----------------------------------------------------------------------
+; LOAD_HOME_PAGE - load the page INDEX.HTZ
+
+LOAD_HOME_PAGE:
+	; push old page into stack
+	CALL    PUSH_PAGE_IN_STACK
+
+	CALL    PREPARE_TO_LOAD
+
+	LD      HL,INDEX_HTZ
+	LD      DE,FCB+1
+	LD      BC,8
+	LDIR
+
+	; load the page
+	CALL    READ_HTZ_FILE
+
+	; render the page
+	JP      DRAW_PAGE_FROM_START
+
+; -----------------------------------------------------------------------
+; CUSTOM_LDIRMV - perform a LDIRMV (or LDIR if system has ADVRAM)
+
+CUSTOM_LDIRMV:
+	LD      IX,LDIRMV
+	JP      CALLBIOS
+
+CUSTOM_LDIRMV_ADVRAM:
+	PUSH    BC
+	LD      A,H
+	CP      0C0h
+	JR      NC,CUSTOM_LDIRMV_DIRECT
+	
+	LD      BC,04000h
+	AND     A
+	SBC     HL,BC
+	LD      BC,08000h
+	EX      DE,HL
+	ADD     HL,BC
+	EX      DE,HL
+	POP     BC
+	JP      SMART_LDIR
+
+CUSTOM_LDIRMV_DIRECT:
+	LD      BC,08000h
+	EX      DE,HL
+	ADD     HL,BC
+	EX      DE,HL
+	POP     BC
+	JP      SMART_LDIR
+
+CUSTOM_LDIRMV_END:
+
+; -----------------------------------------------------------------------
+; SMART_LDIR - perform a faster memcpy than LDIR, but C must 0 
+
+SMART_LDIR:
+	REPT    0100h
+	LDI
+	ENDM
+	JP      PE,SMART_LDIR
+	RET
+
+; -----------------------------------------------------------------------
+; ENABLE_ADVRAM - turn on ADVRAM and change memory layout
+
+ENABLE_ADVRAM:
+	LD      A,(ADVRAM)
+	AND     A
+	RET     Z
+
+	LD      A,0C0h
+	IN      A,(09AH)
+	XOR     A
+	OUT     (0FEh),A
+	LD      A,(EXPTBL)
+	LD      HL,08000h
+	CALL    ENASLT
+	LD      A,1
+	OUT     (0FDh),A
+	RET
+
+; -----------------------------------------------------------------------
+; DISABLE_ADVRAM - turn off ADVRAM and change memory layout
+
+DISABLE_ADVRAM:
+	LD      A,(ADVRAM)
+	AND     A
+	RET     Z
+
+	XOR     A
+	IN      A,(09AH)
+	LD      A,1
+	OUT     (0FEh),A
+	LD      A,(MAINSLOT)
+	LD      HL,08000h
+	CALL    ENASLT
+	LD      A,2
+	OUT     (0FDh),A
+	RET
+
+; -----------------------------------------------------------------------
+; LOAD_HELP_PAGE - load the page HELP.HTZ
+
+LOAD_HELP_PAGE:
+	; push old page into stack
+	CALL    PUSH_PAGE_IN_STACK
+
+	CALL    PREPARE_TO_LOAD
+
+	LD      HL,HELP_HTZ
+	LD      DE,FCB+1
+	LD      BC,8
+	LDIR
+
+	; load the page
+	CALL    READ_HTZ_FILE
+
+	; render the page
+	JP      DRAW_PAGE_FROM_START
+
+; -----------------------------------------------------------------------
+; BACK_PAGE - return to previous page in back buffer
+
+BACK_PAGE:
+	; return if there's no page in back buffer
+	LD      A,(BACK_INDEX)
+	AND     A
+	JP      Z,MAIN_LOOP
+
+	; prepare to pop the page
+	DEC     A
+	LD      (BACK_INDEX),A
+
+	; reset internal buffers
+	CALL    PREPARE_TO_LOAD
+
+	; copy the name of the page from back buffer
+	LD      HL,BACK_BUFFER
+	LD      DE,FCB+1
+	LD      BC,8
+	LDIR
+
+	; pop the page from stack
+	LD      DE,BACK_BUFFER
+	LD      BC,64-8
+	LDIR
+
+	; load the page
+	CALL    READ_HTZ_FILE
+
+	; render the page
+	JP      DRAW_PAGE_FROM_START
+
+; -----------------------------------------------------------------------
+; CURSOR_SPEED - change the cursor speed
+
+CURSOR_SPEED:
+	; wait until user release SELECT
+
+CHANGE_SPEED_WAIT:
+	; read line 7 [ ret slct bs stop tab esc f5 f4 ]
+	CUSTOM_SNSMAT   7
+
+	AND     64
+	JR      Z,CHANGE_SPEED_WAIT
+
+	; change the speed
+	LD      A,(CURSOR_STEP)
+	XOR     3
+	LD      (CURSOR_STEP),A
+
+	; return to main loop
+	JP      MAIN_LOOP
+
+; -----------------------------------------------------------------------
+; CHECK_BANK - check if the banks must be changed
+
+CHECK_BANK:
+	LD      A,(BIGFILE)
+	AND     A
+	RET     Z
+
+	LD      A,(END_SCREEN+1)
+	CP      078h
+	JP      C,CHECK_BANK_UP
+
+	LD      HL,(CURRENT_PAGE)
+	LD      BC,(FINAL_PAGE)
+	OR      A
+	SBC     HL,BC
+	RET     Z
+
+	LD      A,(HALF_PAGE)
+	AND     A
+	JR      NZ,CHECK_BANK_DOWN_HALF
+
+	LD      HL,(CURRENT_PAGE)
+	INC     HL
+	INC     HL
+	CALL    SET_BANK
+
+	LD      HL,06000h
+	LD      DE,04000h
+	LD      BC,02000h
+	LDIR
+
+	LD      HL,08000h
+	LD      DE,06000h
+	LD      BC,02000h
+	LDIR
+
+	LD      A,1
+	LD      (HALF_PAGE),A
+
+	LD      HL,(START_SCREEN)
+	LD      BC,02000h
+	OR      A
+	SBC     HL,BC
+	LD      (START_SCREEN),HL
+
+	LD      HL,(END_SCREEN)
+	SBC     HL,BC
+	LD      (END_SCREEN),HL
+
+	CALL    RESTORE_RAM
+
+	EI
+	RET
+
+CHECK_BANK_DOWN_HALF:
+	LD      HL,(CURRENT_PAGE)
+	INC     HL
+	INC     HL
+	CALL    SET_BANK
+	LD      (CURRENT_PAGE),HL
+
+	LD      HL,08000h
+	LD      DE,04000h
+	LD      BC,04000h
+	LDIR
+
+	XOR     A
+	LD      (HALF_PAGE),A
+
+	LD      HL,(START_SCREEN)
+	LD      BC,02000h
+	OR      A
+	SBC     HL,BC
+	LD      (START_SCREEN),HL
+
+	LD      HL,(END_SCREEN)
+	SBC     HL,BC
+	LD      (END_SCREEN),HL
+
+	CALL    RESTORE_RAM
+
+	EI
+	RET
+
+CHECK_BANK_UP:
+	LD      A,(START_SCREEN+1)
+	CP      048h
+	RET     NC
+
+	LD      A,(HALF_PAGE)
+	AND     A
+	JR      NZ,CHECK_BANK_UP_HALF
+
+	LD      HL,(CURRENT_PAGE)
+	LD      BC,MEMORY_PAGES
+	OR      A
+	SBC     HL,BC
+	RET     Z
+
+	LD      HL,(CURRENT_PAGE)
+	DEC     HL
+	DEC     HL
+	CALL    SET_BANK
+	LD      (CURRENT_PAGE),HL
+
+	LD      HL,04000h
+	LD      DE,06000h
+	LD      BC,02000h
+	LDIR
+
+	LD      HL,0A000h
+	LD      DE,04000h
+	LD      BC,02000h
+	LDIR
+
+	LD      A,1
+	LD      (HALF_PAGE),A
+
+	LD      HL,(START_SCREEN)
+	LD      BC,02000h
+	ADD     HL,BC
+	LD      (START_SCREEN),HL
+
+	LD      HL,(END_SCREEN)
+	ADD     HL,BC
+	LD      (END_SCREEN),HL
+
+	CALL    RESTORE_RAM
+
+	EI
+	RET
+
+CHECK_BANK_UP_HALF:        
+	LD      HL,(CURRENT_PAGE)
+	CALL    SET_BANK
+
+	LD      HL,08000h
+	LD      DE,04000h
+	LD      BC,04000h
+	LDIR
+
+	LD      A,0
+	LD      (HALF_PAGE),A
+
+	LD      HL,(START_SCREEN)
+	LD      BC,02000h
+	ADD     HL,BC
+	LD      (START_SCREEN),HL
+
+	LD      HL,(END_SCREEN)
+	ADD     HL,BC
+	LD      (END_SCREEN),HL
+
+	CALL    RESTORE_RAM
+
+	EI
+	RET
+
+; -----------------------------------------------------------------------
+; SET_BANK - set the memory bank pointed by HL
+
+SET_BANK:
+	LD      A,(BIGMEMORY)
+	AND     A
+	RET     Z
+
+	; set the correct slot
+	PUSH    HL
+	LD      A,(HL)
+	LD      HL,08000h
+	CALL    ENASLT
+	POP     HL
+
+	; set the correct mapper page
+	INC     HL
+	LD      A,(HL)
+	OUT     (0FEh),A
+	DEC     HL
+
+	RET
+
+; -----------------------------------------------------------------------
+; RESTORE_RAM - return the page 2 to main ram
+
+RESTORE_RAM:
+	; restore main ram
+	LD      A,(MAINSLOT)
+	LD      HL,08000h
+	CALL    ENASLT
+	LD      A,1
+	OUT     (0FEh),A
+
+	RET
+
+; -----------------------------------------------------------------------
+; READ_HTZ_FILE - read the HTZ file from disk
+
+READ_HTZ_FILE:
+
+	; open the file
+	LD      C,OPEN
+	LD      DE,FCB
+	CALL    BDOS
+	CP      0FFh
+	CALL    Z,ERROR2
+
+	; check if file is greater than 16kb
+	LD      A,(FCB+18)
+	LD      L,A
+	LD      A,(FCB+19)
+	OR      L
+	JP      NZ,GREATER_16KB
+	LD      DE,(FCB+16)
+	LD      HL,16384
+	SBC     HL,DE
+	JP      C,GREATER_16KB
+
+	; set the DTA in 4000h
+	LD      HL,1
+	LD      (FCBSIZE),HL
+	LD      DE,04000h
+	LD      C,SETDTA
+	CALL    BDOS
+
+	; read 16kb from the file
+	LD      C,RDBLK
+	LD      DE,FCB
+	LD      HL,16384
+	CALL    BDOS
+
+	XOR     A
+	LD      (BIGFILE),A
+
+READ_FILE_END:
+	; copy the dda value to final location
+	LD      HL,SCROLL_DDA_ORIG
+	LD      DE,SCROLL_DDA
+	LD      BC,4
+	LDIR
+
+	; close the file
+	LD      C,CLOSE
+	LD      DE,FCB
+	CALL    BDOS
+
+	; check for wrong version of fudebrowser
+	LD      A,(04000h)
+        CP      0FBh
+	JP      NZ,ERROR1
+
+	LD      A,(04001h)
+	CP      VERSION
+	JP      NZ,ERROR1
+
+	; turn off drive LED
+	LD      B,120
+	EI
+DRIVE_LED_LOOP:
+	PUSH    BC
+	CALL    HKEYI
+	POP     BC
+	DJNZ    DRIVE_LED_LOOP
+
+	RET
+
+; -----------------------------------------------------------------------
+
+GREATER_16KB:
+	; check for mapper or megaram
+	LD      A,(BIGMEMORY)
+	OR      A
+	JP      Z,ERROR_NOMEM
+
+	; save file size
+	LD      HL,(FCB+16)
+	LD      (FILE_SIZE),HL
+	LD      HL,(FCB+18)
+	LD      (FILE_SIZE+2),HL
+
+	; check if file is greater than free memory
+	LD      DE,(TOTAL_PAGES)
+	LD      BC,(FILE_SIZE)
+	LD      HL,0
+	SRL     D
+	RR      E
+	RR      H
+	SRL     D
+	RR      E
+	RR      H
+	SBC     HL,BC
+	EX      DE,HL
+	LD      BC,(FILE_SIZE+2)
+	SBC     HL,BC
+	JP      C,ERROR_NOMEM
+
+	; set the DTA in 8000h
+	LD      HL,1
+	LD      (FCBSIZE),HL
+	LD      DE,08000h
+	LD      C,SETDTA
+	CALL    BDOS
+
+	; begin at memory page 0
+	LD      HL,MEMORY_PAGES
+	LD      (CURRENT_PAGE),HL
+
+	LD      A,1
+	LD      (BIGFILE),A
+
+GREATER_16KB_LOOP:
+	; check if there are more than 16 kbytes still unread 
+	LD      A,(FILE_SIZE+2)
+	LD      L,A
+	LD      A,(FILE_SIZE+3)
+	OR      L
+	JR      NZ,READ_MORE_16KB
+
+	LD      HL,(FILE_SIZE)
+	LD      DE,16384
+	SBC     HL,DE
+	JR      NC,READ_MORE_16KB
+
+	; set proper memory bank
+	LD      HL,(CURRENT_PAGE)
+	CALL    SET_BANK
+	LD      (FINAL_PAGE),HL
+	XOR     A
+	LD      (HALF_PAGE),A
+
+	; read the final amount of bytes
+	LD      HL,(FILE_SIZE)
+	LD      C,RDBLK
+	LD      DE,FCB
+	CALL    BDOS
+
+	; set memory bank 1
+	LD      HL,MEMORY_PAGES
+	LD      (CURRENT_PAGE),HL
+	CALL    SET_BANK
+
+	; copy first bank
+	LD      HL,08000h
+	LD      DE,04000h
+	LD      BC,04000h
+	LDIR
+
+	CALL    RESTORE_RAM
+
+	JP      READ_FILE_END
+
+READ_MORE_16KB:
+	; set proper memory bank
+	LD      HL,(CURRENT_PAGE)
+	CALL    SET_BANK
+	INC     HL
+	INC     HL
+	LD      (CURRENT_PAGE),HL
+
+	; read 16kb from the file
+	LD      C,RDBLK
+	LD      DE,FCB
+	LD      HL,16384
+	CALL    BDOS
+
+	; reduce file size by 16kb
+	LD      HL,(FILE_SIZE)
+	LD      DE,16384
+	OR      A
+	SBC     HL,DE
+	LD      (FILE_SIZE),HL
+
+	LD      HL,(FILE_SIZE+2)
+	LD      DE,0
+	SBC     HL,DE
+	LD      (FILE_SIZE+2),HL
+
+	JP      GREATER_16KB_LOOP
+
+; -----------------------------------------------------------------------
+; CURSOR_ACTION - perform the action selected by the cursor
+
+CURSOR_ACTION:
+
+	; check if the cursor in over a link
+	LD      A,(LINK_UNDER)
+	AND     A
+	JP      NZ,LOAD_NEW_PAGE
+
+	; load the scroll bar position
+	LD      A,(SCROLL_BAR+3)
+	LD      B,A
+
+	; check if the cursor is in scroll bar
+	LD      A,(CURSOR_X)
+	CP      256-8
+	JP      C,MAIN_LOOP
+
+	; check if cursor is in top arrow
+	LD      A,(CURSOR_Y)
+	CP      8
+	JP      C,SCROLL_UP
+
+	; check if cursor is in bottom arrow
+	CP      192-8
+	JP      NC,SCROLL_DOWN
+
+	; check for page up
+	CP      B
+	JP      C,SCROLL_PGUP
+
+	; check for page down
+	SUB     8
+	CP      B
+	JP      NC,SCROLL_PGDOWN
+
+	JP      MAIN_LOOP
+
+; -----------------------------------------------------------------------
+; PREPARE_TO_LOAD - clear internal buffers, preparing to load a new page
+
+PREPARE_TO_LOAD:
+	; clear keyboard buffer
+	LD      HL,(GETPNT)
+	LD      (PUTPNT),HL
+
+	; restore BIOS interrupt
+	DI
+	LD      A,(SAVE_IRQ)
+	LD      (038h),A
+	LD      HL,(SAVE_IRQ+1)
+	LD      (039h),HL
+	EI
+
+	; clear the FCB
+
+	LD      HL,FCB+1
+	LD      DE,FCB+2
+	LD      A,32
+	LD      (HL),A
+	LD      BC,7
+	LDIR
+
+	LD      HL,FCB_FILLER_START
+	LD      DE,FCB_FILLER_START+1
+	XOR     A
+	LD      (HL),A
+	LD      BC,FCB_FILLER_END-FCB_FILLER_START
+	LDIR
+
+	RET
+
+; -----------------------------------------------------------------------
+; PUSH_PAGE_IN_STACK - push the old page into stack
+
+PUSH_PAGE_IN_STACK:
+
+	LD      HL,BACK_BUFFER+63-8
+	LD      DE,BACK_BUFFER+63
+	LD      BC,64-8
+	LDDR
+
+	LD      A,(BACK_INDEX)
+	INC     A
+	CP      9
+	JR      NZ,PUSH_PAGE
+
+	LD      A,8
+
+PUSH_PAGE:
+	LD      (BACK_INDEX),A
+
+	LD      HL,FCB+1
+	LD      DE,BACK_BUFFER
+	LD      BC,8
+	LDIR
+
+	RET
+
+; -----------------------------------------------------------------------
+; LOAD_NEW_PAGE - load a new page pointed by the cursor
+
+LOAD_NEW_PAGE:
+
+	; push old page into stack
+	CALL    PUSH_PAGE_IN_STACK
+
+	; init internal buffers
+	CALL    PREPARE_TO_LOAD
+
+	; find the name of the link
+	; B = 0 at this point due to last LDIR in PREPARE_TO_LOAD
+	LD      A,(LINK_UNDER)
+	LD      HL,START_LINK
+
+LOAD_NEW_PAGE_LOOP:
+	DEC     A
+	JR      Z,LOAD_NEW_PAGE_FOUND
+
+	LD      C,(HL)
+	SCF
+	ADC     HL,BC
+	JR      LOAD_NEW_PAGE_LOOP
+
+LOAD_NEW_PAGE_FOUND:
+
+	; check if file name has more than 8 chars
+	LD      A,(HL)
+	CP      8
+	JR      C,LOAD_NEW_PAGE_OK
+
+	LD      A,8
+
+LOAD_NEW_PAGE_OK:
+	; copy file name to FCB
+	; B still equals 0 at this point
+	LD      C,A
+	LD      DE,FCB+1
+	INC     HL
+	LDIR
+
+	CALL    READ_HTZ_FILE
+
+	JP      DRAW_PAGE_FROM_START
+
+; -----------------------------------------------------------------------
+; CHANGE_CURSOR - move the cursor to new position
+; this function should also check if the cursor must change the shape
+
+CHANGE_CURSOR:
+	; init the sprite attributes
+	LD      HL,SPRITE_ATTR        
+	LD      DE,CURSOR_POS
+	LD      BC,8
+	LDIR
+
+	; retrieve the offset information from lower bits of Y coord
+	LD      HL,(SCROLLBUF)
+	LD      A,(CURSOR_Y)
+	RLCA        
+	RLCA
+	LD      B,A                     
+	AND     0E0h
+	ADD     A,(HL)
+	LD      L,A
+
+	; retrieve the "third" information of Y coord
+	LD      A,B                    
+	AND     3                      
+	ADD     A,HIGH (LINKBUFFER)    
+	LD      H,A                    
+	
+	; adjust the horizontal offset from X coord
+	LD      A,(CURSOR_X)
+	RRCA
+	RRCA
+	RRCA
+	AND     01Fh
+	ADD     A,L                    
+	LD      L,A                    
+
+	; check if the position has a link
+	LD      A,(HL)
+	LD      (LINK_UNDER),A
+	AND     A
+	JR      Z,CHANGE_CURSOR_ARROW
+
+	; change cursor shape to a "hand"
+	LD      A,8
+	LD      (CURSOR_POS+2),A
+	INC     A
+	LD      (CURSOR_POS+2+4),A
+
+CHANGE_CURSOR_ARROW:
+	; evaluate Y position of mouse pointer
+	LD      A,(CURSOR_Y)
+	DEC     A
+	LD      (CURSOR_POS),A
+	LD      (CURSOR_POS+4),A
+	
+	; evaluate X position of mouse pointer
+	LD      A,(CURSOR_X)
+	LD      (CURSOR_POS+1),A
+	LD      (CURSOR_POS+1+4),A
+
+	; draw the mouse pointer
+	LD      HL,CURSOR_POS
+	LD      DE,01B00h
+	LD      BC,2*4
+	LD      IX,LDIRMV
+	CALL    CALLBIOS
+
+	XOR     A
+	LD      (CURSOR_MOVED),A
+	RET
+
+; -----------------------------------------------------------------------
+
+EXIT_NOW:
+	; exit the program
+
+	; clear keyboard buffer
+	LD      HL,(GETPNT)
+	LD      (PUTPNT),HL
+
+	; restore BIOS interrupt
+	DI
+	LD      A,(SAVE_IRQ)
+	LD      (038h),A
+	LD      HL,(SAVE_IRQ+1)
+	LD      (039h),HL
+	EI
+	
+	; return page 2 to previous owner
+	;LD      A,(MAINSLOT)        
+	;LD      HL,08000h
+	;CALL    ENASLT
+
+	; return to text mode
+	LD      IX,TOTEXT
+	CALL    CALLBIOS
+
+	; print final message
+	LD      C,PRINT
+	LD      DE,MSG0
+	CALL    BDOS
+	LD      C,PRINT
+	LD      DE,MSG8
+	CALL    BDOS
+
+	; return to dos
+	JP      0
+
+; -----------------------------------------------------------------------
+; MY_IRQ_HANDLER - small irq handler
+
+MY_IRQ_HANDLER:
+	PUSH    AF
+	PUSH    HL
+	IN      A,(099h)
+
+	LD      A,(CURSOR_STEP)
+	LD      L,A
+
+	; check for GRAPH key
+	LD      A,(KEYLINE_6)
+	AND     4
+	JP      NZ,HANDLER_JOYSTICK
+
+	; check for cursor right
+	LD      A,(KEYLINE_8)
+	AND     128
+	CALL    Z,CURSOR_RIGHT
+
+	; check for cursor left
+	LD      A,(KEYLINE_8)
+	AND     16
+	CALL    Z,CURSOR_LEFT
+
+	; check for cursor up
+	LD      A,(KEYLINE_8)
+	AND     32
+	CALL    Z,CURSOR_UP
+
+	; check for cursor down
+	LD      A,(KEYLINE_8)
+	AND     64
+	CALL    Z,CURSOR_DOWN
+
+HANDLER_JOYSTICK:
+	; check for cursor right
+	LD      A,(JOYLINE)
+	AND     8
+	CALL    Z,CURSOR_RIGHT
+
+	; check for cursor left
+	LD      A,(JOYLINE)
+	AND     4
+	CALL    Z,CURSOR_LEFT
+
+	; check for cursor up
+	LD      A,(JOYLINE)
+	AND     1
+	CALL    Z,CURSOR_UP
+
+	; check for cursor down
+	LD      A,(JOYLINE)
+	AND     2
+	CALL    Z,CURSOR_DOWN
+
+MY_IRQ_HANDLER_EXIT:
+	POP     HL
+	POP     AF
+	EI
+	RET
+
+CURSOR_RIGHT:
+	LD      A,(CURSOR_X)
+	CP      254
+	RET     NC
+	ADD     A,L
+	LD      (CURSOR_X),A
+	LD      A,1
+	LD      (CURSOR_MOVED),A
+	RET
+
+CURSOR_LEFT:
+	LD      A,(CURSOR_X)
+	CP      2
+	RET     C
+	SUB     L
+	LD      (CURSOR_X),A
+	LD      A,1
+	LD      (CURSOR_MOVED),A
+	RET
+
+CURSOR_UP:
+	LD      A,(CURSOR_Y)
+	CP      2
+	RET     C
+	SUB     L
+	LD      (CURSOR_Y),A
+	LD      A,1
+	LD      (CURSOR_MOVED),A
+	RET
+
+CURSOR_DOWN:
+	LD      A,(CURSOR_Y)
+	CP      190
+	RET     NC
+	ADD     A,L
+	LD      (CURSOR_Y),A
+	LD      A,1
+	LD      (CURSOR_MOVED),A
+	RET
+
+; -----------------------------------------------------------------------
+; INIT_START_TEXT - skip the links and find the start of the text
+; return: HL = start of text
+
+INIT_START_TEXT:
+	LD      HL,START_LINK
+	LD      B,0
+
+INIT_START_LOOP:
+	LD      A,(HL)
+	AND     A
+	JR      Z,INIT_START_EXIT
+
+	INC     HL
+	LD      C,A   
+	ADD     HL,BC 
+
+	JP      INIT_START_LOOP
+
+INIT_START_EXIT:
+	INC     HL
+	LD      (START_TEXT),HL
+	RET
+
+; -----------------------------------------------------------------------
+; CHANGE_BORDER - change the border color
+
+CHANGE_BORDER:
+	LD      A,(BORDER_COLOR)
+	INC     A
+	AND     0Fh
+	LD      (BORDER_COLOR),A
+	LD      (BDRCLR),A
+	CALL    CHANGE_COLOR_PORTABLE
+
+	; wait until user release the stop key
+
+CHANGE_BORDER_WAIT:
+	; read line 7 [ ret slct bs stop tab esc f5 f4 ]
+	CUSTOM_SNSMAT   7
+
+	AND     16
+	JR      Z,CHANGE_BORDER_WAIT
+
+	JP      MAIN_LOOP       
+
+; -----------------------------------------------------------------------
+; SETUP_SCROLLBUF - initialize the scrollbuf lookup table
+
+SETUP_SCROLLBUF:
+	LD      BC,0
+	LD      HL,SCROLLBUF_TABLE
+SETUP_SCROLLBUF_LOOP:
+	LD      (HL),C
+	INC     HL
+	INC     BC
+	LD      A,B
+	CP      2
+	JR      NZ,SETUP_SCROLLBUF_LOOP
+	RET
+
+; -----------------------------------------------------------------------
+
+SCROLL_DOWN:
+	; check if GRAPH is pressed
+	LD      A,(KEYLINE_6)
+	AND     4
+	JP      Z,MAIN_LOOP
+	
+	; check if SHIFT is pressed
+	LD      A,(KEYLINE_6)
+	AND     1
+	JP      Z,SCROLL_PGDOWN
+
+	; update the cursor pointer
+	LD      A,1
+	LD      (CURSOR_MOVED),A
+	
+	; check for the end of document
+	LD      HL,(END_SCREEN)
+	INC     HL
+	LD      A,(HL)
+	CP      255
+	JP      Z,MAIN_LOOP
+
+	; evaluate offset into video buffer
+	LD      A,(SCROLLBUF)
+	BIG_SHIFT       H,L,3
+	LD      (WORDOFFSET),HL
+
+	; update the scroll buffer
+	LD      A,(SCROLLBUF)
+	ADD     A,32
+	LD      (SCROLLBUF),A
+
+	; copy one line from second "third" to first
+	LD      HL,(WORDOFFSET)
+	COPY_LINE 08800h,08000h
+
+	; copy one line from third "third" to second
+	LD      HL,(WORDOFFSET)
+	COPY_LINE 09000h,08800h
+
+	; render a new line
+	LD      DE,(WORDOFFSET)
+	LD      A,D
+	ADD     A,090h
+	LD      D,A
+	LD      HL,(END_SCREEN)
+	CALL    RENDER_LINE
+	
+	; update the screen
+	CALL    SCROLL_ONE_DOWN
+	CALL    UPDATE_SCROLL_BAR
+
+	CALL    ENABLE_ADVRAM
+
+	; blit the first "third"
+	LD      HL,(SCROLLBUF)
+	LD      DE,1800h
+	LD      BC,256
+	CALL    CUSTOM_LDIRMV
+
+	; blit this line to screen
+	LD      HL,(WORDOFFSET)
+	BLIT_LINE 08000h,0     
+
+	; blit the second "third"
+	LD      HL,(SCROLLBUF)
+	LD      DE,1900h
+	LD      BC,256
+	CALL    CUSTOM_LDIRMV
+	
+	; blit this line to screen
+	LD      HL,(WORDOFFSET)
+	BLIT_LINE 08800h,0800h
+
+	; blit the third "third"
+	LD      HL,(SCROLLBUF)
+	LD      DE,1A00h
+	LD      BC,256
+	CALL    CUSTOM_LDIRMV
+	
+	; blit this line to screen
+	LD      HL,(WORDOFFSET)
+	BLIT_LINE 09000H,01000h
+
+	CALL    DISABLE_ADVRAM
+
+	JP      MAIN_LOOP
+
+; -----------------------------------------------------------------------
+; EVAL_LINE_OFFSET - perform the compansion of size id
+; enter C=companded size id
+; exit  BC=total size in bytes
+
+EVAL_LINE_OFFSET:
+	LD      A,C
+	CP      64
+	JP      C,EVAL_LINE_64
+
+	CP      128
+	JP      C,EVAL_LINE_128
+
+	SUB     ((128*4-64-64*2)/4) 
+	BIG_SHIFT       B,C,2
+	RET
+
+EVAL_LINE_128:
+	SUB     ((64*2-64)/2)
+	LD      C,A
+	XOR     A
+	SLA     C
+	RLA
+	LD      B,A
+	RET
+
+EVAL_LINE_64:
+	LD      B,0
+	RET
+
+; -----------------------------------------------------------------------
+; DRAW_ENTIRE_SCREEN - draw the entire screen
+
+DRAW_ENTIRE_SCREEN:
+	LD      B,24
+	LD      HL,(START_SCREEN)
+	LD      DE,08000h
+DRAW_ENTIRE_LOOP:
+	INC     HL
+	LD      A,(HL)
+	DEC     HL
+	CP      255
+	JR      Z,DRAW_ENTIRE_BLANK
+	PUSH    BC
+	PUSH    DE
+	CALL    RENDER_LINE
+	POP     DE
+	POP     BC
+	INC     D
+	DJNZ    DRAW_ENTIRE_LOOP
+	RET
+
+DRAW_ENTIRE_BLANK:
+	PUSH    BC
+	CALL    CLEAR_LINE_BUFFER
+	POP     BC
+	INC     D
+	DJNZ    DRAW_ENTIRE_LOOP
+	RET
+
+; -----------------------------------------------------------------------
+
+SCROLL_UP:
+	; check if GRAPH is pressed
+	LD      A,(KEYLINE_6)
+	AND     4
+	JP      Z,MAIN_LOOP
+	
+	; check if CONTROL is pressed
+	LD      A,(KEYLINE_6)
+	AND     2
+	JP      Z,SCROLL_HOME
+
+	; check if SHIFT is pressed
+	LD      A,(KEYLINE_6)
+	AND     1
+	JP      Z,SCROLL_PGUP
+
+	; update the cursor pointer
+	LD      A,1
+	LD      (CURSOR_MOVED),A
+	
+	; check for the beginning of the document
+	LD      HL,(START_SCREEN)
+	LD      A,(HL)
+	CP      255
+	JP      Z,MAIN_LOOP
+
+	; update the scroll buffer 
+	LD      A,(SCROLLBUF)
+	SUB     32
+	LD      (SCROLLBUF),A
+
+	; evaluate the offset
+	LD      A,(SCROLLBUF)
+	BIG_SHIFT       H,L,3
+	LD      (WORDOFFSET),HL
+
+	; copy one line from second "third" to third
+	LD      HL,(WORDOFFSET)
+	COPY_LINE 08800h,09000h
+
+	; copy one line from first "third" to second
+	LD      HL,(WORDOFFSET)
+	COPY_LINE 08000h,08800h
+
+	; update the start of screen
+	CALL    SCROLL_ONE_UP
+	CALL    UPDATE_SCROLL_BAR
+	LD      HL,(START_SCREEN)
+
+	; render a new line
+	LD      DE,(WORDOFFSET)
+	SET     7,D
+	CALL    RENDER_LINE
+
+	CALL    ENABLE_ADVRAM
+
+	; blit the first "third"
+	LD      HL,(SCROLLBUF)
+	LD      DE,1800h
+	LD      BC,256
+	CALL    CUSTOM_LDIRMV
+
+	; blit this line to first "third"
+	LD      HL,(WORDOFFSET)
+	BLIT_LINE 08000h,0
+
+	; blit the second "third"
+	LD      HL,(SCROLLBUF)
+	LD      DE,1900h
+	LD      BC,256
+	CALL    CUSTOM_LDIRMV
+
+	; blit this line to second "third"
+	LD      HL,(WORDOFFSET)
+	BLIT_LINE 08800H,0800h
+
+	; blit the third "third"
+	LD      HL,(SCROLLBUF)
+	LD      DE,1A00h
+	LD      BC,256
+	CALL    CUSTOM_LDIRMV
+
+	; blit this line to third "third"
+	LD      HL,(WORDOFFSET)
+	BLIT_LINE 09000h,01000h
+
+	CALL    DISABLE_ADVRAM
+
+	JP      MAIN_LOOP
+
+; -----------------------------------------------------------------------
+; SCROLL_HOME - go to top of document 
+
+SCROLL_HOME:
+	
+	; update the cursor pointer
+	LD      A,1
+	LD      (CURSOR_MOVED),A
+	
+	; load the first page
+	LD      A,(BIGFILE)
+	AND     A
+	JR      Z,SCROLL_HOME_16KB
+	
+	LD      HL,MEMORY_PAGES
+	LD      (CURRENT_PAGE),HL
+	CALL    SET_BANK
+	LD      HL,08000h
+	LD      DE,04000h
+	LD      BC,04000h
+	LDIR
+	CALL    RESTORE_RAM
+	XOR     A
+	LD      (HALF_PAGE),A
+
+SCROLL_HOME_16KB:
+	; init the offset tables
+	XOR     A
+	LD      (SCROLLBUF),A
+	LD      HL,(TOP_START)
+	LD      (START_SCREEN),HL
+	LD      HL,(TOP_END)
+	LD      (END_SCREEN),HL
+	
+	; draw the entire screen
+	CALL    DRAW_ENTIRE_SCREEN
+
+	CALL    ENABLE_ADVRAM
+
+	; blit the name table
+	IRP     I,<0,1,2>
+	LD      HL,(SCROLLBUF)
+	LD      DE,01800h+I*256
+	LD      BC,256
+	CALL    CUSTOM_LDIRMV
+	ENDM
+	
+	; blit the pattern
+	LD      HL,08000h
+	LD      DE,0
+	LD      BC,32*24*8
+	CALL    CUSTOM_LDIRMV
+
+	; blit the color
+	LD      HL,09800h
+	LD      DE,02000h
+	LD      BC,32*24*8
+	CALL    CUSTOM_LDIRMV
+
+	CALL    DISABLE_ADVRAM
+
+	; update the scroll bar
+	LD      HL,INIT_SCROLL_BAR
+	LD      DE,SCROLL_BAR
+	LD      BC,4
+	LDIR
+	CALL    UPDATE_SCROLL_BAR
+							       
+	JP      MAIN_LOOP
+
+; -----------------------------------------------------------------------
+; SCROLL_ONE_UP - scroll one line up
+
+SCROLL_ONE_UP:
+	LD      HL,(START_SCREEN)
+	LD      A,(HL)
+	CP      255
+	RET     Z
+
+	PUSH    BC
+
+	CALL    CHECK_BANK
+	LD      HL,(START_SCREEN)
+
+	; update the START_SCREEN
+	LD      C,(HL)
+	CALL    EVAL_LINE_OFFSET
+	OR      A
+	SBC     HL,BC
+	DEC     HL
+	DEC     HL
+	LD      (START_SCREEN),HL
+
+	; update the END_SCREEN
+	LD      HL,(END_SCREEN)
+	LD      C,(HL)
+	CALL    EVAL_LINE_OFFSET
+	OR      A
+	SBC     HL,BC
+	DEC     HL
+	DEC     HL
+	LD      (END_SCREEN),HL
+
+	; update the scroll bar
+	LD      HL,(SCROLL_BAR)
+	LD      DE,(SCROLL_DDA)
+	OR      A
+	SBC     HL,DE
+	LD      (SCROLL_BAR),HL
+	LD      HL,(SCROLL_BAR+2)
+	LD      DE,(SCROLL_DDA+2)
+	SBC     HL,DE
+	LD      (SCROLL_BAR+2),HL
+
+	POP     BC
+	RET
+
+; -----------------------------------------------------------------------
+; SCROLL_ONE_DOWN - scroll one line down
+
+SCROLL_ONE_DOWN:
+	LD      HL,(END_SCREEN)
+	INC     HL
+	LD      A,(HL)
+	DEC     HL
+	CP      255
+	RET     Z
+
+	PUSH    BC
+
+	CALL    CHECK_BANK
+	LD      HL,(END_SCREEN)
+
+	; update the END_SCREEN
+	INC     HL
+	LD      C,(HL)
+	INC     HL
+	CALL    EVAL_LINE_OFFSET
+	ADD     HL,BC
+	LD      (END_SCREEN),HL
+
+	; update the START_SCREEN
+	LD      HL,(START_SCREEN)
+	INC     HL
+	LD      C,(HL)
+	INC     HL
+	CALL    EVAL_LINE_OFFSET
+	ADD     HL,BC
+	LD      (START_SCREEN),HL
+
+	; update the scroll bar
+	LD      HL,(SCROLL_BAR)
+	LD      DE,(SCROLL_DDA)
+	ADD     HL,DE
+	LD      (SCROLL_BAR),HL
+	LD      HL,(SCROLL_BAR+2)
+	LD      DE,(SCROLL_DDA+2)
+	ADC     HL,DE
+	LD      (SCROLL_BAR+2),HL
+
+	POP     BC
+	RET
+
+; -----------------------------------------------------------------------
+; SCROLL_PGUP - scroll the page 23 lines up
+
+SCROLL_PGUP:
+	
+	; update the cursor pointer
+	LD      A,1
+	LD      (CURSOR_MOVED),A
+	
+	; init the offset tables
+	XOR     A
+	LD      (SCROLLBUF),A
+	
+	; scroll 23 lines up
+	LD      B,23
+SCROLL_PGUP_LOOP:
+	CALL    SCROLL_ONE_UP
+	DJNZ    SCROLL_PGUP_LOOP
+
+	; draw the entire screen
+	CALL    DRAW_ENTIRE_SCREEN
+
+	CALL    ENABLE_ADVRAM
+
+	; blit the name table
+	IRP     I,<0,1,2>
+	LD      HL,(SCROLLBUF)
+	LD      DE,01800h+I*256
+	LD      BC,256
+	CALL    CUSTOM_LDIRMV
+	ENDM
+	
+	; blit the pattern
+	LD      HL,08000h
+	LD      DE,0
+	LD      BC,32*24*8
+	CALL    CUSTOM_LDIRMV
+
+	; blit the color
+	LD      HL,09800h
+	LD      DE,02000h
+	LD      BC,32*24*8
+	CALL    CUSTOM_LDIRMV
+
+	CALL    DISABLE_ADVRAM
+
+	; update the scroll bar
+	CALL    UPDATE_SCROLL_BAR
+
+	JP      MAIN_LOOP
+
+; -----------------------------------------------------------------------
+; SCROLL_PGDOWN - scroll the page 23 lines down
+
+SCROLL_PGDOWN:
+	
+	; update the cursor pointer
+	LD      A,1
+	LD      (CURSOR_MOVED),A
+	
+	; init the offset tables
+	XOR     A
+	LD      (SCROLLBUF),A
+	
+	; scroll 23 lines down
+	LD      B,23
+SCROLL_PGDOWN_LOOP:
+	CALL    SCROLL_ONE_DOWN
+	DJNZ    SCROLL_PGDOWN_LOOP
+
+	; draw the entire screen
+	CALL    DRAW_ENTIRE_SCREEN
+
+	CALL    ENABLE_ADVRAM
+
+	; blit the name table
+	IRP     I,<0,1,2>
+	LD      HL,(SCROLLBUF)
+	LD      DE,01800h+I*256
+	LD      BC,256
+	CALL    CUSTOM_LDIRMV
+	ENDM
+	
+	; blit the pattern
+	LD      HL,08000h
+	LD      DE,0
+	LD      BC,32*24*8
+	CALL    CUSTOM_LDIRMV
+
+	; blit the color
+	LD      HL,09800h
+	LD      DE,02000h
+	LD      BC,32*24*8
+	CALL    CUSTOM_LDIRMV
+
+	CALL    DISABLE_ADVRAM
+
+	; update the scroll bar
+	CALL    UPDATE_SCROLL_BAR
+
+	JP      MAIN_LOOP
+
+; -----------------------------------------------------------------------
+; UPDATE_SCROLL_BAR - draw the scroll bar at correct position
+
+UPDATE_SCROLL_BAR:
+	LD      HL,SCROLL_BAR+3
+	LD      DE,01B08h
+	LD      BC,1
+	LD      IX,LDIRMV
+	CALL    CALLBIOS
+	LD      HL,SCROLL_BAR+3
+	LD      DE,01B0Ch
+	LD      BC,1    
+	LD      IX,LDIRMV
+	CALL    CALLBIOS
+	RET
+
+; -----------------------------------------------------------------------
+; CLEAR_LINE_BUFFER - clear the line buffer
+; enter: DE=line buffer position
+; HL and DE are preserved
+
+CLEAR_LINE_BUFFER:
+	PUSH    HL
+	LD      HL,CLEAR_BUFFER
+	LD      BC,0100h
+	LDIR
+	LD      A,D
+	ADD     A,017h
+	LD      D,A
+	LD      B,01h
+	LDIR
+	SUB     018h
+	LD      D,A
+	POP     HL
+	RET
+
+; -----------------------------------------------------------------------
+; CLEAR_LINK_BUFFER - evaluate the link offset and clear the link buffer
+; enter: DE=line buffer position
+; exit:  IY=link buffer position
+; HL and DE are preserved
+
+CLEAR_LINK_BUFFER:
+	PUSH    DE
+	LD      A,D
+	AND     03Fh
+	RRCA
+	RRCA
+	RRCA
+	LD      D,A
+	AND     0E0h
+	LD      E,A
+	XOR     D
+	ADD     A,HIGH (LINKBUFFER)
+	LD      D,A
+
+	PUSH    DE
+	LD      B,32
+	XOR     A
+CLEAR_LINK_LOOP:
+	LD      (DE),A
+	INC     E
+	DJNZ    CLEAR_LINK_LOOP
+	POP     IY
+	POP     DE
+	RET
+
+; -----------------------------------------------------------------------
+; RENDER_LINE - render a single line 
+; enter: HL=address of text
+;        DE=address of video buffer
+
+RENDER_LINE:
+	LD      (THIS_LINE_ADDR),HL
+
+	; clear the link buffer
+	CALL    CLEAR_LINK_BUFFER
+
+	; clear the line buffer
+	CALL    CLEAR_LINE_BUFFER
+
+	; retrieve the size of the line        
+	INC     HL
+	LD      C,(HL)
+	INC     HL
+	CALL    EVAL_LINE_OFFSET
+
+	; check if the line is empty
+	LD      A,C
+	OR      B
+	RET     Z
+
+	; initialize the variables
+	LD      IX,FONT_NORMAL
+	LD      (CURRENT_FONT),IX
+	LD      (BASE_FONT),IX
+
+	LD      A,HIGH (CHAR_6X8_TABLE)
+	LD      (CURRENT_TABLE),A
+	
+	LD      A,8
+	LD      (REMAINING),A
+
+	LD      A,(COLOR_TEXT)
+	LD      (COLOR_CODE),A
+	LD      A,(COLOR_TEXT_UND)
+	LD      (COLOR_UNDER),A
+	
+	XOR     A
+	LD      (DO_UNDERLINE),A
+	LD      (ACTUAL_LINK),A
+	LD      (LARGE_FONT),A
+	LD      (ITALIC),A
+	LD      (STATE),A
+
+RENDER_LINE_LOOP:
+	LD      A,(HL)
+	RRCA
+	RRCA
+	RRCA
+	RRCA
+	AND     0Fh
+	CALL    DECODE_NIBBLE
+	LD      A,(HL)
+	AND     0Fh
+	CALL    DECODE_NIBBLE
+	INC     HL
+	DEC     BC
+	LD      A,B
+	OR      C
+	JP      NZ,RENDER_LINE_LOOP
+
+	LD      HL,(THIS_LINE_ADDR)
+	INC     HL
+	LD      C,(HL)
+	INC     HL
+	CALL    EVAL_LINE_OFFSET
+	ADD     HL,BC
+	RET
+
+; -----------------------------------------------------------------------
+; DECODE_NIBBLE - decode a single nibble of code
+; enter: A=nibble (high nibble must be 0)
+
+DECODE_NIBBLE:
+	PUSH    BC
+	PUSH    HL
+
+	EX      AF,AF'
+	LD      A,(STATE)
+	AND     A
+	JP      Z,DECODE_STATE_0
+	DEC     A 
+	JP      Z,DECODE_STATE_1
+	DEC     A 
+	JP      Z,DECODE_STATE_2
+	DEC     A 
+	JP      Z,DECODE_STATE_3
+	DEC     A 
+	JP      Z,DECODE_STATE_4
+	DEC     A 
+	JP      Z,DECODE_STATE_5
+	DEC     A 
+	JP      Z,DECODE_STATE_6
+	DEC     A 
+	JP      Z,DECODE_STATE_7
+	DEC     A 
+	JP      Z,DECODE_STATE_8
+	DEC     A 
+	JP      Z,DECODE_STATE_9
+
+DECODE_NIBBLE_RET:
+	POP     HL
+	POP     BC
+	RET
+
+DECODE_STATE_0:
+	EX      AF,AF'
+	CP      8
+	JP      C,DECODE_NIBBLE_ENCODED
+		
+	LD      L,A
+	LD      H,HIGH (HIST_BUFFER)
+	LD      A,(HL)
+	CALL    RENDER_CHAR
+	JP      DECODE_NIBBLE_RET
+
+DECODE_NIBBLE_ENCODED:
+	CP      2
+	JP      C,DECODE_NIBBLE_EXTENDED
+	
+	LD      (UPPER_CHAR),A        
+	LD      A,1
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_NIBBLE_EXTENDED:
+	CP      0
+	JP      Z,DECODE_NIBBLE_RET
+
+	; at this point A=1
+	INC     A
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_STATE_1:
+DECODE_STATE_3:
+	EX      AF,AF'
+	LD      B,A
+	LD      A,(UPPER_CHAR)
+	RLCA
+	RLCA
+	RLCA
+	RLCA
+	OR      B
+	CALL    RENDER_CHAR
+	XOR     A
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_STATE_2:
+	EX      AF,AF'
+	CP      2
+	JP      C,DECODE_STATE_2_START
+
+	CP      2
+	JP      Z,DECODE_STATE_2_FORMATTING
+	CP      3
+	JP      Z,DRAW_HR
+	CP      4
+	JP      Z,DRAW_ALIGN
+	CP      5
+	JP      Z,DECODE_5_OFFSET
+	CP      6
+	JP      Z,DECODE_5_GRAPHICS
+
+	CP      9
+	JP      C,DECODE_NIBBLE_RET
+
+DECODE_STATE_2_START:
+	LD      (UPPER_CHAR),A
+	LD      A,3
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_STATE_2_FORMATTING:
+	LD      A,4
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_STATE_4:
+	EX      AF,AF'
+	CP      0
+	JP      Z,DECODE_STATE_4_UNDER
+	CP      1
+	JP      Z,DECODE_STATE_4_NOUNDER
+	CP      2
+	JP      Z,DECODE_4_LINK
+	CP      3
+	JP      Z,DECODE_4_NORMAL
+	CP      4
+	JP      Z,DECODE_4_BOLD
+	CP      5
+	JP      Z,DECODE_4_NOBOLD
+	CP      6
+	JP      Z,DECODE_4_CODE
+	CP      7
+	JP      Z,DECODE_4_NOCODE
+	CP      8
+	JP      Z,DECODE_4_LARGE
+	CP      9
+	JP      Z,DECODE_4_NOLARGE
+	CP      0Ah
+	JP      Z,DECODE_4_ITALIC
+	CP      0Bh
+	JP      Z,DECODE_4_NOITALIC
+	CP      0Eh
+	JP      Z,DECODE_4_UPPERLARGE
+	CP      0Fh
+	JP      Z,DECODE_4_COLOR
+
+	XOR     A
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_STATE_4_UNDER:
+	LD      A,255
+	LD      (DO_UNDERLINE),A
+	XOR     A
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_4_ITALIC:
+	LD      A,1
+	LD      (ITALIC),A
+	XOR     A
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_4_NOITALIC:
+	XOR     A
+	LD      (ITALIC),A
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_4_LARGE:
+	LD      A,(LARGE_FONT)
+	OR      1
+	LD      (LARGE_FONT),A
+	XOR     A
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_4_NOLARGE:
+	LD      A,(LARGE_FONT)
+	AND     0FEh
+	LD      (LARGE_FONT),A
+	XOR     A
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_4_UPPERLARGE:
+	LD      A,(LARGE_FONT)
+	OR      2
+	LD      (LARGE_FONT),A
+	XOR     A
+	LD      (STATE),A
+
+	LD      HL,(THIS_LINE_ADDR)
+	INC     HL
+	LD      C,(HL)
+	CALL    EVAL_LINE_OFFSET
+	ADD     HL,BC
+	INC     HL
+	INC     HL
+	POP     BC
+	POP     BC
+	LD      C,(HL)
+	CALL    EVAL_LINE_OFFSET
+	INC     BC      
+	PUSH    BC
+	PUSH    HL
+
+	JP      DECODE_NIBBLE_RET
+
+DECODE_4_BOLD:
+	XOR     A
+	LD      (STATE),A
+	LD      HL,FONT_BOLD
+	LD      (BASE_FONT),HL
+	LD      (CURRENT_FONT),HL
+	LD      A,HIGH (CHAR_8X8_TABLE)
+	LD      (CURRENT_TABLE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_4_CODE:
+	XOR     A
+	LD      (STATE),A
+	LD      HL,FONT_CODE
+	LD      (BASE_FONT),HL
+	LD      (CURRENT_FONT),HL
+	LD      A,HIGH (CHAR_CODE_TABLE)
+	LD      (CURRENT_TABLE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_4_COLOR:
+	LD      A,7
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_STATE_4_NOUNDER:
+	XOR     A
+	LD      (DO_UNDERLINE),A
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_4_NOBOLD:
+DECODE_4_NOCODE:
+	XOR     A
+	LD      (STATE),A
+	LD      HL,FONT_NORMAL
+	LD      (BASE_FONT),HL
+	LD      (CURRENT_FONT),HL
+	LD      A,HIGH (CHAR_6X8_TABLE)
+	LD      (CURRENT_TABLE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_4_LINK:
+	LD      A,8
+	LD      (STATE),A
+	LD      A,(COLOR_LINK)
+	LD      (COLOR_CODE),A
+	LD      A,(COLOR_LINK_UND)
+	LD      (COLOR_UNDER),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_4_NORMAL:
+	XOR     A
+	LD      (STATE),A
+	LD      (ACTUAL_LINK),A
+	LD      A,(COLOR_TEXT)
+	LD      (COLOR_CODE),A
+	LD      A,(COLOR_TEXT_UND)
+	LD      (COLOR_UNDER),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_5_OFFSET:
+	LD      A,5
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_STATE_5:
+	EX      AF,AF'
+	LD      (UPPER_CHAR),A
+	LD      A,6
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_STATE_6:
+	EX      AF,AF'
+	LD      C,A
+	AND     7
+	SUB     8
+	NEG
+	LD      (REMAINING),A
+	LD      A,(UPPER_CHAR)
+	RLCA
+	RLCA
+	RLCA
+	RLCA
+	LD      B,A
+	LD      A,C
+	AND     0F8h
+	OR      B
+	LD      C,A
+	ADD     A,E
+	LD      E,A
+	LD      A,D
+	ADC     A,0
+	LD      D,A
+
+	LD      A,C
+	RRCA
+	RRCA
+	RRCA
+	AND     01Fh
+	LD      C,A
+	LD      B,0
+	ADD     IY,BC
+
+	XOR     A
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_STATE_7:
+	XOR     A
+	LD      (STATE),A
+	LD      A,(COLOR_CODE)
+	AND     0Fh
+	LD      B,A
+	EX      AF,AF'
+	RLCA
+	RLCA
+	RLCA
+	RLCA
+	OR      B
+	LD      (COLOR_CODE),A
+	LD      (COLOR_UNDER),A
+	JP      DECODE_NIBBLE_RET        
+
+DECODE_5_GRAPHICS:
+	PUSH    BC
+	POP     IX
+	INC     HL
+
+	; decode pattern
+	PUSH    DE
+	CALL    DECODE_GRAPHICS
+	EX      (SP),HL
+	PUSH    HL
+	OR      A
+	EX      DE,HL
+	SBC     HL,DE
+
+	; decode link
+	LD      A,L
+	XOR     H
+	AND     0F8h
+	XOR     H
+	RRCA
+	RRCA
+	RRCA
+	LD      B,A
+	LD      A,(ACTUAL_LINK)
+DECODE_5_LOOP:
+	LD      (IY),A
+	INC     IY
+	DJNZ    DECODE_5_LOOP
+
+	POP     DE
+	POP     HL
+
+	; decode color
+	LD      A,D
+	ADD     A,18h
+	LD      D,A
+	CALL    DECODE_GRAPHICS
+
+	LD      A,D
+	SUB     018h
+	LD      D,A
+
+	DEC     HL
+	PUSH    IX
+	POP     BC
+	XOR     A
+	LD      (STATE),A
+	POP     AF
+	POP     AF
+	RET
+
+DECODE_STATE_8:
+	EX      AF,AF'
+	LD      (UPPER_CHAR),A
+	LD      A,9
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+DECODE_STATE_9:
+	EX      AF,AF'
+	LD      B,A
+	LD      A,(UPPER_CHAR)
+	RLCA
+	RLCA
+	RLCA
+	RLCA
+	OR      B
+	LD      (ACTUAL_LINK),A
+	XOR     A
+	LD      (STATE),A
+	JP      DECODE_NIBBLE_RET
+
+; -----------------------------------------------------------------------
+; DECODE_GRAPHICS - uncompress a graphic slice
+; enter: HL=compressed graphics
+;        DE=destination
+;        IX should be decremented for each compressed byte
+
+DECODE_GRAPHICS:
+	LD      A,(HL)
+	INC     HL
+	DEC     IX
+
+	AND     A
+	RET     Z
+
+	RLCA
+	JP      C,DECODE_MULTI
+
+	; raw sequence
+	NEG
+	LD      C,A
+	LD      B,0FFh
+	ADD     IX,BC
+	NEG
+	LD      C,A
+	INC     B
+	LDIR
+	JP      DECODE_GRAPHICS
+
+	; multi sequence
+DECODE_MULTI:
+	AND     0FEh
+	LD      B,A
+	LD      A,(HL)
+	INC     HL
+	DEC     IX
+DECODE_MULTI_LOOP:
+	LD      (DE),A
+	INC     DE
+	DJNZ    DECODE_MULTI_LOOP
+	JP      DECODE_GRAPHICS
+
+; -----------------------------------------------------------------------
+; PAINT_CHAR - paint the background of a char
+
+PAINT_CHAR      MACRO
+LOCAL UPPER,END
+
+	PUSH    DE
+	EX      AF,AF'
+	LD      A,D
+	ADD     A,018h
+	LD      D,A
+	LD      A,(LARGE_FONT)
+	AND     2
+	JR      NZ,UPPER
+
+	LD      A,(COLOR_CODE)
+	REPT    7
+	LD      (DE),A
+	INC     DE
+	ENDM
+	LD      A,(COLOR_UNDER)
+	LD      (DE),A
+	JR      END
+UPPER:
+	LD      A,(COLOR_CODE)
+	REPT    8
+	LD      (DE),A
+	INC     DE
+	ENDM
+END:
+	EX      AF,AF'
+	POP     DE
+
+		ENDM
+
+; -----------------------------------------------------------------------
+; RENDER_CHAR - render the decoded char in the video buffer
+; enter: A=char
+
+RENDER_CHAR:
+	
+	; paint the char
+	PAINT_CHAR
+
+	; get the char and evaluate address in char table
+	EXX
+	LD      L,A
+	BIG_SHIFT       D,E,3
+	LD      IX,(CURRENT_FONT)
+	ADD     IX,DE
+	LD      A,(CURRENT_TABLE)
+	LD      H,A
+	LD      A,(HL)
+	LD      (CHAR_SIZE),A
+
+	LD      HL,DO_UNDERLINE
+	SUB     8+HIGH (SHL_TABLE)
+	NEG
+	LD      D,A
+	LD      E,255
+	LD      A,(DE)
+	AND     (HL)
+	EXX
+	LD      C,A
+
+	; at this point
+	; IY = link buffer position
+	; IX = char pattern
+	; DE = video buffer
+	; C  = underline mask
+
+	LD      A,(LARGE_FONT)
+	AND     A
+	CALL    NZ,ENLARGE_FONT
+
+	LD      A,(ITALIC)
+	AND     A
+	CALL    NZ,MAKE_ITALIC
+
+	; fill the link buffer
+	LD      A,(ACTUAL_LINK)
+	LD      (IY),A
+
+	; check if the char must be splitted
+	LD      A,(CHAR_SIZE)
+	LD      B,A
+	LD      A,(REMAINING)
+	CP      B
+	JR      C,RENDER_CHAR_SPLIT
+
+	; shift the char to the right
+	SUB     8+HIGH (SHR_TABLE)
+	NEG
+	LD      H,A
+
+	; render the char
+	PUSH    DE
+	IRP     I,<0,1,2,3,4,5,6>
+	LD      L,(IX+I)
+	LD      A,(DE)
+	OR      (HL)
+	LD      (DE),A
+	INC     DE
+	ENDM
+	LD      A,(IX+7)
+	OR      C
+	LD      L,A
+	LD      A,(DE)
+	OR      (HL)
+	LD      (DE),A
+	POP     DE
+
+	; check if there is space left in the block
+	LD      A,(CHAR_SIZE)
+	LD      B,A
+	LD      A,(REMAINING)
+	SUB     B
+	LD      (REMAINING),A
+	RET     NZ
+	
+	; no, there isn't
+	LD      A,8
+	LD      (REMAINING),A
+	ADD     A,E
+	LD      E,A
+	LD      A,D
+	ADC     A,0
+	LD      D,A
+	INC     IY
+	RET
+
+RENDER_CHAR_SPLIT:
+	; shift the first slice to the right
+	SUB     8+HIGH (SHR_TABLE)
+	NEG
+	LD      H,A
+
+	; render the char
+	IRP     I,<0,1,2,3,4,5,6>
+	LD      L,(IX+I)
+	LD      A,(DE)
+	OR      (HL)
+	LD      (DE),A
+	INC     DE
+	ENDM
+	LD      A,(IX+7)
+	OR      C
+	LD      L,A
+	LD      A,(DE)
+	OR      (HL)
+	LD      (DE),A
+	INC     DE
+
+	PAINT_CHAR
+
+	; shift the remaining pixels to the left
+	LD      A,(REMAINING)
+	ADD     A,HIGH (SHL_TABLE)
+	LD      H,A
+
+	; render the other slice of char
+	PUSH    DE
+	IRP     I,<0,1,2,3,4,5,6>
+	LD      L,(IX+I)
+	LD      A,(DE)
+	OR      (HL)
+	LD      (DE),A
+	INC     DE
+	ENDM
+	LD      A,(IX+7)
+	OR      C
+	LD      L,A
+	LD      A,(DE)
+	OR      (HL)
+	LD      (DE),A
+	POP     DE
+
+	; fill the link buffer
+	INC     IY
+	LD      A,(ACTUAL_LINK)
+	LD      (IY),A
+
+	; evaluate how many pixels are left
+	LD      A,(CHAR_SIZE)
+	LD      B,A
+	LD      A,(REMAINING)
+	ADD     A,8
+	SUB     B
+	LD      (REMAINING),A
+	RET
+
+; -----------------------------------------------------------------------
+; ENLARGE_FONT - enlarge a font from 8x8 to 8x16
+; enter: A = contents of LARGE_FONT variable
+
+ENLARGE_FONT:
+	PUSH    BC
+	PUSH    HL
+	PUSH    DE
+	PUSH    IY
+
+	CP      2
+	JP      Z,ENLARGE_NULL
+
+	LD      HL,SMALL_CHAR+2
+	IRP     I,<0,1,2,3,4,5,6,7>
+	LD      A,(IX+I)
+	LD      (HL),A
+	INC     HL
+	ENDM
+
+	LD      IX,SMALL_CHAR+2
+	LD      IY,LARGE_CHAR
+
+	LD      (IY),0
+	INC     IY
+
+	LD      A,(LARGE_FONT)
+	CP      3
+	JP      Z,ENLARGE_UPPER
+
+	LD      E,(IX+3-1)
+	LD      L,(IX+3)
+	IRP     I,<3,4,5,6,7>
+	ENLARGE_SLICE I
+	ENDM
+					   
+	LD      IX,LARGE_CHAR+8
+	POP     IY
+	POP     DE
+	POP     HL
+	POP     BC
+	RET
+
+ENLARGE_UPPER:
+	LD      E,(IX-1)
+	LD      L,(IX)
+	IRP     I,<0,1,2,3>
+	ENLARGE_SLICE I
+	ENDM
+
+ENLARGE_UPPER_END:
+	LD      IX,LARGE_CHAR
+	POP     IY
+	POP     DE
+	POP     HL
+	POP     BC
+	LD      C,0
+	RET
+
+ENLARGE_NULL:
+	LD      B,8
+	XOR     A
+	LD      HL,LARGE_CHAR
+ENLARGE_NULL_LOOP:
+	LD      (HL),A
+	INC     HL
+	DJNZ    ENLARGE_NULL_LOOP
+	JR      ENLARGE_UPPER_END
+
+
+; -----------------------------------------------------------------------
+
+MAKE_ITALIC:
+	PUSH    HL
+	LD      HL,ITALIC_CHAR
+
+ITALIC_I DEFL 0        
+	IRP     S,<3,3,2,2,1,1,0,0>
+	
+	LD      A,(IX+ITALIC_I)
+	
+	REPT    S
+	SRL     A
+	ENDM
+	
+	LD      (HL),A
+	INC     HL
+	
+	ITALIC_I DEFL ITALIC_I+1
+	ENDM
+
+	LD      IX,ITALIC_CHAR
+	POP     HL
+	RET
+
+; -----------------------------------------------------------------------
+
+DRAW_HR:
+	XOR     A
+	LD      (STATE),A
+
+	PUSH    DE
+	LD      HL,4
+	ADD     HL,DE
+	LD      DE,7
+	LD      B,30-1
+	LD      (HL),080h
+	INC     HL
+	LD      (HL),0FFh
+	ADD     HL,DE
+DRAW_HR_LOOP:
+	LD      (HL),000h
+	INC     HL
+	LD      (HL),0FFh
+	ADD     HL,DE
+	DJNZ    DRAW_HR_LOOP
+	LD      (HL),000h
+	INC     HL
+	LD      (HL),0FEh
+	POP     DE
+
+	PUSH    DE
+	LD      HL,01804h
+	ADD     HL,DE
+	LD      DE,7
+	LD      B,32-1
+DRAW_HR_LOOP_2:
+	LD      (HL),0E1h
+	INC     HL
+	LD      (HL),0E1h
+	ADD     HL,DE
+	DJNZ    DRAW_HR_LOOP_2
+	POP     DE
+	JP      DECODE_NIBBLE_RET        
+
+; -----------------------------------------------------------------------
+
+DRAW_ALIGN:
+	XOR     A
+	LD      (STATE),A
+
+	LD      A,(REMAINING)
+	CP      8
+	JP      Z,DECODE_NIBBLE_RET        
+
+	LD      BC,8
+	EX      DE,HL
+	ADD     HL,BC
+	EX      DE,HL
+	LD      A,C  
+	LD      (REMAINING),A
+	INC     IY
+	JP      DECODE_NIBBLE_RET
+
+; -----------------------------------------------------------------------
+
+READ_FONTS:
+	; normal font
+	LD      HL,ORIGINAL_FONTS
+	LD      DE,FONT_NORMAL
+	LD      BC,800h
+	LDIR
+	
+	; bold font
+	LD      HL,ORIGINAL_FONTS+0800h
+	LD      DE,FONT_BOLD
+	LD      BC,800h
+	LDIR
+	
+	; code font
+	LD      HL,ORIGINAL_FONTS+01000h
+	LD      DE,FONT_CODE
+	LD      BC,800h
+	LDIR
+
+	RET
+
+; -----------------------------------------------------------------------
+; WHEREAMI - find the slot ID of main ram
+; return: A = slot id
+
+WHEREAMI:
+	IN      A,(0A8h)
+	AND     3
+	LD      C,A
+	LD      B,0
+	LD      HL,EXPTBL
+	ADD     HL,BC
+	LD      B,A
+	LD      A,(HL)
+	LD      E,A
+	RLCA
+	SBC     A,A
+	LD      C,A
+	LD      A,E
+	AND     080h
+	LD      E,A
+	INC     HL
+	INC     HL
+	INC     HL
+	INC     HL
+	LD      A,(HL)
+	RLCA
+	RLCA
+	AND     1100b
+	AND     C
+	OR      B
+	OR      E
+	RET
+
+; -----------------------------------------------------------------------
+; COMMAND_LINE: parse the command line and place the file name in FCB
+
+COMMAND_LINE:
+	LD      HL,081H
+	LD      DE,FCB+1
+STARTSKIP:
+	LD      A,(HL)
+	CP      0Dh
+	JR      Z,STARTSKIP1
+	CP      32
+	JR      NZ,START0
+STARTSKIP1:
+	INC     HL
+	JR      STARTSKIP
+START0:
+	LD      A,(HL)
+	CP      0DH
+	RET     Z
+	CP      00H
+	RET     Z
+	CP      32
+	RET     Z
+	LD      (DE),A
+	INC     DE
+START2:
+	INC     HL
+	JR      START0
+	
+; -----------------------------------------------------------------------
+; ERROR1: wrong version of fudebrowser
+
+ERROR1:
+	; check for text screen
+	LD      A,(ACTUAL_SCREEN)
+	CP      2
+	JR      NZ,ERROR1_GO
+
+	LD      IX,TOTEXT
+	CALL    CALLBIOS
+
+ERROR1_GO:
+	; return page 2 to previous owner
+	;LD      A,(MAINSLOT)        
+	;LD      HL,08000h
+	;CALL    ENASLT
+
+	LD      C,PRINT
+	LD      DE,WRONGVERSION
+	CALL    BDOS
+
+	JP      0
+
+; -----------------------------------------------------------------------
+; ERROR2: file could not be opened
+; try to open 404.HTZ and exit to DOS if not found
+
+ERROR2:
+	; try to open 404.HTZ
+	LD      HL,PAGE404
+	LD      DE,FCB+1
+	LD      BC,8
+	LDIR
+
+	LD      C,OPEN
+	LD      DE,FCB
+	CALL    BDOS
+	CP      0FFh
+	RET     NZ
+
+	; 404.HTZ is not on current directory
+	LD      A,(ACTUAL_SCREEN)
+	CP      2
+	JR      NZ,ERROR2_GO
+
+	LD      IX,TOTEXT
+	CALL    CALLBIOS
+
+ERROR2_GO:
+	; return page 2 to previous owner
+	;LD      A,(MAINSLOT)        
+	;LD      HL,08000h
+	;CALL    ENASLT
+
+	LD      C,PRINT
+	LD      DE,MSG5
+	CALL    BDOS
+
+	JP      0
+
+; -----------------------------------------------------------------------
+; ERROR_NOMEM: not enough memory
+
+ERROR_NOMEM:
+	; check for text screen
+	LD      A,(ACTUAL_SCREEN)
+	CP      2
+	JR      NZ,ERROR_NOMEM_GO
+
+	LD      IX,TOTEXT
+	CALL    CALLBIOS
+
+ERROR_NOMEM_GO:
+	; return page 2 to previous owner
+	;LD      A,(MAINSLOT)        
+	;LD      HL,08000h
+	;CALL    ENASLT
+
+	LD      C,PRINT
+	LD      DE,MSG_NO_MEMORY
+	CALL    BDOS
+
+	JP      0
+
+; -----------------------------------------------------------------------
+; Call SubRom - SubRom Function on IX
+
+CALLSUB:
+	LD      IY,(0FAF7h)
+	CALL    001Ch
+	RET
+
+; -----------------------------------------------------------------------
+; Portable routine to change to SCREEN 2 in any MSX model
+; written by Daniel Caetano
+; Enter: A = border color
+
+SCREEN2:
+	PUSH    AF
+
+	; set up actual screen variable
+	LD      A,2
+	LD      (ACTUAL_SCREEN),A
+
+	; Verify if MSX Type is NOT MSX 1
+	LD      A,(0FCC1h)
+	LD      HL,02Dh
+	CALL    0Ch
+	CP      0
+	JR      NZ, SCREEN2_MSX2
+
+; set up SCREEN 2 on MSX1
+
+	; Change to Screen2
+	LD      IX,INIGRP
+	CALL    CALLBIOS
+
+	; set the sprites to 8x8
+	LD      A,(RG1SAV)
+	AND     11111100b
+	LD      B,A
+	LD      C,1
+	LD      IX,WRTVDP
+	CALL    CALLBIOS
+
+	; set border color
+	POP     AF
+	LD      (BDRCLR),A
+	CALL    CHANGE_COLOR_PORTABLE
+
+	RET
+
+; set up SCREEN 2 on MSX2
+
+SCREEN2_MSX2:        
+	; Change to Screen2
+	LD      IX,00DDh
+	CALL    CALLSUB
+	LD      IX,0141h
+	CALL    CALLSUB
+
+	; clear SCREEN
+	LD      IX,0115h
+	CALL    CALLSUB
+
+	; set the sprites to 8x8
+	LD      A,(RG1SAV)
+	AND     11111100b
+	LD      B,A
+	LD      C,1
+	LD      IX,012Dh
+	CALL    CALLSUB
+
+	; set border color
+
+	POP     AF
+	LD      (BDRCLR),A
+	CALL    CHANGE_COLOR_PORTABLE
+
+	RET
+
+; -----------------------------------------------------------------------
+; Portable routine to change the border color in any MSX model
+
+CHANGE_COLOR_PORTABLE:
+	LD      IX,CHGCLR
+	CALL    CALLBIOS
+	RET
+
+; -----------------------------------------------------------------------
+; Work Area
+
+FCB:
+	DB      0               ; 0: drive number
+	DB      '        '      ; 1: file name
+	DB      'HTZ'           ; 9: file extension
+FCB_FILLER_START:
+	DB      0,0             ; 12: reserved
+FCBSIZE:
+	DB      0,0             ; 14: size of random access register
+	DB      0,0,0,0         ; 16: file length
+	DB      0,0             ; 20: date
+	DB      0,0             ; 22: time
+	DB      0,0,0,0,0,0,0,0 ; 24: reserved
+	DB      0               ; 32: reserved
+	DB      0,0,0,0         ; 33: current random access register
+FCB_FILLER_END:
+
+	DB      0
+
+MSG0:   
+	IF      NAMEBROWSER EQ FUDEBROWSER
+	DB      'Fude'
+	ELSE
+	DB      'Fly'
+	ENDIF
+
+	DB      'Browser 1.8',13,10
+	DB      'Copyright (C) 1999,2000',13,10
+	DB      'by Ricardo Bittencourt',13,10,10,'$'
+MSG5:   DB      13,10,'Sorry, the file could not be opened.$'
+MSG8:   DB      'Official site:',13,10
+	DB      'http://www.lsi.usp.br/~ricardo/msx.htm',13,10
+	DB      'Send bugs, comments and suggestions',13,10
+	DB      'to ricardo@lsi.usp.br'
+CRLF:
+	DB      13,10,'$'
+WRONGVERSION:
+	DB      'Wrong version of '
+	IF      NAMEBROWSER EQ FUDEBROWSER
+	DB      'Fude'
+	ELSE
+	DB      'Fly'
+	ENDIF
+	DB      'Browser',13,10,'$'
+MAINRAMIN:
+	DB      'Main RAM in slot $'
+INTERNAL:
+	DB      'Internal $'
+EXTERNAL:
+	DB      'External $'
+MAPPERINSLOT:
+	DB      'Mapper in slot $'
+SIZE_MSG:
+	DB      ' ($'
+P_CRLF:
+	DB      ' kb)',13,10,'$'
+MEMORY_AVAILABLE:
+	DB      13,10,'Memory available for pages: $'
+KB_CRLF:
+	DB      ' kb',13,10,'$'
+MSG_NO_MEMORY:
+	DB      'Not enough memory',13,10,'$'
+MEGARAM_FOUND:
+	DB      'MegaRAM in slot $'
+ADVRAM_FOUND:
+	DB      'This system has ADVRAM',13,10,'$'
+
+INDEX_HTZ:      DB      'INDEX   '
+PAGE404:        DB      '404     '
+HELP_HTZ:       DB      'HELP    '
+
+ALIGN
+
+HIST_BUFFER:    DB      0,0,0,0,0,0,0,0
+		DB      0,0,0,0,0,0,0,32
+REMAINING:      DB      0
+CHAR_SIZE:      DB      6
+STATE:          DB      0
+UPPER_CHAR:     DB      0
+BASE_FONT:      DW      FONT_NORMAL
+CURRENT_FONT:   DW      FONT_NORMAL
+CURRENT_TABLE:  DB      HIGH (CHAR_6X8_TABLE)
+COLOR_CODE:     DB      01Fh
+COLOR_UNDER:    DB      01Fh
+COLOR_TEXT:     DB      01Fh
+COLOR_TEXT_UND: DB      01Fh
+COLOR_LINK:     DB      01Fh
+COLOR_LINK_UND: DB      01Fh
+DO_UNDERLINE:   DB      0
+ACTUAL_LINK:    DB      0
+LINK_UNDER:     DB      0
+LARGE_FONT:     DB      0
+LARGE_CHAR:     DS      17
+SMALL_CHAR:     DB      0,0, 0,0,0,0, 0,0,0,0, 0,0
+ITALIC_CHAR:    DS      16
+ITALIC:         DB      0
+
+MAINSLOT:       DB      0
+MAPPERSLOT:     DB      0
+MAPPERSIZE:     DW      0
+BIGFILE:        DB      0
+BIGMEMORY:      DB      0
+PRINTSYSTEM:    DB      0
+TOTAL_PAGES:    DW      0
+CURRENT_PAGE:   DW      MEMORY_PAGES
+FINAL_PAGE:     DW      MEMORY_PAGES
+HALF_PAGE:      DB      0
+FILE_SIZE:      DW      0,0
+ADVRAM:         DB      0
+HASMAPPER:      DB      0
+
+SAVE_IRQ:       DB      0,0,0
+BORDER_COLOR:   DB      0Bh
+KEYLINE_6:      DB      0FFh
+KEYLINE_7:      DB      0FFh
+KEYLINE_8:      DB      0FFh
+JOYLINE:        DB      0FFh
+CURSOR_X:       DB      1
+CURSOR_Y:       DB      1
+CURSOR_MOVED:   DB      0
+CURSOR_STEP:    DB      1
+ACTUAL_SCREEN:  DB      0
+BACK_INDEX:     DB      0
+THIS_LINE_ADDR: DW      0
+
+START_TEXT:     DW      0
+WORDOFFSET:     DW      0
+END_SCREEN:     DW      0
+START_SCREEN:   DW      0
+TOP_START:      DW      0
+TOP_END:        DW      0
+SCROLLBUF:      DW      SCROLLBUF_TABLE
+SCROLL_DDA:     DB      0,0,0,0
+
+INIT_SCROLL_BAR:
+		DB      0,0,0,7
+
+SPRITE_PATT:
+		; sprite 0
+		DB      00000001b
+		DB      00000011b
+		DB      00010011b
+		DB      00111011b
+		DB      01111111b
+		DB      00000011b
+		DB      01111111b
+		DB      11111111b
+		
+		; sprite 1
+		DB      00000001b
+		DB      00000011b
+		DB      01111111b
+		DB      00111011b
+		DB      00010011b
+		DB      00000011b
+		DB      01111111b
+		DB      11111111b
+
+		; sprite 2
+		DB      00000001b
+		DB      00000011b
+		DB      00000011b
+		DB      00000011b
+		DB      00000011b
+		DB      00000011b
+		DB      01111111b
+		DB      11111111b
+
+		; sprite 3
+		DB      11111110b
+		DB      11111100b
+		DB      11101100b
+		DB      11000100b
+		DB      10000000b
+		DB      11111100b
+		DB      10000000b
+		DB      00000000b
+		
+		; sprite 4
+		DB      11111110b
+		DB      11111100b
+		DB      10000000b
+		DB      11000100b
+		DB      11101100b
+		DB      11111100b
+		DB      10000000b
+		DB      00000000b
+
+		; sprite 5
+		DB      11111110b
+		DB      11111100b
+		DB      11111100b
+		DB      11111100b
+		DB      11111100b
+		DB      11111100b
+		DB      10000000b
+		DB      00000000b
+
+		; sprite 6
+		DB      11000000b
+		DB      10110000b
+		DB      01001100b
+		DB      01000010b
+		DB      00100100b
+		DB      00101010b
+		DB      00010101b
+		DB      00000010b
+
+		; sprite 7
+		DB      00000000b
+		DB      01000000b
+		DB      00110000b
+		DB      00111100b
+		DB      00011000b
+		DB      00010100b
+		DB      00000010b
+		DB      00000000b
+
+		; sprite 8
+		DB      01100000b
+		DB      01010000b
+		DB      01011110b
+		DB      01010101b
+		DB      01000001b
+		DB      10000001b
+		DB      10000001b
+		DB      01000010b
+
+		; sprite 9
+		DB      00000000b
+		DB      00100000b
+		DB      00100000b
+		DB      00101010b
+		DB      00111110b
+		DB      01111110b
+		DB      01111110b
+		DB      00111100b
+
+SPRITE_ATTR:
+		DB      1-1,1,6,1
+		DB      1-1,1,7,15
+		DB      0D1h,256-8,5,15
+		DB      0D1h,256-8,2,1
+		DB      0-1,256-8,0,1
+		DB      192-8-1,256-8,1,1
+		DB      0-1,256-8,3,15
+		DB      192-8-1,256-8,4,15
+		DB      0D0h,0,0,0
+
+ALIGN
+	INCLUDE SHR.INC
+	INCLUDE SHL.INC
+	INCLUDE FONT6X8.INC
+	INCLUDE FONT8X8.INC
+	INCLUDE FONTCODE.INC
+	INCLUDE LARGE.INC
+
+ALIGN
+
+CLEAR_BUFFER:
+	REPT    256-8
+	DB      0
+	ENDM
+	DB      01010101b
+	DB      10101010b
+	DB      01010101b
+	DB      10101010b
+	DB      01010101b
+	DB      10101010b
+	DB      01010101b
+	DB      10101010b
+
+	REPT    256-8
+	DB      01FH
+	ENDM
+	REPT    8
+	DB      01Eh
+	ENDM
+
+ENDOFCODE:
+
+	INCLUDE FUDEFONT.INC
+
+; these buffers cannot be in page 0
+SCROLLBUF_TABLE EQU     0D000h  ; DS 200h
+SCROLL_BAR      EQU     0D200h  ; DS 4
+CURSOR_POS      EQU     0D204h  ; DS 8
+BACK_BUFFER     EQU     0D20Ch  ; DS 64
+
+
+	IF      ENDOFCODE-1 GT 04000h
+	.PRINTX . You must implement the megaram support !!! .
+	ENDIF
+
+; -----------------------------------------------------------------------
+
+	END     START
+
+
+
+
