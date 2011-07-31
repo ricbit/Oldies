@@ -1,0 +1,415 @@
+; -----------------------------------------------------------------------        
+;
+;    Terramex Plus
+;    Copyright (C) 2002 by Ricardo Bittencourt
+;
+;    Project started at 5/6/2002. Last modification was on 5/6/2002.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@lsi.usp.br
+;        http://www.lsi.usp.br/~ricardo
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+;
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+	ORG     0100h
+
+BDOS    EQU     00005h
+OPEN    EQU     0000Fh
+RDSEQ   EQU     00014h
+PRINT   EQU     00009h
+DTA     EQU     00080h
+INIMLT  EQU     00075h
+INIT32  EQU     0006Fh
+INITXT  EQU     0006Ch
+INIGRP  EQU     00072h
+FILVRM  EQU     00056h
+LDIRMV  EQU     0005Ch
+CLRSPR  EQU     00069h
+PRTCHR  EQU     00002h
+ENASLT  EQU     00024h
+RSLREG  EQU     00138h
+TOTEXT  EQU     000D2h
+BDRCLR  EQU     0F3EBh
+CHGCLR  EQU     007F7h
+DISSCR  EQU     00041h
+ENASCR  EQU     00044h
+EXPTBL  EQU     0FCC1h
+RG1SAV  EQU     0F3E0h
+WRTVDP  EQU     00047h
+RDBLK   EQU     00027h
+SETDTA  EQU     0001Ah
+CHGMOD   EQU     000D1h
+CLSSUB   EQU     00115h
+
+ALIGNF  DEFL    0
+
+; -----------------------------------------------------------------------
+
+ALIGNX          MACRO  X
+
+VOID&X:
+		DS      256*(HIGH (VOID&X+255))-VOID&X
+
+		ENDM
+
+ALIGN           MACRO
+
+		ALIGNX  %ALIGNF
+		ALIGNF  DEFL    ALIGNF+1
+
+		ENDM
+
+; -----------------------------------------------------------------------
+
+START:
+	; prepare compatibility
+	CALL    PREPARE
+
+	; open the file
+
+	LD      C,OPEN  
+	LD      DE,FCB
+	CALL    BDOS
+
+        ; set buffer at 4000h
+        LD      DE,04000h
+	LD      C,SETDTA
+	CALL    BDOS
+        LD      HL,128
+	LD      (FCBSIZE),HL
+
+        ; read one page at a time
+        IRP     I,<4,5,6,7>
+        LD      A,I
+        OUT     (0FDh),A
+	LD      C,RDBLK
+	LD      DE,FCB
+        LD      HL,128
+	CALL    BDOS
+        ENDM
+
+        CALL    SCREEN8
+
+        ; GAMBI
+        LD      A,4
+        OUT     (099h),A
+        LD      A,080h+14
+        OUT     (099h),A
+
+        ;LD      IX,INIGRP
+        ;CALL    CALLBIOS
+
+        DI
+        LD      A,4
+        OUT     (0FFh),A
+        JP      0C097h
+
+        XOR     A
+        OUT     (0FCh),A
+        JP      0300h
+
+        LD      A,4
+        OUT     (0FCh),A
+        RET
+
+MINIBIOS:
+        DS      0300h-MINIBIOS
+
+        JP      REPLACE_9E2A
+
+REPLACE_9E2A:
+; ENTER HL=xxx11333 LLLKKKKK
+; EXIT  HL=xxx11LLL KKKKK333
+
+; 333 = offset y dentro do bloco 8x8
+; KKKKK = posicao x do bloco
+; 11LLL = posicao y do bloco
+
+; em screen 8  YYYY YYYY XXXX XXXX
+; logo         11LL L333 KKKK K000
+
+; ou entao     11 + __LLL333 KKKKK000
+        LD      (SAVESP),SP
+        LD      SP,03FFEh
+
+        PUSH    BC
+        LD      DE,MIRRORTABLE
+COPYTABLE:
+        LD      A,(IY)
+        LD      (DE),A
+        INC     IY
+        INC     DE
+        LD      A,(IY)
+        LD      (DE),A
+        INC     IY
+        INC     DE
+        DJNZ    COPYTABLE
+        POP     BC
+
+        PUSH    IY
+        LD      IY,MIRRORTABLE
+
+OUTER:
+        PUSH    AF
+        PUSH    HL
+        PUSH    DE
+        PUSH    BC
+        LD      A,H
+        RRCA
+        RRCA
+        RRCA
+        AND     3
+        LD      D,A
+        OUT     (099h),A
+        LD      A,080h+14
+        OUT     (099h),A
+        LD      A,L
+        RLCA
+        RLCA
+        RLCA
+        AND     0F8h
+        LD      C,A
+        ;OUT     (099h),A
+        LD      A,L
+        RLCA
+        RLCA
+        RLCA
+        AND     7
+        RRC     H
+        RRC     H
+        RRC     H
+        RLC     H
+        RLA
+        RLC     H
+        RLA
+        RLC     H
+        RLA
+        ADD     A,040h
+        ;OUT     (099h),A
+        LD      L,D
+        LD      D,A
+        LD      E,C
+        LD      C,L
+
+        LD      L,(IY+0)
+        LD      H,(IY+1)
+
+INNER   MACRO
+LOCAL   LOOP
+        LD      A,E
+        OUT     (099h),A
+        LD      A,D
+        OUT     (099h),A
+        REPT    8
+        RLC     (HL)
+        SBC     A,A
+        OUT     (098H),A
+        ENDM
+        LD      A,D
+        INC     A
+        BIT     6,A
+        JR      NZ,LOOP
+        INC     C
+        PUSH    AF
+        LD      A,C
+        OUT     (099h),A
+        LD      A,080h+14
+        OUT     (099h),A
+        POP     AF
+        AND     03Fh
+        OR      040h
+LOOP:
+        LD      D,A
+        INC     HL
+        ENDM
+
+        REPT    24
+        INNER
+        ENDM
+
+        POP     BC
+        POP     DE
+        POP     HL
+        POP     AF
+
+        INC     IY
+        INC     IY
+        INC     L
+        DEC     B
+        JP      NZ,OUTER
+
+        ; GAMBI
+        LD      A,4
+        OUT     (099h),A
+        LD      A,080h+14
+        OUT     (099h),A
+
+        POP     IY
+
+        LD      A,5
+        OUT     (0FDh),A
+        INC     A
+        OUT     (0FEh),A
+
+        LD      SP,(SAVESP)
+        JP      09e32h
+
+; -----------------------------------------------------------------------
+; CALLBIOS - call a bios routine
+; enter: IX = address
+
+CALLBIOS:
+	LD      (CALLBIOS1),IX
+	RST     030h
+CALLBIOS0:
+	DB      0
+CALLBIOS1:
+	DW      0
+	RET
+
+; -----------------------------------------------------------------------
+; PREPARE - prepare compatibility
+
+PREPARE:
+	LD      A,(EXPTBL)
+	LD      (CALLBIOS0),A
+	RET
+
+; -----------------------------------------------------------------------
+; PRINTHEX - print a byte in hexadecimal format
+; enter: A = byte
+
+PRINTHEX:
+	PUSH    AF
+	RRCA
+	RRCA
+	RRCA
+	RRCA
+	AND     0Fh
+	CALL    PRINTDIG
+	POP     AF
+	AND     0Fh
+PRINTDIG:
+	CP      10
+	JR      C,PRINTDIG0
+	ADD     A,'A'-10
+	JR      PRINTDIG1
+PRINTDIG0:
+	ADD     A,'0'
+PRINTDIG1:
+	LD      C,PRTCHR
+	LD      E,A
+	CALL    BDOS
+	RET
+
+; -----------------------------------------------------------------------
+; PRINTSLOT - print a slot id
+; enter: A = slot id
+
+PRINTSLOT:
+	PUSH    AF
+	AND     3
+	CALL    PRINTDIG
+	POP     AF
+	BIT     7,A
+	RET     Z
+	PUSH    AF
+	LD      C,PRTCHR
+	LD      E,'.'
+	CALL    BDOS
+	POP     AF
+	RRCA
+	RRCA
+	AND     3
+	JP      PRINTDIG
+
+; -----------------------------------------------------------------------
+; COMMAND_LINE: parse the command line and place the file name in FCB
+
+COMMAND_LINE:
+	LD      HL,081H
+	LD      DE,FCB+1
+STARTSKIP:
+	LD      A,(HL)
+	CP      0Dh
+	JR      Z,STARTSKIP1
+	CP      32
+	JR      NZ,START0
+STARTSKIP1:
+	INC     HL
+	JR      STARTSKIP
+START0:
+	LD      A,(HL)
+	CP      0DH
+	RET     Z
+	CP      00H
+	RET     Z
+	CP      32
+	RET     Z
+	LD      (DE),A
+	INC     DE
+START2:
+	INC     HL
+	JR      START0
+	
+; -----------------------------------------------------------------------
+; CALLSUB - call the subrom
+; enter: IX = address 
+
+CALLSUB:
+	LD      IY,(0FAF7h)
+	CALL    001Ch
+	RET
+
+; -----------------------------------------------------------------------
+; SCREEN8 - set up SCREEN 8 using the BIOS
+
+SCREEN8:
+        ; change to screen 8
+        LD      IX,CHGMOD
+        LD      A,8
+	CALL    CALLSUB
+
+	; clear SCREEN
+        LD      IX,CLSSUB
+	CALL    CALLSUB
+
+        RET
+
+; -----------------------------------------------------------------------
+; Work Area
+
+FCB:
+	DB      0               ; 0: drive number
+        DB      'terramex'      ; 1: file name
+        DB      'BIN'           ; 9: file extension
+	DB      0,0             ; 12: reserved
+FCBSIZE:
+	DB      0,0             ; 14: size of random access register
+	DB      0,0,0,0         ; 16: file length
+	DB      0,0             ; 20: date
+	DB      0,0             ; 22: time
+	DB      0,0,0,0,0,0,0,0 ; 24: reserved
+	DB      0               ; 32: reserved
+	DB      0,0,0,0         ; 33: current random access register
+
+SAVESP:         DW      0
+MIRRORTABLE:    DS      256
+
+ALIGN
+ENDOFCODE:
+
+	END     START
+
+
+

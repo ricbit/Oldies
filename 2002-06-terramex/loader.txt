@@ -1,0 +1,29 @@
+002 binario D000 D200 D000
+003 binario 9000 CD00 9000
+executa D1C5 (copia 3D00 bytes pra vram 0000 a partir de 9000)
+004 binario 9000 D030 D000 ,R (LDIR HL=9000 DE=0A00 BC=4000)
+005 binario 9000 D930 D000 ,R (LDIR HL=9000 DE=4A00 BC=4000)
+006 binario 8A00 C9FE 8A00
+007 binario D000 D200 D000 ,R 
+(coloca SP em 0300)
+(LDIR HL=D000 DE=0000 BC=0200)
+(LDDR HL=C9FE DE=FFFE BC=C000 - termina com HL~0A00 e DE~4000)
+(copia de volta VRAM para 0300)
+(executa 8D00)
+
+patches 0097-00AB - loader
+
+C44D - init geral do jogo
+C45A-C4B3 - set screen 2, patch para pular
+C4B4 -> continua
+
+91CC - limpa tabela de padroes
+C54A - setwrt, troca HL=xxx11333 LLLLLLLL por xxx11LLL LLLLL333
+91f4 - desenha titulo TERRAMEX
+941D - graficos do titulo TERRAMEX
+92BB - pintura da tabela de cores (?)
+9E2A - desenho de shapes ! (orig e5)
+
+9E32 -> RETORNO !
+
+9925 setwrt no hl
