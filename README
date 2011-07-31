@@ -182,6 +182,11 @@ Language: C
 Description: Reads a wave file containing an MSX cassete image and demodulate
 the FSK to get a .cas binary stream.
 
+Name: 1999-05-fudebrowser
+Language: Assembly Z80
+Description: Web browser for MSX. Browses over pre-rendered html pages loaded
+from disk.
+
 Name: 1999-10-fourfours
 Language: C
 Description: Solve the four fours puzzle using forward chaining.
