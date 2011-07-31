@@ -257,6 +257,10 @@ Name: 2002-06-terramex
 Language: Assembly Z80
 Description: A demo of what Terramex would look like in screen 8.
 
+Name: 2002-09-checkers
+Language: C
+Description: An engine of checkers where the computer plays against itself.
+
 Name: 2002-12-jvm
 Language: C
 Description: Decodes the header of a Java .class file.
