@@ -1,0 +1,372 @@
+; -----------------------------------------------------------------------
+;
+;    JoyWave 1.0
+;    Copyright (C) 1999 by Ricardo Bittencourt
+;
+;    Project started at 1/12/1999. Last modification was on 1/12/1999.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@lsi.usp.br
+;        http://www.lsi.usp.br/~ricardo
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+	ORG     0100h
+
+BDOS    EQU     00005h
+OPEN    EQU     0000Fh
+CLOSE   EQU     00010h
+RDSEQ   EQU     00014h
+PRINT   EQU     00009h
+DTA     EQU     00080h
+INIMLT  EQU     00075h
+INIT32  EQU     0006Fh
+INITXT  EQU     0006Ch
+INIGRP  EQU     00072h
+FILVRM  EQU     00056h
+LDIRMV  EQU     0005Ch
+CLRSPR  EQU     00069h
+PRTCHR  EQU     00002h
+ENASLT  EQU     00024h
+RSLREG  EQU     00138h
+TOTEXT  EQU     000D2h
+BDRCLR  EQU     0F3EBh
+CHGCLR  EQU     00062h
+DISSCR  EQU     00041h
+ENASCR  EQU     00044h
+EXPTBL  EQU     0FCC1h
+RG1SAV  EQU     0F3E0h
+WRTVDP  EQU     00047h
+RDBLK   EQU     00027h
+SETDTA  EQU     0001Ah
+CHGET   EQU     0009Fh
+CHPUT   EQU     000A2h
+RDSLT   EQU     0000Ch
+SNSMAT  EQU     00141h
+CLIKSW  EQU     0F3DBh
+GETPNT  EQU     0F3FAh
+PUTPNT  EQU     0F3F8h
+HKEYI   EQU     0FD9Fh
+GETCPU  EQU     00183h
+CPUID   EQU     0002Dh
+PMDAC   EQU     000A4H            
+PMCNT   EQU     000A4H            
+PMCNTL  EQU     000A5H            
+PMSTAT  EQU     000A5H            
+SYSTML  EQU     000E6H
+
+; -----------------------------------------------------------------------
+
+START:
+        CALL    PREPARE
+
+        ; check if MSX is Turbo-R
+        LD      A,(EXPTBL)
+        LD      HL,CPUID
+        CALL    RDSLT
+        CP      3
+        JP      NZ,ERROR1
+
+        ; check if R800 is enabled
+        LD      IX,GETCPU
+        CALL    CALLBIOS
+        AND     A
+        JP      Z,ERROR1
+
+        ; wait for the PC
+        CALL    JOYNET_SYNC
+
+        DI
+
+PLAY:
+        ; prepare the PCM for output
+        LD      A,00000011B
+        OUT     (PMCNTL),A      
+        IN      A,(SYSTML)
+
+PLAY_OUTER:
+        ; reset Turbo-R system timer
+        XOR   A
+        OUT   (SYSTML),A      
+
+        ; read a byte through joynet
+        ; exit if timeout
+
+        CALL  RECV_BYTE_R800
+        JR    C,PLAY_EXIT  
+        LD    D,A
+
+        ; wait for (1/16000) seconds
+PLAY_INNER:
+        IN    A,(SYSTML)
+        CP    15
+        JR    C,PLAY_INNER
+
+        ; copy the sample to the DAC
+        LD    A,D
+        OUT   (PMDAC),A
+        JR    PLAY_OUTER
+
+PLAY_EXIT:
+        EI
+        JP      0
+
+; -----------------------------------------------------------------------
+
+JOYNET_SYNC:
+        DI
+
+        ; send bibble
+        LD      A,0
+        CALL    SEND_BIBBLE
+
+RECV_0000:
+        ; recv bibble
+        CALL    RECV_BIBBLE
+        AND     A
+        JR      NZ,RECV_0000
+
+        ; send bibble
+        LD      A,10011B
+        CALL    SEND_BIBBLE
+
+RECV_1111:
+        ; recv bibble
+        CALL    RECV_BIBBLE
+        XOR     7
+        JR      NZ,RECV_1111
+
+        EI
+        RET
+
+; -----------------------------------------------------------------------
+; RECV_BIBBLE - read a bibble
+; exit: A=bibble
+
+RECV_BIBBLE:
+        LD      A,15
+        OUT     (0A0H),A
+        IN      A,(0A2H)
+        AND     10111111B
+        OUT     (0A1H),A
+
+        LD      A,14
+        OUT     (0A0H),A
+        IN      A,(0A2H)
+        AND     7
+
+        RET
+
+; -----------------------------------------------------------------------
+; SEND_BIBBLE - send a bibble
+; enter: A=bibble
+
+SEND_BIBBLE:
+        PUSH    AF
+        LD      A,15
+        OUT     (0A0H),A
+        POP     AF
+
+        OR      00001100B
+        OUT     (0A1H),A
+
+        RET
+
+; -----------------------------------------------------------------------
+; must be called with interrupts disabled
+
+CPU_Z80         EQU     0
+CPU_Z80_TURBO   EQU     1
+CPU_R800        EQU     2
+
+; this delay is required in R800 mode
+; but you can safely remove it in Z80 at 3.57 MHz
+
+DELAY   MACRO CPU
+          IF CPU EQ CPU_R800
+            REPT 8
+              NOP
+            ENDM
+          ENDIF 
+        ENDM
+
+RECEIVE_BYTE    MACRO CPU
+
+        ; send bibble
+        LD      A,15
+        OUT     (0A0H),A
+
+        DELAY   CPU
+
+        LD      A,00101100B
+        OUT     (0A1H),A
+
+        ; prepare to receive
+        LD      A,14
+        OUT     (0A0H),A
+
+        DELAY   CPU
+        LD      BC,0
+
+RECV_0000&CPU:
+        ; recv bibble
+        DEC     BC
+        LD      A,B
+        OR      C
+        JP      Z,RECV_FAILED&CPU
+
+        IN      A,(0A2H)
+        AND     7
+        CP      4
+        JR      NC,RECV_0000&CPU
+
+        LD      B,0
+        RRCA
+        RR      B
+        RRCA
+        RR      B
+
+        ; send bibble
+        LD      A,15
+        OUT     (0A0H),A
+
+        DELAY   CPU
+
+        LD      A,00111111B
+        OUT     (0A1H),A
+
+        ; prepare to receive
+        LD      A,14
+        OUT     (0A0H),A
+
+        DELAY   CPU
+
+RECV_1111&CPU:
+        ; recv bibble
+        IN      A,(0A2H)
+        AND     7
+        CP      4
+        JR      C,RECV_1111&CPU
+
+        RRCA
+        RR      B
+        RRCA
+        RR      B
+
+        ; send bibble
+        LD      A,15
+        OUT     (0A0H),A
+
+        DELAY   CPU
+
+        LD      A,00101100B
+        OUT     (0A1H),A
+
+        ; prepare to receive
+        LD      A,14
+        OUT     (0A0H),A
+
+        DELAY   CPU
+
+RECV_0000_2&CPU:
+        ; recv bibble
+        IN      A,(0A2H)
+        AND     7
+        CP      4
+        JR      NC,RECV_0000_2&CPU
+
+        RRCA
+        RR      B
+        RRCA
+        RR      B
+
+        ; send bibble
+        LD      A,15
+        OUT     (0A0H),A
+
+        DELAY   CPU
+
+        LD      A,00111111B
+        OUT     (0A1H),A
+
+        ; prepare to receive
+        LD      A,14
+        OUT     (0A0H),A
+
+        DELAY   CPU
+
+RECV_1111_2&CPU:
+        ; recv bibble
+        IN      A,(0A2H)
+        AND     7
+        CP      4
+        JR      C,RECV_1111_2&CPU
+
+        RRCA
+        RR      B
+        RRCA
+        RR      B
+
+        LD      A,B
+        AND     A
+        RET
+
+RECV_FAILED&CPU:
+        SCF
+        RET
+
+                ENDM
+
+RECV_BYTE:
+        RECEIVE_BYTE    CPU_Z80
+
+RECV_BYTE_R800:
+        RECEIVE_BYTE    CPU_R800
+
+; -----------------------------------------------------------------------
+
+ERROR1:
+        LD      DE,MSG_ERROR
+	LD      C,PRINT
+	CALL    BDOS
+        JP      0
+
+MSG_ERROR:
+        DB      'Sorry, JoyWave require MSX Turbo-R in R800 mode',13,10,'$'
+
+; -----------------------------------------------------------------------
+; CALLBIOS - call a bios routine
+; enter: IX = address
+
+CALLBIOS:
+	LD      (CALLBIOS1),IX
+	RST     030h
+CALLBIOS0:
+	DB      0
+CALLBIOS1:
+	DW      0
+	RET
+
+; -----------------------------------------------------------------------
+; PREPARE - prepare compatibility
+
+PREPARE:
+	LD      A,(EXPTBL)
+	LD      (CALLBIOS0),A
+	RET
+
+ENDOFCODE:
+
+	END     START
+
+
+
+
