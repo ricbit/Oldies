@@ -178,6 +178,10 @@ Language: C
 Description: A FAT12 implementation, useful to insert and extract files
 from floppy disk images.
 
+Name: 1998-05-glove
+Language: C
+Description: A driver for a virtual reality glove called 5th Glove.
+
 Name: 1998-08-scr2grp
 Language: C
 Description: Converts ZX Spectrum .SCR screenshots to the MSX .GRP format.
