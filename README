@@ -187,6 +187,11 @@ Language: C
 Description: Reads a wave file containing an MSX cassete image and demodulate
 the FSK to get a .cas binary stream.
 
+Name: 1999-03-gota
+Language: C
+Description: Realistic physics simulator, could handle static and dynamic coils
+with newton integration.
+
 Name: 1999-05-fudebrowser
 Language: Assembly Z80
 Description: Web browser for MSX. Browses over pre-rendered html pages loaded
