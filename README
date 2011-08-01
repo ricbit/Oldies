@@ -321,6 +321,10 @@ Language: Assembly Z80
 Description: This is a remake of 1995-10-firedemo, this time running on MSX2
 with a binary of only 256 bytes.
 
+Name: 2003-12-rbsocket
+Language: C
+Description: A web server written on the socket level.
+
 Name: 2004-02-ramboplus
 Language: Assembly Z80
 Description: Patch to insert a new opening screen on the game Rambo. In order
