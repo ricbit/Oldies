@@ -242,6 +242,10 @@ Name: 1999-12-joywave
 Language: Assembly Z80, C
 Description: Streams a wave to a MSX turboR using joynet.
 
+Name: 1999-12-joyrom
+Language: Assembly Z80, C
+Description: Loads a ROM in MSX using joynet.
+
 Name: 2000-01-3dtictactoe
 Language: Java
 Description: 3D tic tac toe as a java applet. This game differs from classic
