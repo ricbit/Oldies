@@ -190,6 +190,10 @@ Name: 1998-09-must
 Language: Assembly Z80
 Description: Plays compressed music in an MSX with a standard megaram.
 
+Mame: 1998-09-wav2wvz
+Language: C
+Description: Converts a .wav file to the .wvz format used by must.
+
 Name: 1998-12-mp2audio
 Language: C
 Description: Decodes the header of an mp2 audio file.
