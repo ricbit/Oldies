@@ -141,6 +141,10 @@ Language: C
 Description: Voxel rendering engine based on shell extraction. This was
 promising but videocard makers spoiled the fun for us software renderers.
 
+Name: 1997-08-penguin
+Language: C++, Lex, Yacc
+Description: A parallax game engine including a DSL for character description.
+
 Name: 1997-08-brmsx
 Language: Assembly x86, Binary x86
 Description: This MSX emulator raised the bar for all others, being the faster

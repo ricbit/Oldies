@@ -1,0 +1,170 @@
+bot "pengbot" {
+  
+  origin "jogo-01.tga"
+  frame WALKING_RIGHT_1         0       0       24      32      D
+  frame WALKING_RIGHT_2         1*24    0       24      32      D
+  frame WALKING_RIGHT_3         2*24    0       24      32      D
+  frame STANDING_RIGHT          3*24    0       24      32      D
+  frame STARTING_WALK_RIGHT     4*24    0       24      32      D
+  frame WALKING_LEFT_1          0       0       24      32      I
+  frame WALKING_LEFT_2          1*24    0       24      32      I
+  frame WALKING_LEFT_3          2*24    0       24      32      I
+  frame STANDING_LEFT           3*24    0       24      32      I
+  frame STARTING_WALK_LEFT      4*24    0       24      32      I
+  frame BLINKING_RIGHT_1        7*24    0       24      32      D
+  frame BLINKING_RIGHT_2        8*24    0       24      32      D
+  frame BLINKING_LEFT_1         7*24    0       24      32      I
+  frame BLINKING_LEFT_2         8*24    0       24      32      I
+  frame ANGRY_RIGHT_1           9*24    0       24      32      D
+  frame ANGRY_RIGHT_2           10*24   0       24      32      D
+  frame ANGRY_LEFT_1            9*24    0       24      32      I
+  frame ANGRY_LEFT_2            10*24   0       24      32      I
+  frame DUCKING_RIGHT           6*24    0       24      32      D
+  frame DUCKING_LEFT            6*24    0       24      32      I
+
+  STATE_WALKING_RIGHT   {
+    WALKING_RIGHT_1
+    WALKING_RIGHT_2
+    WALKING_RIGHT_1
+    WALKING_RIGHT_3
+  }
+
+  STATE_STANDING_RIGHT {
+    STANDING_RIGHT
+  }
+
+  STATE_STARTING_WALK_RIGHT {
+    STARTING_WALK_RIGHT
+  }
+
+  STATE_WALKING_LEFT {
+    WALKING_LEFT_1
+    WALKING_LEFT_2
+    WALKING_LEFT_1
+    WALKING_LEFT_3
+  }
+
+  STATE_STANDING_LEFT {
+    STANDING_LEFT
+  }
+
+  STATE_STARTING_WALK_LEFT {
+    STARTING_WALK_LEFT
+  }
+
+  STATE_BLINKING_RIGHT {
+    BLINKING_RIGHT_1
+    BLINKING_RIGHT_1
+    BLINKING_RIGHT_2
+    BLINKING_RIGHT_2
+  }
+
+  STATE_BLINKING_LEFT {
+    BLINKING_LEFT_1
+    BLINKING_LEFT_1
+    BLINKING_LEFT_2
+    BLINKING_LEFT_2
+  }
+
+  STATE_ANGRY_RIGHT {
+    ANGRY_RIGHT_1
+    ANGRY_RIGHT_1
+    ANGRY_RIGHT_2
+    ANGRY_RIGHT_2
+  }
+
+  STATE_ANGRY_LEFT {
+    ANGRY_LEFT_1
+    ANGRY_LEFT_1
+    ANGRY_LEFT_2
+    ANGRY_LEFT_2
+  }
+
+  STATE_DUCKING_LEFT {
+    DUCKING_LEFT
+  }
+
+  STATE_DUCKING_RIGHT {
+    DUCKING_RIGHT
+  }
+
+  SEQUENCE_RIGHT {
+    [ 
+      STATE_STANDING_RIGHT 
+      STATE_STANDING_LEFT 
+      STATE_BLINKING_LEFT
+      STATE_BLINKING_RIGHT 
+      STATE_ANGRY_LEFT 
+      STATE_ANGRY_RIGHT
+      STATE_WALKING_LEFT 
+      STATE_STARTING_WALK_LEFT
+      STATE_DUCKING_RIGHT
+      STATE_DUCKING_LEFT
+    ] 
+    => 0 STATE_STARTING_WALK_RIGHT
+    
+    [ STATE_STARTING_WALK_RIGHT ] => 1 STATE_WALKING_RIGHT
+
+  }
+
+  SEQUENCE_LEFT {
+    [ STATE_STANDING_RIGHT 
+      STATE_STANDING_LEFT 
+      STATE_BLINKING_LEFT
+      STATE_BLINKING_RIGHT
+      STATE_ANGRY_LEFT
+      STATE_ANGRY_RIGHT
+      STATE_WALKING_RIGHT
+      STATE_STARTING_WALK_RIGHT
+      STATE_DUCKING_RIGHT
+      STATE_DUCKING_LEFT
+    ] 
+    => 0 STATE_STARTING_WALK_LEFT
+    
+    [ STATE_STARTING_WALK_LEFT ] => 1 STATE_WALKING_LEFT
+
+  }
+
+  SEQUENCE_DOWN {
+
+    [ STATE_WALKING_LEFT
+      STATE_STARTING_WALK_LEFT
+      STATE_STANDING_LEFT
+      STATE_BLINKING_LEFT
+      STATE_ANGRY_LEFT
+    ] 
+    => 0 STATE_DUCKING_LEFT
+
+    [ STATE_WALKING_RIGHT
+      STATE_STARTING_WALK_RIGHT
+      STATE_STANDING_RIGHT
+      STATE_BLINKING_RIGHT
+      STATE_ANGRY_RIGHT
+    ] 
+    => 0 STATE_DUCKING_RIGHT
+
+  }
+
+  SEQUENCE_ALONE {
+
+    [ STATE_WALKING_LEFT 
+      STATE_STARTING_WALK_LEFT 
+      STATE_DUCKING_LEFT
+    ] 
+    => 0 STATE_STANDING_LEFT
+
+    [ STATE_WALKING_RIGHT 
+      STATE_STARTING_WALK_RIGHT 
+      STATE_DUCKING_RIGHT
+    ] 
+    => 0 STATE_STANDING_RIGHT
+
+    [ STATE_STANDING_RIGHT ] => 21 STATE_BLINKING_RIGHT
+    [ STATE_STANDING_LEFT ] => 21 STATE_BLINKING_LEFT
+    [ STATE_BLINKING_LEFT ] => 13 STATE_ANGRY_LEFT
+    [ STATE_BLINKING_RIGHT ] => 13 STATE_ANGRY_RIGHT
+
+  }
+
+}
+
