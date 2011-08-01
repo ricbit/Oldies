@@ -354,6 +354,10 @@ Name: 2004-06-ttf
 Language: Assembly Z80
 Description: True type font renderer for MSX.
 
+Name: 2004-07-zbasic
+Language: C
+Description: MSX BASIC detokenizer.
+
 Name: 2004-08-boing
 Language: Assembly Z80
 Description: A remake of the Amiga demo Boing Ball to MSX1.
