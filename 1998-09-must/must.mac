@@ -1,0 +1,1402 @@
+; -----------------------------------------------------------------------        
+;
+;    Music Station 1.6
+;    Copyright (C) 1998 by Ricardo Bittencourt
+;
+;    This program is free software; you can redistribute it and/or modify
+;    it under the terms of the GNU General Public License as published by
+;    the Free Software Foundation; either version 2 of the License, or
+;    (at your option) any later version.
+;
+;    This program is distributed in the hope that it will be useful,
+;    but WITHOUT ANY WARRANTY; without even the implied warranty of
+;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;    GNU General Public License for more details.
+;
+;    You should have received a copy of the GNU General Public License
+;    along with this program; if not, write to the Free Software
+;    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+;
+;    Project started at 26/9/1998. Last modification was on 30/6/1999.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@lsi.usp.br
+;        http://www.lsi.usp.br/~ricardo
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+;               Adriano Cunha       (megaram library)
+;               Daniel Caetano      (msx2 video setup)    
+;
+;       Graphics
+;               Raul Tabajara       (original artwork)
+;               Ricardo Bittencourt (conversion to SCREEN 2)
+;
+;       Thanks to
+;               Walter MARUJO       (MSX-1 forever!)
+;               Giovanni Nunes      (my command line parser was broken!)
+;               Eduardo Brand       (send me more wvzs!)
+;               TFH                 (visit the MUST page at MEP!)
+;               Italo Valerio       (the impossible come true!)
+;               Renato Degiovani    (Graphos III rulez!)
+;
+;
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+	ORG     0100h
+
+BDOS    EQU     00005h
+OPEN    EQU     0000Fh
+RDSEQ   EQU     00014h
+PRINT   EQU     00009h
+DTA     EQU     00080h
+INIMLT  EQU     00075h
+INIT32  EQU     0006Fh
+INITXT  EQU     0006Ch
+INIGRP  EQU     00072h
+FILVRM  EQU     00056h
+LDIRMV  EQU     0005Ch
+CLRSPR  EQU     00069h
+PRTCHR  EQU     00002h
+ENASLT  EQU     00024h
+RSLREG  EQU     00138h
+TOTEXT  EQU     000D2h
+BDRCLR  EQU     0F3EBh
+CHGCLR  EQU     007F7h
+DISSCR  EQU     00041h
+ENASCR  EQU     00044h
+EXPTBL  EQU     0FCC1h
+RG1SAV  EQU     0F3E0h
+WRTVDP  EQU     00047h
+RDBLK   EQU     00027h
+SETDTA  EQU     0001Ah
+
+ALIGNF  DEFL    0
+
+; -----------------------------------------------------------------------
+
+ALIGNX          MACRO  X
+
+VOID&X:
+		DS      256*(HIGH (VOID&X+255))-VOID&X
+
+		ENDM
+
+ALIGN           MACRO
+
+		ALIGNX  %ALIGNF
+		ALIGNF  DEFL    ALIGNF+1
+
+		ENDM
+
+; -----------------------------------------------------------------------
+
+START:
+	; retrieve file name from command line
+
+	CALL    COMMAND_LINE
+
+	; prepare compatibility
+
+	CALL    PREPARE
+
+	; init the megaram
+
+	CALL    WHEREAMI
+	LD      (MAINSLOT),A
+
+	CALL    FIND_MEGARAM
+	CP      255
+	JP      Z,ERROR1
+	LD      (MEGASLOT),A
+
+	LD      HL,08000h
+	CALL    ENASLT
+
+	; open the file
+
+	LD      C,OPEN  
+	LD      DE,FCB
+	CALL    BDOS
+	CP      0FFh
+	JP      Z,ERROR2
+
+	; read the header
+	LD      HL,128
+	LD      (FCBSIZE),HL
+	LD      C,RDBLK
+	LD      DE,FCB
+	LD      HL,1
+	CALL    BDOS
+
+	; copy music name to final location
+	LD      HL,DTA+6
+	LD      DE,MUSICNAME
+	LD      BC,32
+	LDIR
+
+; -----------------------------------------------------------------------
+
+	; border color = light yellow
+	LD      A,0Bh
+	CALL    SCREEN2
+
+	; disable screen
+	LD      IX,DISSCR
+	CALL    CALLBIOS
+
+	; copy the opening screen to vram
+	LD      HL,OPENING_SCREEN
+	CALL    UNCOMPRESS
+	EI
+
+	; enable screen
+	LD      IX,ENASCR
+	CALL    CALLBIOS
+
+; -----------------------------------------------------------------------
+
+	; read file from disk
+
+	LD      DE,08000h
+	LD      C,SETDTA
+	CALL    BDOS
+
+MEGALOOP:
+
+	LD      A,(BLOCK)
+	OUT     (08Eh),A
+	LD      (08000h),A
+	INC     A
+	LD      (0A000h),A
+	IN      A,(08Eh)
+
+	LD      HL,08000h
+	LD      DE,08001h
+	LD      BC,03FFFh
+	LD      (HL),L
+	LDIR        
+
+	; read 128 blocks of data (16kb)
+
+	LD      HL,128
+	LD      DE,FCB
+	LD      C,RDBLK
+	CALL    BDOS
+
+	CP      1
+	JR      Z,ENDNOW
+
+	LD      A,(BLOCK)
+	INC     A
+	INC     A
+	LD      (BLOCK),A
+	JR      MEGALOOP
+
+ENDNOW: 
+	LD      A,(BLOCK)
+	INC     A
+	INC     A
+	LD      (BLKEND),A
+
+; -----------------------------------------------------------------------
+
+	; wait two seconds
+
+	LD      B,120
+WAIT0:
+	HALT
+	DJNZ    WAIT0
+
+; -----------------------------------------------------------------------
+
+	; centralize the music
+
+	LD      HL,MUSICNAME+31
+	LD      E,0
+	LD      B,32
+
+SEARCHMORE:
+	LD      A,(HL)
+	CP      32
+	JR      NZ,ENDFOUND
+
+	DEC     HL
+	INC     E
+	DJNZ    SEARCHMORE
+
+ENDFOUND:
+	SRL     E
+	LD      D,0
+	PUSH    DE
+	LD      C,E
+	LD      B,0
+	LD      HL,MUSICNAME+31
+	OR      A
+	SBC     HL,DE
+	EX      DE,HL
+	LD      HL,32
+	SBC     HL,BC
+	LD      C,L
+	LD      B,H
+	LD      HL,MUSICNAME+31
+	EX      DE,HL
+	LDDR
+	POP     BC
+
+	LD      B,C
+	INC     B
+FILLZERO:
+	LD      A,32
+	LD      (DE),A
+	DEC     DE
+	DJNZ    FILLZERO
+
+; -----------------------------------------------------------------------
+
+	; copy the scroll bar to bottom bar
+	LD      B,32*5
+	LD      HL,SCROLLBAR
+	LD      DE,SCROLLBARBOTTOM
+COPYBAR:
+	LD      A,(HL)
+	OR      080h
+	LD      (DE),A
+	INC     HL
+	INC     DE
+	DJNZ    COPYBAR
+
+; -----------------------------------------------------------------------
+
+	; border color = white
+	LD      A,0Fh
+	CALL    SCREEN2
+	
+	; disable screen
+	LD      IX,DISSCR
+	CALL    CALLBIOS
+	
+	; copy the opening screen to vram
+	LD      HL,MAIN_SCREEN
+	CALL    UNCOMPRESS
+	EI
+
+	; enable screen
+
+	LD      IX,ENASCR
+	CALL    CALLBIOS
+
+	; set up psg mixer
+
+	LD      A,7
+	OUT     (0A0h),A
+	LD      A,10111111b
+	OUT     (0A1H),A
+
+	; set new irq handler
+
+	DI
+	LD      HL,(0038h)
+	LD      (SAVE_IRQ),HL
+	LD      HL,(003Ah)
+	LD      (SAVE_IRQ+2),HL
+	LD      A,0C3h
+	LD      (0038h),A
+	LD      HL,INSTALL_HANDLER
+	LD      (0039h),HL
+	
+	EI
+	HALT
+	
+	LD      A,8
+	OUT     (0A0h),A
+
+	XOR     A
+	LD      (BLOCK),A
+	
+	LD      A,8
+	EX      AF,AF'
+
+	EXX
+	LD      HL,STEP_WAVEFORM
+	LD      DE,WAVEFORM
+	LD      BC,MASKTABLE
+	LD      IX,PENGUIN_ATTR
+	EXX
+
+	OUT     (08Eh),A
+
+; -----------------------------------------------------------------------
+
+MEGAPLAY:
+	LD      A,(BLOCK)
+	INC     A
+	INC     A
+	LD      (08000h),A
+	LD      A,(08000h)
+	LD      (0C000h),A
+
+	LD      A,(BLOCK)
+	LD      (08000h),A
+	INC     A
+	LD      (0A000h),A
+	LD      BC,8000H
+
+PLAY0:
+
+	; SAMPLE 0
+
+	LD      A,(BC)                          ; 8 8
+	LD      L,A                             ; 5 13
+	LD      H,HIGH (DECODE_SINGLE)+0        ; 8 21
+	LD      D,(HL)                          ; 8 29
+	LD      H,HIGH (DECODE_CHECK)+0         ; 8 37
+	LD      E,(HL)                          ; 8 45
+	LD      H,HIGH (DECODE_EXT)+1           ; 8 53
+	LD      A,(BC)                          ; 8 61
+	LD      L,A                             ; 5 66
+	LD      A,(HL)                          ; 8 74
+	AND     E                               ; 5 79
+	LD      E,A                             ; 5 84
+	EX      AF,AF'                          ; 5 89
+	ADD     A,D                             ; 5 94
+	ADD     A,E                             ; 5 99
+	OUT     (0A1h),A                        ; 12 111
+	EX      AF,AF'                          ; 5 116
+	JP      NZ,SKIPTO2                      ; 10 126
+
+
+SKIPTO1ENTER:        
+	NOP                                     ; 5 5
+	NOP                                     ; 5 10
+	NOP                                     ; 5 15
+	NOP                                     ; 5 20
+	NOP                                     ; 5 25
+	CALL    IDLE                            ; 18 43
+
+	; SAMPLE 1
+
+	LD      A,(BC)
+	LD      L,A
+	LD      H,HIGH (DECODE_SINGLE)+1
+	LD      D,(HL)
+	LD      H,HIGH (DECODE_CHECK)+1
+	LD      E,(HL)
+	LD      H,HIGH (DECODE_EXT)+2
+	LD      A,(BC)
+	LD      L,A
+	LD      A,(HL)
+	AND     E
+	LD      E,A
+	EX      AF,AF'
+	ADD     A,D
+	ADD     A,E
+	OUT     (0A1h),A
+	EX      AF,AF'
+	JP      NZ,SKIPTO3
+
+SKIPTO2:
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	CALL    IDLE
+
+	; SAMPLE 2
+
+	LD      A,(BC)
+	LD      L,A
+	LD      H,HIGH (DECODE_SINGLE)+2
+	LD      D,(HL)
+	LD      H,HIGH (DECODE_CHECK)+2
+	LD      E,(HL)
+	LD      H,HIGH (DECODE_EXT)+3
+	LD      A,(BC)
+	LD      L,A
+	LD      A,(HL)
+	AND     E
+	LD      E,A
+	EX      AF,AF'
+	ADD     A,D
+	ADD     A,E
+	OUT     (0A1h),A
+	EX      AF,AF'
+	JP      NZ,SKIPTO0
+
+SKIPTO3:
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+	CALL    IDLE
+
+	; SAMPLE 3
+
+	LD      A,(BC)
+	LD      L,A
+	LD      H,HIGH (DECODE_SINGLE)+3
+	LD      D,(HL)
+	LD      H,HIGH (DECODE_CHECK)+3
+	LD      E,(HL)
+	LD      H,HIGH (DECODE_EXT)+0
+	INC     BC
+	LD      A,(BC)
+	LD      L,A
+	LD      A,(HL)
+	AND     E
+	LD      E,A
+	EX      AF,AF'
+	ADD     A,D
+	ADD     A,E
+	OUT     (0A1h),A
+	EX      AF,AF'
+	JP      NZ,SKIPTO1
+
+	CALL    IDLE
+
+	LD      A,B
+	CP      0C0h
+	JP      NZ,PLAY0
+	JP      NEXTBLOCK
+
+SKIPTO0:
+	CALL    IDLE
+
+	INC     BC
+	LD      A,B
+	CP      0C0h
+	JP      NZ,PLAY0
+	JP      NEXTBLOCK
+
+SKIPTO1:
+	LD      A,B
+	CP      0C0h
+	JP      NZ,SKIPTO1ENTER
+
+NEXTBLOCK:
+	LD      A,(BLOCK)
+	INC     A       
+	INC     A
+	LD      (BLOCK),A
+	DI
+	PUSH    HL
+	LD      HL,BLKEND
+	CP      (HL)
+	POP     HL
+	EI
+	JP      NZ,MEGAPLAY
+
+; -----------------------------------------------------------------------
+
+	; exit the program
+
+	; return page 2 to previous owner
+	LD      A,(MAINSLOT)        
+	LD      HL,08000h
+	CALL    ENASLT
+
+	; enable old irq-handler 
+	DI
+	LD      HL,(SAVE_IRQ)
+	LD      (0038h),HL
+	LD      HL,(SAVE_IRQ+2)
+	LD      (003Ah),HL
+	EI
+
+	; return to text mode
+	LD      IX,TOTEXT
+	CALL    CALLBIOS
+
+	; print final message
+	LD      C,PRINT
+	LD      DE,MSG0
+	CALL    BDOS
+	LD      C,PRINT
+	LD      DE,MSG8
+	CALL    BDOS
+
+	; return to dos
+	JP      0
+
+; -----------------------------------------------------------------------
+
+
+IDLE:
+	DI              ; 5 5
+	EXX             ; 5 10
+	JP      (HL)    ; 5 15
+
+; -----------------------------------------------------------------------
+
+STEP_X  MACRO X,X2
+
+STEP&X:
+	;; 103 CLOCKS
+	LD      A,(IX+X*2)              ;; 21 21
+	OUT     (098h),A                ;; 12 33
+	EX      AF,AF'                  ;; 5 38
+	LD      (DE),A                  ;; 8 46
+	EX      AF,AF'                  ;; 5 51
+	INC     E                       ;; 5 56
+	LD      A,(PCOUNTER)            ;; 14 70
+	LD      A,(IX+X*2+1)            ;; 21 91
+	OUT     (098h),A                ;; 12 103
+	;;
+	LD      HL,STEP&X2
+	EXX
+	EI
+	RET
+
+	ENDM
+
+; -----------------------------------------------------------------------
+
+STEP_SCROLL_X  MACRO X,X2
+
+STEPSCROLL&X:
+	;; 103 CLOCKS
+	LD      A,(IX+X*2)              ;; 21 21
+	OUT     (098h),A                ;; 12 33
+	EX      AF,AF'                  ;; 5 38
+	LD      (DE),A                  ;; 8 46
+	EX      AF,AF'                  ;; 5 51
+	INC     E                       ;; 5 56
+	LD      A,(PCOUNTER)            ;; 14 70
+	LD      A,(IX+X*2+1)            ;; 21 91
+	OUT     (098h),A                ;; 12 103
+	;;
+	LD      HL,STEPSCROLL&X2
+	EXX
+	EI
+	RET
+
+	ENDM
+
+; -----------------------------------------------------------------------
+
+STEP_BOTTOM_X  MACRO X,X2
+
+STEPBOTTOM&X:
+	;; 103 CLOCKS
+	LD      A,(IX+X*2)              ;; 21 21
+	OUT     (098h),A                ;; 12 33
+	EX      AF,AF'                  ;; 5 38
+	LD      (DE),A                  ;; 8 46
+	EX      AF,AF'                  ;; 5 51
+	INC     E                       ;; 5 56
+	LD      A,(PCOUNTER)            ;; 14 70
+	LD      A,(IX+X*2+1)            ;; 21 91
+	OUT     (098h),A                ;; 12 103
+	;;
+	LD      HL,STEPBOTTOM&X2
+	EXX
+	EI
+	RET
+
+	ENDM
+
+; -----------------------------------------------------------------------
+
+STEP_WAVEFORM:
+	; 103 CLOCKS
+	LD      A,0                     ; 8 41
+	OUT     (099h),A                ; 12 53
+	EX      AF,AF'                  ; 5 5       
+	LD      C,A                     ; 5 10
+	EX      AF,AF'                  ; 5 15
+	LD      A,C                     ; 5 20
+	LD      (DE),A                  ; 8 28
+	INC     E                       ; 5 33
+	INC     HL                      ; 7 96
+	INC     HL                      ; 7 103
+	LD      A,01Bh                  ; 8 61
+	AND     03Fh                    ; 8 69
+	OR      040h                    ; 8 77
+	OUT     (099h),A                ; 12 89
+	;
+	LD      HL,STEP0
+	EXX
+	EI
+	RET
+
+	I       DEFL    0
+	REPT    16
+	J       DEFL    I+1
+	STEP_X  %I,%J
+	I       DEFL    J
+	ENDM
+
+STEP16:
+	; 103 CLOCKS
+	LD      A,0A0h                  ; 8 8
+	OUT     (099h),A                ; 12 20
+	EX      AF,AF'                  ; 5 25
+	LD      (DE),A                  ; 8 33
+	EX      AF,AF'                  ; 5 38
+	LD      IX,(SCROLLPOS)          ; 22 60
+	INC     E                       ; 5 65
+	NEG                             ; 10 75
+	OR      0                       ; 8 83
+	LD      A,05Ah                  ; 8 91
+	OUT     (099h),A                ; 12 103
+	;
+	LD      HL,STEPSCROLL0
+	EXX
+	EI
+	RET
+	
+	I       DEFL    0
+	REPT    16
+	J       DEFL    I+1
+	STEP_SCROLL_X   %I,%J
+	I       DEFL    J
+	ENDM
+
+STEPSCROLL16:
+	EX      DE,HL         ; 5 5  
+	LD      DE,32*5       ; 11 16
+	ADD     IX,DE         ; 17 33
+	EX      DE,HL         ; 5 38
+	EX      AF,AF'        ; 5 43  
+	LD      (DE),A        ; 8 51
+	EX      AF,AF'        ; 5 56
+	INC     E             ; 5 61
+	LD      A,R           ; 11 72  
+	LD      A,0           ; 8 80  
+	LD      A,0           ; 8 88
+	REPT    3
+	NOP
+	ENDM
+	;
+	LD      HL,STEPBOTTOM0
+	EXX
+	EI
+	RET
+
+	I       DEFL    0
+	REPT    16
+	J       DEFL    I+1
+	STEP_BOTTOM_X   %I,%J
+	I       DEFL    J
+	ENDM
+
+STEPBOTTOM16:
+STEPLASTLOOP:        
+	; 103 CLOCKS
+	EX      AF,AF'                  ; 5 5       
+	LD      C,A                     ; 5 10
+	EX      AF,AF'                  ; 5 15
+	LD      A,C                     ; 5 20
+	LD      (DE),A                  ; 8 28
+	LD      C,E                     ; 5 33
+	LD      A,(BC)                  ; 8 41
+	ADD     A,E                     ; 5 46
+	LD      E,A                     ; 5 51
+	REPT    4
+	LD      A,0
+	ENDM
+	REPT    4
+	NOP
+	ENDM
+	;
+	LD      HL,STEPLASTLOOP
+	EXX
+	EI
+	RET
+
+; -----------------------------------------------------------------------
+
+STEP_DRAW_0:
+	; 103 CLOCKS
+	LD      A,(DE)                  ; 8 8
+	OR      C                       ; 5 13
+	LD      L,A                     ; 5 18
+	LD      H,B                     ; 5 23
+	SET     7,(HL)                  ; 17 40
+	INC     E                       ; 5 45
+	LD      A,(DE)                  ; 8 53
+	OR      C                       ; 5 58
+	LD      L,A                     ; 5 63
+	SET     6,(HL)                  ; 17 80
+	INC     E                       ; 5 85
+	LD      A,0                     ; 8 93
+	NOP                             ; 5 98
+	NOP                             ; 5 103
+	;
+	LD      HL,STEP_DRAW_1
+	EXX
+	EI
+	RET
+
+STEP_DRAW_1:
+	; 103 CLOCKS
+	LD      A,(DE)                  ; 8 8
+	OR      C                       ; 5 13
+	LD      L,A                     ; 5 18
+	LD      H,B                     ; 5 23
+	SET     5,(HL)                  ; 17 40
+	INC     E                       ; 5 45
+	LD      A,(DE)                  ; 8 53
+	OR      C                       ; 5 58
+	LD      L,A                     ; 5 63
+	SET     4,(HL)                  ; 17 80
+	INC     E                       ; 5 85
+	LD      A,0                     ; 8 93
+	NOP                             ; 5 98
+	NOP                             ; 5 103
+	;
+	LD      HL,STEP_DRAW_2
+	EXX
+	EI
+	RET
+
+STEP_DRAW_2:
+	; 103 CLOCKS
+	LD      A,(DE)                  ; 8 8
+	OR      C                       ; 5 13
+	LD      L,A                     ; 5 18
+	LD      H,B                     ; 5 23
+	SET     3,(HL)                  ; 17 40
+	INC     E                       ; 5 45
+	LD      A,(DE)                  ; 8 53
+	OR      C                       ; 5 58
+	LD      L,A                     ; 5 63
+	SET     2,(HL)                  ; 17 80
+	INC     E                       ; 5 85
+	LD      A,0                     ; 8 93
+	NOP                             ; 5 98
+	NOP                             ; 5 103
+	;
+	LD      HL,STEP_DRAW_3
+	EXX
+	EI
+	RET
+
+STEP_DRAW_3:
+	; 103 CLOCKS
+	LD      A,(DE)                  ; 8 8
+	OR      C                       ; 5 13
+	LD      L,A                     ; 5 18
+	LD      H,B                     ; 5 23
+	SET     1,(HL)                  ; 17 40
+	INC     E                       ; 5 45
+	LD      A,(DE)                  ; 8 53
+	OR      C                       ; 5 58
+	LD      L,A                     ; 5 63
+	SET     0,(HL)                  ; 17 80
+	INC     E                       ; 5 85
+	LD      A,0                     ; 8 93
+	NOP
+	NOP
+	;
+	LD      HL,STEP_DRAW_4
+	EXX
+	EI
+	RET
+
+STEP_DRAW_4:
+	; 103 CLOCKS
+	LD      A,C                     ; 5 5
+	ADD     A,16                    ; 8 13
+	LD      C,A                     ; 5 18
+	LD      A,B                     ; 5 23
+	ADC     A,0                     ; 8 31
+	LD      B,A                     ; 5 36
+
+	REPT    4
+	LD      A,0
+	ENDM
+	REPT    7
+	NOP
+	ENDM
+	;
+	LD      HL,STEP_DRAW_0
+	EXX
+	EI
+	RET
+
+; -----------------------------------------------------------------------
+
+STEP_FLUSH_0:
+	; 103 CLOCKS
+	LD      A,0                     ; 8 8
+	OUT     (099h),A                ; 12 20
+	REPT    4
+	LD      A,0
+	ENDM
+	REPT    3
+	NOP
+	ENDM
+	LD      A,08h                   ; 8 28
+	AND     03Fh                    ; 8 36
+	OR      040h                    ; 8 44
+	OUT     (099h),A                ; 12 56
+	;
+	LD      HL,STEP_FLUSH_1
+	EXX
+	EI
+	RET
+
+STEP_FLUSH_1:
+	; 103 CLOCKS
+	LD      A,(DE)          ; 8 8
+	LD      C,A             ; 5 13
+	OUT     (098h),A        ; 12 25
+	XOR     A               ; 5 30
+	LD      (DE),A          ; 8 38
+	INC     DE              ; 7 53
+	LD      A,(DE)          ; 8 61
+	NOP                     ; 5 66
+	NOP                     ; 5 71
+	OUT     (098h),A        ; 12 83
+	XOR     A               ; 5 88
+	LD      A,0
+	LD      (DE),A          ; 8 96
+	INC     DE              ; 7 103
+	;
+	LD      HL,STEP_FLUSH_1
+	EXX
+	EI
+	RET
+
+; -----------------------------------------------------------------------
+
+INSTALL_HANDLER:
+	PUSH    HL
+	LD      HL,MY_HANDLER
+	LD      (0039h),HL
+	POP     HL
+	EI
+	RET
+
+; -----------------------------------------------------------------------
+
+MY_HANDLER:
+	PUSH    AF
+	IN      A,(099h)
+	
+	LD      A,(TASK)
+	CP      1
+	JR      Z,MY_HANDLER_TASK1
+
+	LD      A,(TASK)
+	CP      2
+	JR      Z,MY_HANDLER_TASK2
+
+MY_HANDLER_TASK0:
+	LD      IX,PENGUIN_ATTR
+	LD      A,(PCOUNTER)
+	ADD     A,8
+	LD      (PCOUNTER),A
+	AND     01100000b
+
+	EXX
+	LD      C,A
+	LD      B,0
+	ADD     IX,BC
+	LD      HL,STEP_WAVEFORM
+	LD      DE,WAVEFORM
+	LD      BC,MASKTABLE
+	EXX
+
+	LD      A,1
+	LD      (TASK),A
+
+	POP     AF
+	EI
+	RET
+
+MY_HANDLER_TASK1:
+	EXX
+
+	LD      A,(SCROLLIND)
+	INC     A
+	LD      (SCROLLIND),A
+	LD      L,A
+	LD      H,HIGH (SCROLLTABLE)
+	LD      A,(HL)
+	LD      (SCROLLPOS),A
+
+	LD      HL,STEP_DRAW_0
+	LD      DE,WAVEFORM
+	LD      BC,ROTATEBUF
+	EXX
+	
+	LD      A,0
+	LD      (ACTUAL),A
+
+	LD      A,2
+	LD      (TASK),A
+
+	POP     AF
+	EI
+	RET
+
+MY_HANDLER_TASK2:
+	EXX
+	LD      HL,STEP_FLUSH_0
+	LD      DE,ROTATEBUF
+	EXX
+	
+	LD      A,0
+	LD      (ACTUAL),A
+
+	LD      A,0
+	LD      (TASK),A
+
+	POP     AF
+	EI
+	RET
+
+; -----------------------------------------------------------------------
+; WHEREAMI - find the slot ID of main ram
+; return: A = slot id
+
+WHEREAMI:
+	IN      A,(0A8h)
+	AND     3
+	LD      C,A
+	LD      B,0
+	LD      HL,EXPTBL
+	ADD     HL,BC
+	LD      B,A
+	LD      A,(HL)
+	LD      E,A
+	RLCA
+	SBC     A,A
+	LD      C,A
+	LD      A,E
+	AND     080h
+	LD      E,A
+	INC     HL
+	INC     HL
+	INC     HL
+	INC     HL
+	LD      A,(HL)
+	RLCA
+	RLCA
+	AND     1100b
+	AND     C
+	OR      B
+	OR      E
+	RET
+
+; -----------------------------------------------------------------------
+; CALLBIOS - call a bios routine
+; enter: IX = address
+
+CALLBIOS:
+	LD      (CALLBIOS1),IX
+	RST     030h
+CALLBIOS0:
+	DB      0
+CALLBIOS1:
+	DW      0
+	RET
+
+; -----------------------------------------------------------------------
+; PREPARE - prepare compatibility
+
+PREPARE:
+	LD      A,(EXPTBL)
+	LD      (CALLBIOS0),A
+	RET
+
+; -----------------------------------------------------------------------
+; PRINTHEX - print a byte in hexadecimal format
+; enter: A = byte
+
+PRINTHEX:
+	PUSH    AF
+	RRCA
+	RRCA
+	RRCA
+	RRCA
+	AND     0Fh
+	CALL    PRINTDIG
+	POP     AF
+	AND     0Fh
+PRINTDIG:
+	CP      10
+	JR      C,PRINTDIG0
+	ADD     A,'A'-10
+	JR      PRINTDIG1
+PRINTDIG0:
+	ADD     A,'0'
+PRINTDIG1:
+	LD      C,PRTCHR
+	LD      E,A
+	CALL    BDOS
+	RET
+
+; -----------------------------------------------------------------------
+; PRINTSLOT - print a slot id
+; enter: A = slot id
+
+PRINTSLOT:
+	PUSH    AF
+	AND     3
+	CALL    PRINTDIG
+	POP     AF
+	BIT     7,A
+	RET     Z
+	PUSH    AF
+	LD      C,PRTCHR
+	LD      E,'.'
+	CALL    BDOS
+	POP     AF
+	RRCA
+	RRCA
+	AND     3
+	JP      PRINTDIG
+
+; -----------------------------------------------------------------------
+; COMMAND_LINE: parse the command line and place the file name in FCB
+
+COMMAND_LINE:
+	LD      HL,081H
+	LD      DE,FCB+1
+STARTSKIP:
+	LD      A,(HL)
+	CP      0Dh
+	JR      Z,STARTSKIP1
+	CP      32
+	JR      NZ,START0
+STARTSKIP1:
+	INC     HL
+	JR      STARTSKIP
+START0:
+	LD      A,(HL)
+	CP      0DH
+	RET     Z
+	CP      00H
+	RET     Z
+	CP      32
+	RET     Z
+	LD      (DE),A
+	INC     DE
+START2:
+	INC     HL
+	JR      START0
+	
+; -----------------------------------------------------------------------
+; ERROR1: system does not have megaram
+
+ERROR1:
+	LD      C,PRINT
+	LD      DE,MSG4
+	CALL    BDOS
+	JP      0
+
+; -----------------------------------------------------------------------
+; ERROR2: file could not be opened
+
+ERROR2:
+	; return page 2 to previous owner
+	LD      A,(MAINSLOT)        
+	LD      HL,08000h
+	CALL    ENASLT
+
+	LD      C,PRINT
+	LD      DE,MSG5
+	CALL    BDOS
+
+	JP      0
+
+; -----------------------------------------------------------------------
+; Call SubRom - SubRom Function on IX
+
+CALLSUB:
+	LD      IY,(0FAF7h)
+	CALL    001Ch
+	RET
+
+; -----------------------------------------------------------------------
+; Portable routine to change to SCREEN 2 in any MSX model
+; written by Daniel Caetano
+
+; Enter: A = border color
+
+SCREEN2:
+	PUSH    AF
+
+	; Verify if MSX Type is NOT MSX 1
+	LD      A,(0FCC1h)
+	LD      HL,02Dh
+	CALL    0Ch
+	CP      0
+	JR      NZ, SCREEN2_MSX2
+
+; set up SCREEN 2 on MSX1
+
+	; Change to Screen2
+	LD      IX,INIGRP
+	CALL    CALLBIOS
+
+	; set the sprites to 16x16
+	LD      A,(RG1SAV)
+	OR      2
+	LD      B,A
+	LD      C,1
+	LD      IX,WRTVDP
+	CALL    CALLBIOS
+
+	; set border color to light yellow
+	POP     AF
+	;LD      A,0Bh
+	LD      (BDRCLR),A
+	LD      IX,CHGCLR
+	CALL    CALLBIOS
+
+	RET
+
+; set up SCREEN 2 on MSX2
+
+SCREEN2_MSX2:        
+	; Change to Screen2
+	LD      IX,00DDh
+	CALL    CALLSUB
+	LD      IX,0141h
+	CALL    CALLSUB
+
+	; clear SCREEN
+	LD      IX,0115h
+	CALL    CALLSUB
+
+	; set the sprites to 16x16
+	LD      A,(RG1SAV)
+	OR      2
+	LD      B,A
+	LD      C,1
+	LD      IX,012Dh
+	CALL    CALLSUB
+
+	; set border color to light yellow
+
+	POP     AF
+	;LD      A,0Bh
+	LD      (BDRCLR),A
+	LD      IX,0111h
+	CALL    CALLBIOS
+
+	RET
+
+; -----------------------------------------------------------------------
+; Memory Manager by A&L Software
+
+INCLUDE MEGARAM.INC
+
+; -----------------------------------------------------------------------
+; Copy a compressed area to VRAM
+
+UNCOMPRESS:
+	DI      
+	LD      A,0
+	OUT     (099h),A
+	EX      (SP),HL
+	EX      (SP),HL
+	LD      A,040h
+	OUT     (099h),A
+
+UNCOMPRESS_FETCH:
+	LD      A,(HL)
+	INC     HL
+
+	AND     A
+	RET     Z
+
+	RLCA
+	JP      C,DECODE_MULTI
+
+	; raw sequence
+	LD      B,A
+DECODE_FILL:
+	LD      A,(HL)
+	OUT     (098h),A
+	INC     HL
+	DJNZ    DECODE_FILL
+	JP      UNCOMPRESS_FETCH
+
+	; multi sequence
+DECODE_MULTI:
+	AND     0FEh
+	LD      B,A
+	LD      A,(HL)
+	INC     HL
+DECODE_MULTI_LOOP:
+	OUT     (098h),A
+	EX      (SP),HL
+	EX      (SP),HL
+	DJNZ    DECODE_MULTI_LOOP
+	JP      UNCOMPRESS_FETCH
+
+; -----------------------------------------------------------------------
+; Work Area
+
+FCB:
+	DB      0               ; 0: drive number
+	DB      '        '      ; 1: file name
+	DB      'WVZ'           ; 9: file extension
+	DB      0,0             ; 12: reserved
+FCBSIZE:
+	DB      0,0             ; 14: size of random access register
+	DB      0,0,0,0         ; 16: file length
+	DB      0,0             ; 20: date
+	DB      0,0             ; 22: time
+	DB      0,0,0,0,0,0,0,0 ; 24: reserved
+	DB      0               ; 32: reserved
+	DB      0,0,0,0         ; 33: current random access register
+
+MSG0:   DB      'Music Station 1.6',13,10
+	DB      'Copyright (C) 1998',13,10
+	DB      'by Ricardo Bittencourt',13,10,10,'$'
+MSG1:   DB      13,10,10,'Loading $'
+MSG2:   DB      '.$'
+MSG3:   DB      13,10,'Playing ...$'
+MSG4:   DB      13,10,'Sorry, this system doesn''t ',13,10
+	DB      'have a MegaRAM.$'
+MSG5:   DB      13,10,'Sorry, the file could not be opened.$'
+MSG6:   DB      'MainRAM in slot $'
+MSG7:   DB      13,10,'MegaRAM in slot $'
+MSG8:   DB      'Official site:',13,10
+	DB      'http://www.lsi.usp.br/~ricardo/must.htm',13,10
+	DB      'Send bugs, comments and suggestions',13,10
+	DB      'to ricardo@lsi.usp.br',13,10,'$'
+MSG9:   DB      13,10,'Music: $'
+
+BLOCK:          DB      0
+BLKEND:         DB      0
+ACTUAL:         DB      0
+TASK:           DB      0
+MEGASLOT:       DB      0
+MAINSLOT:       DB      0
+PCOUNTER:       DB      0
+SCROLLIND:      DB      0
+SCROLLPOS:      DW      SCROLLBAR
+
+SAVE_IRQ:
+	DB      0,0,0,0
+
+ALIGN           
+
+SCROLLBAR:
+	DB      '                                '
+	DB      'MUST 1.6  by Ricardo Bittencourt'
+	DB      '                                '
+MUSICNAME:
+	DB      '                                '
+	DB      '                                '
+
+SCROLLBARBOTTOM:
+	DS      32*5
+
+ALIGN           
+
+MASKTABLE:
+	REPT    255
+	DB      1
+	ENDM
+	DB      0
+
+SCROLLTABLE:
+	I       DEFL    0
+	REPT    32
+	DB      I
+	I       DEFL    I+1
+	ENDM
+
+	REPT    64
+	DB      32
+	ENDM
+
+	I       DEFL    32
+	REPT    64
+	DB      I
+	I       DEFL    I+1
+	ENDM
+
+	REPT    64
+	DB      32+64
+	ENDM
+
+	I       DEFL    32+64
+	REPT    32
+	DB      I
+	I       DEFL    I+1
+	ENDM
+
+PENGUIN_ATTR:
+	DB      19,220,0,1
+	DB      35,220,4,1
+	DB      19,220,8,9
+	DB      35,220,12,9
+	DB      19,220,16,5
+	DB      35,220,20,5
+	DB      19,220,24,10
+	DB      35,220,28,10
+
+	DB      19,220,32+0,1
+	DB      35,220,32+4,1
+	DB      19,220,32+8,9
+	DB      35,220,32+12,9
+	DB      19,220,32+16,5
+	DB      35,220,32+20,5
+	DB      19,220,32+24,10
+	DB      35,220,32+28,10
+
+	DB      19,220,64+0,1
+	DB      35,220,64+4,1
+	DB      19,220,64+8,9
+	DB      35,220,64+12,9
+	DB      19,220,64+16,5
+	DB      35,220,64+20,5
+	DB      19,220,64+24,10
+	DB      35,220,64+28,10
+		      
+	DB      19,220,32+0,1
+	DB      35,220,32+4,1
+	DB      19,220,32+8,9
+	DB      35,220,32+12,9
+	DB      19,220,32+16,5
+	DB      35,220,32+20,5
+	DB      19,220,32+24,10
+	DB      35,220,32+28,10
+
+ALIGN           
+
+DECODE_SINGLE:
+	INCLUDE DECODE2.INC
+
+DECODE_CHECK:
+	INCLUDE DECODE3.INC
+
+DECODE_EXT:
+	INCLUDE DECODE1.INC
+
+; opening screen and main screen
+
+	INCLUDE VRAMZ.INC
+
+ALIGN
+ENDOFCODE:
+
+MINMAXTABLE     EQU     ENDOFCODE
+WAVEFORM        EQU     ENDOFCODE+0100h
+ROTATEBUF       EQU     ENDOFCODE+0200h
+FARAWAY         EQU     04000H
+
+	END     START
+
+
+

@@ -168,11 +168,6 @@ Description: Update to the old psgplayer, this time emulating the PSG using
 wave-based synthesis. This was a proof of concept before I implemented
 sound support in BrMSX.
 
-Name: 1998-07-serial
-Language: C
-Description: Connects two computers using a serial cable. This was a proof of
-concept before I implemented multiplayer over serial in BrMSX.
-
 Name: 1998-04-dsktool
 Language: C
 Description: A FAT12 implementation, useful to insert and extract files
@@ -182,9 +177,18 @@ Name: 1998-05-glove
 Language: C
 Description: A driver for a virtual reality glove called 5th Glove.
 
+Name: 1998-07-serial
+Language: C
+Description: Connects two computers using a serial cable. This was a proof of
+concept before I implemented multiplayer over serial in BrMSX.
+
 Name: 1998-08-scr2grp
 Language: C
 Description: Converts ZX Spectrum .SCR screenshots to the MSX .GRP format.
+
+Name: 1998-09-must
+Language: Assembly Z80
+Description: Plays compressed music in an MSX with a standard megaram.
 
 Name: 1998-12-mp2audio
 Language: C
