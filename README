@@ -136,6 +136,11 @@ Name: 1996-12-vesa
 Language: C
 Description: Lists all video modes available from a VESA videocard.
 
+Name: 1996-12-rbvv
+Language: C
+Description: Voxel rendering engine based on shell extraction. This was
+promising but videocard makers spoiled the fun for us software renderers.
+
 Name: 1997-08-brmsx
 Language: Assembly x86, Binary x86
 Description: This MSX emulator raised the bar for all others, being the faster
