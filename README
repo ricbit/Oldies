@@ -414,6 +414,10 @@ Name: 2008-03-roman
 Language: C
 Description: Roman numbers using preprocessor metaprogramming.
 
+Name: 2008-04-sudoku
+Language: C++
+Description: Solver for irregular sudokus using exact cover and dancing links.
+
 Name: 2008-05-optimumpower
 Language: C++
 Description: Find the optimum sequence of multiplications to calculate
