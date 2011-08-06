@@ -422,6 +422,10 @@ Name: 2005-05-fpgapong
 Language: VHDL
 Description: A pong clone for the Digilent FPGA.
 
+Name: 2005-06-gomoku
+Language: Java
+Description: Gomoku applet.
+
 Name: 2005-09-gibi
 Language: C
 Description: This was supposed to grow to a .cbr reader for Nintendo DS,
