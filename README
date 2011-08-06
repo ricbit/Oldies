@@ -428,6 +428,10 @@ Language: C++
 Description: Find the optimum sequence of multiplications to calculate
 integer powers, using addition chains.
 
+Name: 2008-05-montecarlo
+Language: C++
+Description: Password reconstruction using monte carlo and exact cover.
+
 Name: 2008-06-randomprime
 Language: C++
 Description: Monte carlo simulation for the expected value of a trial and error
