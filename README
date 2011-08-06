@@ -346,6 +346,10 @@ Name: 2003-02-canyon
 Language: Assembly Z80
 Description: Vertical parallax game engine for MSX.
 
+Name: 2003-02-agi
+Language: BASIC
+Description: Converts graphics and sounds from AGI Sierra adventures to MSX2.
+
 Name: 2003-04-superopt
 Language: C
 Description: Superoptimization, uses brute force to find the minimum assembly
