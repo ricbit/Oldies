@@ -474,6 +474,11 @@ Name: 2009-06-cylon
 Language: VHDL
 Description: Cylon visor for the Digilent FPGA board.
 
+Name: 2010-01-orbits
+Language: Python
+Description: Draw planetary orbits when Newton's gravitation law is not
+inversely quadratic.
+
 Name: 2010-04-zenoreduce
 Language: Python
 Description: Zeno machine emulator.
