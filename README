@@ -446,6 +446,10 @@ Name: 2008-06-randompi
 Language: Python
 Description: Calculates pi using a monte carlo approximation.
 
+Name: 2008-06-miles
+Language: Python
+Description: Convert miles to kilometers using fibonacci shifts.
+
 Name: 2008-10-bookperspective
 Language: Python
 Description: Applies perspective correction on photos of book covers.
