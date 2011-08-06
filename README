@@ -428,6 +428,11 @@ Language: C++
 Description: Find the optimum sequence of multiplications to calculate
 integer powers, using addition chains.
 
+Name: 2008-06-randomprime
+Language: C++
+Description: Monte carlo simulation for the expected value of a trial and error
+random prime number algorithm.
+
 Name: 2009-03-rakell
 Language: Haskell
 Description: Ray-tracer in Haskell.
