@@ -191,6 +191,10 @@ Name: 1998-05-glove
 Language: C
 Description: A driver for a virtual reality glove called 5th Glove.
 
+Name: 1998-06-twoliners
+Language: BASIC
+Description: A collection of games and demos in two lines of MSX BASIC.
+
 Name: 1998-07-serial
 Language: C
 Description: Connects two computers using a serial cable. This was a proof of
