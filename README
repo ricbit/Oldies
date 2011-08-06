@@ -203,6 +203,10 @@ Name: 1998-12-mp2audio
 Language: C
 Description: Decodes the header of an mp2 audio file.
 
+Name: 1999-02-smsfix
+Language: C
+Description: Fix bad dumps of SMS cartridges.
+
 Name: 1999-02-castool
 Language: C
 Description: Reads a wave file containing an MSX cassete image and demodulate
