@@ -432,6 +432,11 @@ Name: 2008-05-montecarlo
 Language: C++
 Description: Password reconstruction using monte carlo and exact cover.
 
+Name: 2008-06-nthprime
+Language: Python
+Description: Calculates the nth prime using a formula based on Wilson's
+theorem.
+
 Name: 2008-06-randomprime
 Language: C++
 Description: Monte carlo simulation for the expected value of a trial and error
