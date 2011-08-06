@@ -300,6 +300,14 @@ Name: 2002-06-terramex
 Language: Assembly Z80
 Description: A demo of what Terramex would look like in screen 8.
 
+Name: 2002-06-terrain
+Language: Matlab
+Description: Terrain generation using Perlin noise.
+
+Name: 2002-06-pigment
+Language: Matlab
+Description: Animal pigment skin generator using cellular automata.
+
 Name: 2002-08-fudebium
 Language: VHDL
 Description: A Z80 clone in VHDL. Eventually I ditched this for T80 from

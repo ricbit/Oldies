@@ -1,0 +1,6 @@
+function c=pigmento(s,size);
+c=rand(size);
+for i=1:6, 
+    c=conv2(c,s,'same'); 
+end;
+c=interp2(c,3);

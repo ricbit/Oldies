@@ -1,0 +1,16 @@
+function y=perlin (n,level);
+size=floor(log2(n));
+y=zeros(n);
+for i=level:size,
+    r=randn(2^i)./(2^i);
+    y=y+interpft(interpft(r',n)',n);
+end
+
+function hh=erosao(h,nivel);
+hh=h;
+for i=1:nivel,
+    c=(hh>shiftr(hh)).*(hh>shiftl(hh));
+    c=c.*(hh>shiftu(hh)).*(hh>shiftd(hh));
+    hx=hh.*c.*0.01;
+    hh=hh-hx+(shiftr(hx)+shiftl(hx)+shiftu(hx)+shiftd(hx))/4;
+end
