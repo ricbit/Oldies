@@ -479,6 +479,10 @@ Language: Python
 Description: Draw planetary orbits when Newton's gravitation law is not
 inversely quadratic.
 
+Name: 2010-02-pairprogramming
+Language: C
+Description: Single-person pair programming.
+
 Name: 2010-04-zenoreduce
 Language: Python
 Description: Zeno machine emulator.
