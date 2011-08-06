@@ -1,0 +1,24 @@
+;
+;Square root of 16-bit value
+;In:  HL = value
+;Out:  D = result (rounded down)
+;
+Sqr16:	ld de,#0040
+	ld a,l
+	ld l,h
+	ld h,d
+	or a
+	ld b,8
+Sqr16_Loop:
+	sbc hl,de
+	jr nc,Sqr16_Skip
+	add hl,de
+Sqr16_Skip:
+	ccf
+	rl d
+	add a,a
+	adc hl,hl
+	add a,a
+	adc hl,hl
+	djnz Sqr16_Loop
+	ret

@@ -1,0 +1,26 @@
+        ; divisao por nove
+        ; entra     HL = numero de 0 a 1440
+        ; sai       A = HL/9
+        ; destroi   HL,DE
+
+DIV9:                           ; Z80  R800
+        INC     HL              ;  7    1
+        LD      D,H             ;  5    1
+        LD      E,L             ;  5    1
+        ADD     HL,HL           ;  12   1
+        ADD     HL,HL           ;  12   1
+        ADD     HL,HL           ;  12   1
+        SBC     HL,DE           ;  17   2
+        LD      E,0             ;  8    2
+        LD      D,L             ;  5    1
+        LD      A,H             ;  5    1
+        ADD     HL,HL           ;  12   1
+        ADD     HL,HL           ;  12   1
+        ADD     HL,DE           ;  12   1
+        ADC     A,E             ;  5    1
+        XOR     H               ;  5    1
+        AND     03FH            ;  8    2
+        XOR     H               ;  5    1
+        RLCA                    ;  5    1
+        RLCA                    ;  5    1
+        RET            ; total  = 157  22

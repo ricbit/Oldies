@@ -309,6 +309,10 @@ Name: 2002-09-checkers
 Language: C
 Description: An engine of checkers where the computer plays against itself.
 
+Name: 2002-10-numeric
+Language: Assembly Z80
+Description: Fast routines to perform square root and division by 9.
+
 Name: 2002-12-jvm
 Language: C
 Description: Decodes the header of a Java .class file.
