@@ -452,6 +452,11 @@ Name: 2008-03-roman
 Language: C
 Description: Roman numbers using preprocessor metaprogramming.
 
+Name: 2008-04-mandelbrot
+Language: Actionscript, Python, Javascript, Bytecode JVM
+Description: The Mandelbrot fractal implemented under 512 bytes in many
+languages.
+
 Name: 2008-04-sudoku
 Language: C++
 Description: Solver for irregular sudokus using exact cover and dancing links.
