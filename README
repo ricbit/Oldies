@@ -466,6 +466,10 @@ Name: 2009-03-rakell
 Language: Haskell
 Description: Ray-tracer in Haskell.
 
+Name: 2009-03-spectrum
+Language: Java, GWT
+Description: Wavelength spectrum editor using GWT.
+
 Name: 2009-06-cylon
 Language: VHDL
 Description: Cylon visor for the Digilent FPGA board.

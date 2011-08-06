@@ -1,0 +1,16 @@
+<module>
+
+      <!-- Inherit the core Web Toolkit stuff.                        -->
+      <inherits name='com.google.gwt.user.User'/>
+
+      <!-- Add the Canvas Widget, available from
+           http://code.google.com/p/gwt-canvas/                       -->
+	  <inherits name='gwt.canvas.gwt-canvas'/>
+
+      <!-- Specify the app entry point class.                         -->
+      <entry-point class='com.ricbit.client.Spectrum'/>
+    
+      <!-- Specify the application specific style sheet.              -->
+      <stylesheet src='Spectrum.css' />
+	
+</module>
