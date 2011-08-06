@@ -1,0 +1,17 @@
+extrn blit: near
+extrn xscrollbuf: byte
+extrn init_scroll_buffer: near
+extrn last_scroll_buffer: near
+extrn init_skip_buffer: near
+extrn clear_left_column: near
+extrn border_updated: dword
+extrn noborder: dword
+extrn palette_raster: dword
+extrn palette_sg1000: dword
+extrn direct_color: dword
+extrn bordercolor: byte
+extrn blit_linear_512_15_branch: near
+extrn blit_linear_512_inter_branch: near
+extrn lightgun: dword
+extrn lcdfilter: dword
+extrn blit_linear_512_2xsai_branch: near

@@ -1,0 +1,160 @@
+BrSMS registration form v1.12
+
+Please fill in this form and send it to ricardo@lsi.usp.br
+
+Everyone who send this form will receive the next version of 
+BrSMS by e-mail one week before the official release!!
+
+Try to answer all the questions below.
+If you don't know the answer, leave it blank.
+Don't worry because your e-mail will not be distributed to spam lists.
+
+----
+
+Name/nick: [                                       ]
+email:     [                                       ]
+City:      [                                       ]
+Country:   [                                       ]
+
+----
+
+Computer:
+
+[ ] 386
+[ ] 486
+[ ] Pentium
+[ ] Pentium MMX / K6
+[ ] Pentium Pro
+[ ] Pentium II
+[ ] other:  [            ]
+
+[ ] Intel
+[ ] AMD
+[ ] Cyrix
+[ ] other:  [            ]
+
+Speed (MHz): [     ]
+
+Operating System:
+
+[ ] MS-DOS
+[ ] Windows 95
+[ ] Windows 98
+[ ] Windows NT
+[ ] other: [                    ]
+
+Does BrSMS works in your computer?
+
+[ ] Yes
+[ ] No
+
+Does BrSMS guess right the speed of your computer (pentium only)?
+
+[ ] Yes
+[ ] No
+
+Using "brsms game.sms -frame 1 -nosound -res 0", does all the games
+work at full speed?
+
+[ ] Yes
+[ ] No
+
+----
+
+Video Board:
+
+[ ] VGA
+[ ] SVGA VESA 1.2
+[ ] SVGA VESA 2.0 (either native or with SDD)
+
+[ ] 8 bit color only
+[ ] 15/16 bit color
+[ ] 24/32 bit color
+
+Can you succesfully use the "-res 1" option?
+
+[ ] Yes
+[ ] No
+
+Can you succesfully use the "-res 2" option?
+
+[ ] Yes
+[ ] No
+
+Do the VESA 2.0 modes run at full speed?
+
+[ ] Yes
+[ ] No
+
+----
+
+Sound Board:
+
+[ ] Sound Blaster Pro
+[ ] Sound Blaster 2.0
+[ ] Sound Blaster 16/AWE32/AWE64
+[ ] Gravis Ultra Sound
+[ ] Ensoniq Soundscape
+[ ] other: [                 ]
+
+Can you hear any sound from BrSMS ?
+
+[ ] Yes
+[ ] No
+
+----
+
+Serial games:
+
+Did you ever succesfully used the serial multiplayer option?
+
+[ ] Yes
+[ ] No
+
+----
+
+What feature of BrSMS do you like most?
+(please mark only two)
+
+[ ] Fast emulation
+[ ] Accurate sound
+[ ] TV emulation
+[ ] Large Game Gear screen with square pixels
+[ ] 3D Glasses emulation
+[ ] Multiplayer games
+[ ] other: [                      ]
+
+What do you want to see in the next version of BrSMS ?
+(please mark only two)
+
+[ ] GUI
+[ ] Netplay
+[ ] FM sound in Mark 3 games
+[ ] Improved compatibility
+
+If you selected Improved compatibility, which game that currently does
+not run do you want to play ?
+(please write only two games)
+
+1: [                           ]
+2: [                           ]
+
+----
+
+After finishing BrSMS, with complete Master System and Game Gear support,
+what emulator do you want to see?
+(please mark only two)
+
+[ ] Br-Neo Geo
+[ ] Br-Odyssey 2
+[ ] Br-Playstation
+[ ] Br-SNES
+[ ] Br-TMNT Arcade
+[ ] Br-X68k
+
+[ ] other: [                ]
+
+----
+
+That's all, people!
+Don't forget to send it to ricardo@lsi.usp.br !!

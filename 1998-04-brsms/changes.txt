@@ -1,0 +1,199 @@
+[1.21] (2/6/1999) (secret release)
+
+- fixed a problem in video cache (CV "Artillery Duel","Tapper" are faster)
+- added "-res 8" (512x384x15 with 2xSaI engine)
+- added an auto-framerate renderer 
+- added a fps counter on the 7th bar of the "-cpugraph"
+- improved Z80 initialization (SMS "Shadow Dancer")
+- support to 6Mbit games (SMS "Street Fighter 2'")
+- fixed a minor border bug in the intro of GG "Power Strike 2"
+- improved lightgun support (SMS "Rambo 3")
+
+[1.20] (12/4/1999)
+
+- added "-coleco" (enable Colecovision emulation)
+
+[1.19] (9/4/1999)
+
+- improved Z80 initialization (GG "Ecco", GG "Taz in Escape from Mars") 
+- improved VDP emulation (GG "Surf Ninjas", GG "Popeye Beach Volley")
+- fixed a bug in the "3" key of the SC3000
+- support to all kinds of SC3000 roms (patched / non-patched)
+- added video cache to SG1000 games (amazing speed increase of 640% !!)
+- added "-paddle" to enable it in keyboard or joystick (SMS "A.K. BMX Trial")
+- added "-mousepad" to enable paddle with the mouse
+- support to Pro Action Replay codes
+- added TURN OFF/TURN ON key (F11)
+
+[1.18.2] (3/3/1999)
+
+- bugfix to make BrSMS works under Win95
+
+[1.18] (1/3/1999)
+
+- now "-res 4" and "-res 6" can be used with SG1000/SC3000 games
+- added "-sc3000" (enable SC3000 computer emulation)
+- added "-lightgun" (enable lightgun emulation through the mouse)
+- improved support to nationalization (GG "Pop Breaker")
+- improved Z80 initialization (GG "Evander Holyfield Boxing")
+- added "-2d" to play 3D games without 3D glasses
+- improved speech support (GG "Chakan")
+- added "-lcd" to enable LCD persistence (GG "Halley Wars", "S. Monaco GP 2")
+- fixed SRAM emulation (GG "Shining Force 2/3", "Desert Speedtrap")
+- improved IRQ engine (GG "Smash TV", "Spiderman: Return of Sinister Six")
+- improved HALT emulation (SMS "Sh.Beast","P.Fox",GG "Poker",SG1000 "Orguss")
+- improved VDP emulation (GG "Ax Battler",SMS "S.Chess","Zool","Bart vs.SpM")
+
+[1.17] (4/2/1999)
+
+- added "-res 4" (512x384x15 with bilinear filtering)
+- added "-res 6" (512x384x15 with Parrot engine)
+- Game Gear palette raster effects (GG "Space Harrier", GG "Sonic Tails 2")
+- added "-border" to enable border raster effects (SMS "Choplifter")
+- support to SG1000 backdrop color (SG1000 "Congo Bongo", SG1000 "N-Sub")
+- support to 40kb ROMs (SG1000 "Monaco GP")
+- fixed a bug in 3D glasses emulation (SMS "Poseidon Wars 3D")
+- now BrSMS can detect bad dumps
+
+[1.16] (23/1/1999)
+
+- fixed SRAM emulation (SMS "Phantasy Star" & "Ys", GG "Shining Force 2/3")
+- optimized sprite renderer (line-by-line engine can be up to 10% faster)
+- now the "-listrom" switch displays a small compatibility list
+- support to sprite collision detection (SMS "Cheese cat.", GG "Green Dog")
+- added "-sprcol" and "-nosprcol" (enable and disable sprite collision)
+- improved IRQ engine again (SG1000 "Girl's Garden", SMS/GG "Fantasy Zone")
+- new SG1000 renderer (25% speed increase, 100% with MMX, "Champion Golf")
+- added "-lpt <n>" to select which LPT port is connected to the SNESpad
+- increased clock to 3.57MHz again (this is the clock of the brazilian SMS)
+- fake support to I/O port 01h (now GG "Primal Rage" works)
+
+[1.15] (15/1/1999)
+
+- almost perfect border color emulation
+- added "-noborder" to disable border emulation
+- fixed a bug in "-jap" switch
+- support to palette raster effects (SMS "California Games", "Space Harrier")
+- added "-palraster" to force palette raster engine 
+- improved IRQ engine (GG "Power Strike 2", stage 4 of SMS "Sonic 1")
+- improved block engine (GG "Ristar", "Sonic Drift 2", "Chakan")
+
+[1.14] (5/1/1999)
+
+- reduced Z80 clock from 3.57MHz to 3.32MHz 
+- new line by line engine (SMS "Global Gladiators", "Cool Spot", "Gauntlet")
+- added "-line" to force the line-by-line engine
+- added "-block" to force the block-based engine
+- support to zoomed sprites (GG "X-Men")
+- optimized the VESA 2 video modes for MMX processors (100% speed gain)
+- now the speaker is turned off when the emulator exits
+- tweaked the border color, now GG "Fatal Fury Special" has less flicker
+
+[1.13] (28/12/1998)
+
+- video cache in blitting stage (speed gain up to 200%)
+- support to mirror port BD (GG "Sailor Moon S")
+- support to VDP[0] bit 3 (SMS "Ghouls'n'Ghosts")
+- improved speech support (GG "Sonic and Tails 2", GG "Sailor Moon S")
+- rewrote IRQ engine from scratch (fixed the PAUSE button and a lot of games)
+- SRAM emulation (SMS "Golden Axe Warrior", SMS "Miracle Warriors")
+- more games have custom optimizations
+- added "-snespad" to enable a SNES joypad connected on LPT1
+- added "-truevsync" for really smooth scroll in VESA2 modes
+- added "-speaker" to enable sound through the PC Speaker
+- added Fast Forward key in the NumLock
+- removed "-normal", "-fast" and "-turbo" (use the FF key instead)
+
+[1.12] (30/11/1998)
+
+- Game Gear emulation
+- SG1000 emulation ("Girl's Garden", "Hang On 2")
+- fixed bug in bit 7 of VDP[0] (this make "Gauntlet" better but not 100%)
+- "-custom <n>" removed (now BrSMS autodetect which custom CPU it should use)
+- added "-noguess" (disable autodetection and custom CPUs)
+- added "-listrom" (list all games with custom CPUs available)
+- added "-3d" (enable 3D glasses emulation)
+- added "-sms" and "-gg" (forces SMS or GG emulation, ignoring extension)
+- replaced "-mmx" with "-nommx" (now the MMX is always enabled when detected)
+- now the default language is english instead of japanese
+
+[1.11] (22/7/1998)
+
+- support to PSG white noise
+- fixed a minor bug in background renderer (intro of "Sonic Chaos")
+- rewrote all the sprite engine (score of "Pacmania", intro of "Sonic 2")
+- MMX sprite renderer ("-mmx")
+- custom CPU emulators ("-custom <n>")
+- TURBO mode is faster than before
+- preliminary video cache
+
+[1.10] (22/6/1998)
+
+- limited support to line interrupts ("Psychic World")
+
+[1.9] (19/6/1998)
+
+- fixed a bug on sound emulation, now the voice is working again
+- fixed a minor bug in the memory dump of debugger
+- new commands to debugger: F7 and F8 (step into and step over)
+
+[1.8] (17/6/1998)
+
+- fixed a vertical IRQ problem (correct speed on "Sonic 2")
+- fixed a bug in memory emulation ("WonderBoy3","Spellcaster")
+
+[1.7] (18/5/1998)
+
+- fixed a bug on Sound Blasters configured to IRQs greater than 7
+- fixed two graphic bugs related to the CPU Graph
+- fixed a sprite bug (score of "Golvellius" in top-view stages)
+- now BrSMS can open read-only files (ie files on CD-ROMs)
+- support for PAUSE key (press "P" on keyboard)
+- option to adjust joystick sensivity ("-joysens")
+- optimized the sprite renderer
+
+[1.6] (11/5/1998)
+
+- bugfix: now the "load state" on F7 key is working again
+
+[1.5] (8/5/1998)
+
+- fixed a bug on voice emulation ("Afterburner", "Alex Kidd Lost Stars")
+- now there is one save state for each game (no more BRSMS.STA)
+- options to select nationalization ("-eng" and "-jap")
+- did a little speed up in the background renderer
+
+[1.4] (4/5/1998)
+
+- support to VRAM reads (intro of "Sonic 1", "Aztec Adventure")
+- support to VDP register 0, bit 5 (this fix the bug on left side of screen)
+- support to VDP register 0, bit 6 (score of "Double Dragon" & "Golvellius")
+- support to VDP register 0, bit 7 (score of "Golvellius" in vertical stages)
+- support to sprite/background priorities (intro of "Sonic 2")
+- support to second player on keyboard
+- support to joystick (as player 1 or player 2)
+- RESET button
+- multiplayer game through a serial cable
+- TV emulation, with scanlines (VESA 2)
+- save and load state at any time
+- save PCX snapshots
+
+[1.3] (27/4/1998)
+
+- support to horizontal scroll
+- support to VDP register 2 ("Pacmania")
+
+[1.2] (22/4/1998)
+
+- brighter palette
+- support to 8x8 and 8x16 sprites
+- support to vertical scroll
+- support to mirror ports C0 and C1 (used by "Pit Pot")
+- fixed the mapper routines ("Afterburner" and a lot of other games)
+- fixed the IRQ support ("Alien Storm")
+- fixed color of the CPU graph and PSG graph
+- full debugger
+
+[1.0] (20/4/1998)
+
+- initial release

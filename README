@@ -173,6 +173,11 @@ Language: C
 Description: A FAT12 implementation, useful to insert and extract files
 from floppy disk images.
 
+Name: 1998-04-brsms
+Language: Assembly x86, Binary x86
+Description: Console emulator, supports Sega SG-1000, Sega SC-3000, 
+Sega Master System, Sega Game Gear and Colecovision.
+
 Name: 1998-05-glove
 Language: C
 Description: A driver for a virtual reality glove called 5th Glove.
