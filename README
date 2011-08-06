@@ -326,6 +326,10 @@ Name: 2003-08-pangram
 Language: C
 Description: Generates pangrams in portuguese.
 
+Name: 2003-10-vis
+Language: C
+Description: Determines visibility on a maze.
+
 Name: 2003-11-plasma
 Language: Assembly x86
 Description: Plasma demo using only 176 bytes.
