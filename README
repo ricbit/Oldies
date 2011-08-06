@@ -432,6 +432,10 @@ Name: 2008-05-montecarlo
 Language: C++
 Description: Password reconstruction using monte carlo and exact cover.
 
+Name: 2008-05-turingoneliner
+Language: Python
+Description: Compiles brainfuck to a python one liner.
+
 Name: 2008-06-nthprime
 Language: Python
 Description: Calculates the nth prime using a formula based on Wilson's
