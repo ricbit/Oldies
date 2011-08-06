@@ -458,6 +458,10 @@ Name: 2008-10-bookperspective
 Language: Python
 Description: Applies perspective correction on photos of book covers.
 
+Name: 2009-01-capullo
+Language: Python
+Description: Perspective drawing using pyOpenGL.
+
 Name: 2009-03-rakell
 Language: Haskell
 Description: Ray-tracer in Haskell.
