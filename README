@@ -117,6 +117,10 @@ could play MSX tunes on the PC by mapping the PSG registers on the FM
 registers of the SoundBlaster. Of course this method had a very low sound
 quality when compared to the original.
 
+Name: 1996-06-shading
+Language: C
+Description: Fast shading using lookup tables.
+
 Name: 1996-08-doom
 Language: C, Lex, Yacc
 Description: Another 3d engine, this time with a DSL to describe polygons.
