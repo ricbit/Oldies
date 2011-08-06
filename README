@@ -145,6 +145,11 @@ Language: C
 Description: Voxel rendering engine based on shell extraction. This was
 promising but videocard makers spoiled the fun for us software renderers.
 
+Name: 1997-04-rbd
+Language: C, Lex, Yacc, Assembly x86
+Description: 3d engine capable of reading and processing models from 3D Studio,
+generates fractal landscapes, compatible with dos and linux.
+
 Name: 1997-08-penguin
 Language: C++, Lex, Yacc
 Description: A parallax game engine including a DSL for character description.
