@@ -418,6 +418,11 @@ Name: 2008-04-sudoku
 Language: C++
 Description: Solver for irregular sudokus using exact cover and dancing links.
 
+Name: 2008-04-power10
+Language: C++
+Description: Calculates log10(x) in O(log log n) using template
+metaprogramming.
+
 Name: 2008-05-optimumpower
 Language: C++
 Description: Find the optimum sequence of multiplications to calculate
