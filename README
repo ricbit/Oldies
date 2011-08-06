@@ -499,6 +499,10 @@ Name: 2010-10-archytas
 Language: Povray
 Description: Draw Archytas' solution to the Delian problem using povray.
 
+Name: 2010-11-birthday
+Language: Python
+Description: Compare approximation to the birthday paradox.
+
 Name: 2011-03-randompi
 Language: BASIC
 Description: Calculates pi using a monte carlo approximation, in ZX-81 BASIC.
