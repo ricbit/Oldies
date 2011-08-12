@@ -573,3 +573,7 @@ Description: Solution of the Torto Reverso puzzle using prolog.
 Name: 2011-07-constexpr
 Language: C++0x, Python
 Description: An analysis of metaprogramming techniques using C++0x.
+
+Name: 2011-08-doppelstern
+Language: C++
+Description: Solves the Doppelstern puzzle using exact cover and dancing links.
