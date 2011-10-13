@@ -581,3 +581,7 @@ Description: Solves the Doppelstern puzzle using exact cover and dancing links.
 Name: 2011-10-gotour
 Language: Go
 Description: Solutions for the exercises on go-tour.appspot.com.
+
+Name: 2011-10-exactcover
+Language: Go
+Description: A parallel implementation of the exact cover written in Go.
