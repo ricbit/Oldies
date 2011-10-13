@@ -5,11 +5,14 @@ import "fmt"
 type matrix [][]bool
 type solution []bool
 
-func PrintListener(out chan solution) {
+func PrintListener(out chan *solution) {
   for {
     s := <-out
+    if s == nil {
+      break
+    }
     output := "Solution: "
-    for i, value := range s {
+    for i, value := range *s {
       if (value) {
         output += fmt.Sprintf("%d ", i)
       }
@@ -85,12 +88,12 @@ func cover(s state, row int) state {
   return next
 }
 
-func solveRecursive(s state, out chan solution, finish chan bool) {
+func solveRecursive(s state, out chan *solution, finish chan bool) {
   defer func() {
     finish <- true
   }()
   if allCovered(s) {
-    out <- s.sol
+    out <- &s.sol
     return
   }
   min_col := findMinCol(s)
@@ -108,7 +111,7 @@ func solveRecursive(s state, out chan solution, finish chan bool) {
   }
 }
 
-func SolveExactCover(m matrix, out chan solution, finish chan bool) {
+func SolveExactCover(m matrix, out chan *solution, finish chan bool) {
   var s state
   s.m = m
   s.sol = make(solution, len(m))
@@ -136,9 +139,10 @@ func ReadMatrix() matrix {
 
 func main() {
   m := ReadMatrix()
-  out := make(chan solution)
+  out := make(chan *solution)
   go PrintListener(out)
   finish := make(chan bool)
   go SolveExactCover(m, out, finish)
   <-finish
+  out <- nil
 }
