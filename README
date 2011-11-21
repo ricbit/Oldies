@@ -585,3 +585,7 @@ Description: Solutions for the exercises on go-tour.appspot.com.
 Name: 2011-10-exactcover
 Language: Go
 Description: A parallel implementation of the exact cover written in Go.
+
+Name: 2011-11-aiclass
+Language: C++, Python
+Description: Exercises from the 2011 ai-class.com course.
