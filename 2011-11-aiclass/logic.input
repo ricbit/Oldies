@@ -1,0 +1,6 @@
+not a
+a or (not a)
+imp ( (a and (not a)) , imp (b,c) )
+imp(a,b) and imp(b,c) and imp(c, a)
+imp(a, b) and (not ((not a) or b))
+eqv( (imp(a,b) and imp(b ,c)) , imp(a , c) )
