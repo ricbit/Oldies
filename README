@@ -590,6 +590,10 @@ Name: 2011-11-aiclass
 Language: C++, Python
 Description: Exercises from the 2011 ai-class.com course.
 
+Name: 2011-12-mlclass
+Language: Matlab
+Description: Exercises from the 2011 ml-class.com course.
+
 Name: 2012-02-spojlib
 Language: C++
 Description: Generic C++ libraries to help solving spoj problems.
