@@ -1,4 +1,7 @@
 #include <vector>
+#include <algorithm>
+#include <functional>
+#include <memory>
 
 template<typename T>
 class matrix {
@@ -9,19 +12,27 @@ class matrix {
   matrix(int rows, int cols)
       : mat_(rows, vt(cols)),
         rows_(rows),
-        cols_(cols) {
+        cols_(cols),
+        id_cache_(NULL) {
   }
 
   template<typename Iterator>
   matrix(int rows, int cols, Iterator data)
       : mat_(rows, vt(cols)),
         rows_(rows),
-        cols_(cols) {
+        cols_(cols),
+        id_cache_(NULL) {
     for (int j = 0; j < rows; j++) {
       for (int i = 0; i < cols; i++) {
         mat_[j][i] = *data;
         ++data;
       }
+    }
+  }
+
+  virtual ~matrix() {
+    if (id_cache_ != NULL) {
+      delete id_cache_;
     }
   }
 
@@ -44,9 +55,8 @@ class matrix {
   matrix<T> operator+(const matrix<T>& b) const {
     matrix<T> ans(rows_, cols_);
     for (int j = 0; j < rows_; j++) {
-      for (int i = 0; i < cols_; i++) {
-        ans[j][i] = mat_[j][i] + b[j][i];
-      }
+      std::transform(mat_[j].begin(), mat_[j].end(), b[j].begin(),
+                     ans[j].begin(), std::plus<T>());
     }
     return ans;
   }
@@ -65,13 +75,17 @@ class matrix {
   }
 
   matrix<T> id() const {
-    matrix a(rows_, cols_);
+    if (id_cache_ != NULL) {
+      return *id_cache_;
+    }
+    id_cache_ = new matrix<T>(rows_, cols_);
     for (int i = 0; i <rows_; i++)
-      a[i][i] = 1;
-    return a;
+      (*id_cache_)[i][i] = 1;
+    return *id_cache_;
   }
 
-  matrix<T> power(int n) const {
+  template <typename S>
+  matrix<T> power(S n) const {
     if (n == 0) return id();
     if (n == 1) return *this;
     matrix<T> half = power(n / 2);
@@ -94,4 +108,5 @@ class matrix {
  private:
   vvt mat_;
   int rows_, cols_;
+  mutable matrix<T>* id_cache_;
 };

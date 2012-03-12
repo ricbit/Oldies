@@ -1,14 +1,20 @@
 template<int M>
 class modint {
  public:
-  modint() : value_(0) {}
   modint(int v) : value_(v < 0 ? M + v % M : v % M) {}
+  modint() : value_(0) {}
 
-  modint<M> operator+(const modint<M>& b) const {
-    return build((value_ + b.value_) % M);
+  modint operator+(const modint& b) const {
+    int ans = value_ + b.value_;
+    return ans < M ? build(ans) : build(ans - M);
   }
 
-  modint<M> operator*(const modint<M>& b) const {
+  modint operator-(const modint& b) const {
+    int ans = value_ - b.value_;
+    return ans < 0 ? build(ans + M) : build(ans);
+  }
+
+  modint operator*(const modint& b) const {
    int ans;
    asm (
      "imull %%ebx\n\t"
@@ -20,16 +26,16 @@ class modint {
    return build(ans);
   }
 
-  modint<M> operator-() const {
-    return modint<M>(-value_);
+  modint operator-() const {
+    return modint(-value_);
   }
 
   template<typename T>
-  modint<M> power(T n) const {
+  modint power(T n) const {
     if (n == 0) {
       return one_;
     }
-    modint<M> half = power(n / 2);
+    modint half = power(n / 2);
     if (n % 2) {
       return half * half * build(value_);
     } else {
@@ -37,20 +43,20 @@ class modint {
     }
   }
 
-  modint<M> inverse() const {
+  modint inverse() const {
     return power(M - 2); // only for M prime!
   }
 
-  int get() const {
+  operator int() const {
     return value_;
-  }  
+  }
 
  private:
   int value_;
-  static const modint<M> one_;
+  static const modint one_;
 
-  modint<M> build(int v) const {
-    modint<M> ans;
+  modint build(int v) const {
+    modint ans;
     ans.value_ = v;
     return ans;
   }
