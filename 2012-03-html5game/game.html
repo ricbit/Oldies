@@ -1,0 +1,334 @@
+<!doctype html>
+<!--
+HTML5 aims to be the easier version of HTML so far.
+You can notice that by the starting line in this game: the doctype.
+This doctype declartion is much easier to remember than the older ones,
+such as the one for XHTML: !DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 etc etc
+-->
+
+<html>
+  <head>
+    <style>
+
+      /* The background of the game is just a simple tiled image
+      I downloaded from the NASA's website. */
+      #background {
+        background-image: url("universe.jpg");
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+      }
+
+      /* The player starship is just a simple div. We style the div
+      to make it look spherical, by using border-radius to get the
+      round corners, and radial-gradient to get a nice shading inside.
+      For browsers that don't support radial-gradient, we fallback
+      to a flat red. */
+      #ball {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background-color: red;
+        background-image: -webkit-radial-gradient(
+             74% 40%, circle cover, rgba(171, 166, 14, 1),
+             rgba(255, 0, 0, 1) 76%);
+        border-radius: 15px;
+        display: none;
+      }
+
+      /* The blackhole is a div too, with a background image I also
+      got from NASA's website. In order to make it rotate, we use
+      CSS3 animations: no javascript required. The animation works by
+      interpolating from two keyframes: one at 0 degrees, another at
+      360 degrees. */
+      @-webkit-keyframes rotate_kf {
+        from {
+          -webkit-transform: rotate(0deg);
+        }
+        to {
+          -webkit-transform: rotate(360deg);
+        }
+      }
+      #blackhole {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        top: 370px;
+        left: 370px;
+        background-image: url('bhole.png');
+        -webkit-animation: rotate_kf 5s linear 0 infinite normal;
+      }
+
+      /* The Game Over animation is also done entirely without javascript,
+      using only CSS3 animations. The two keyframes select the font to
+      be in two different sizes, and the browser interpolates the rest.*/
+      @-webkit-keyframes pulse_kf {
+        from {
+          font-size: 60px;
+        }
+        to {
+          font-size: 80px;
+        }
+      }
+      #gameover {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        text-align: center;
+        color: yellow;
+        -webkit-text-stroke: 1px #00ff00;
+        font-size: 40px;
+        display: none;
+        -webkit-animation: pulse_kf 1s linear 0 infinite alternate;
+      }
+
+      /* The score indicator is just a regular div, floated to the right. */
+      #restart {
+        background-color: yellow;
+        padding: 5px;
+      }
+      #score {
+        float: right;
+      }
+    </style>
+    <script>
+
+      /* The game is controlled by a bunch of global variables. */
+
+      /* Those are just caches to avoid calling getElementById every time. */
+      var ball = null;
+      var gameover = null;
+      var score = null;
+      var blackhole = null;
+
+      /* The callback to the main game handler, called each 20ms. */
+      var interval_handler = null;
+
+      /* User input: accelarations due to keyboard. */
+      var keyboard_up = 0.0;
+      var keyboard_down = 0.0;
+      var keyboard_left = 0.0;
+      var keyboard_right = 0.0;
+
+      /* User input: accelerations due to accelerometer. */
+      var angleX = null;
+      var angleY = null;
+
+      /* Current position and velocity of the player starship */
+      var velocityX = 0.0;
+      var velocityY = 0.0;
+      var positionX = 50.0;
+      var positionY = 50.0;
+
+      /* Position of the blackhole. */
+      var blackholeX = 400.0;
+      var blackholeY = 400.0;
+
+      /* Stores the angles of the device when the game started up. */
+      var saved_angleX = null;
+      var saved_angleY = null;
+
+      /* The current score of the player. */
+      var points = 0.0;
+
+      /* One-time initialization of the game, performed on page load. */
+      function initialize() {
+        // Cache the element ids.
+        ball = document.getElementById('ball');
+        gameover = document.getElementById('gameover');
+        score = document.getElementById('score');
+        blackhole = document.getElementById('blackhole');
+
+        // Place the blackhole in its correct position.
+        blackhole.style.left = blackholeX - 30 + "px";
+        blackhole.style.top = blackholeY - 30 + "px";
+
+        // Install keyboard handlers.
+        document.onkeydown = keydown_handler;
+        document.onkeyup = keyup_handler;
+
+        // Install accelerometer handlers, trying every known interface.
+        if (window.DeviceOrientationEvent) {
+          window.addEventListener('deviceorientation', function(event) {
+            tilt_handler([event.beta, event.gamma]);
+          }, true);
+        } else if (window.DeviceMotionEvent) {
+          window.addEventListener('devicemotion', function(event) {
+            tilt_handler([event.acceleration.x * 2, event.acceleration.y * 2]);
+          }, true);
+        } else {
+          window.addEventListener('MozOrientation', function(orientation) {
+            tilt_handler([orientation.x * 50, orientation.y * 50]);
+          }, true);
+        }
+      }
+
+      /* Initialization performed each time the game starts. */
+      function start() {
+        // Initial position and velocity of the player.
+        velocityX = 0.0;
+        velocityY = 0.0;
+        positionX = 50.0;
+        positionY = 50.0;
+
+        // Initial score.
+        points = 0.0;
+
+        // Display the player ship and hide the game over message.
+        ball.style.display = "block";
+        gameover.style.display = "none";
+
+        // Force a recalibration of the accelerometer.
+        saved_angleX = null;
+        saved_angleY = null;
+
+        // Draw the player ship.
+        draw_ball();
+
+        // Configure the main game handler to run each 20ms.
+        interval_handler = setTimeout(game_slice, 20);
+      }
+
+      // Updates the player ship and the score.
+      function draw_ball() {
+        ball.style.left = positionX - 15 + "px";
+        ball.style.top = positionY - 15 + "px";
+        score.innerHTML = Math.floor(100000 * points) + " points";
+      }
+
+      // A slice of game logic, called each 20ms.
+      function game_slice() {
+        // The physics used in the game is not the traditional
+        // Newtonian gravity. We use a black hole with a gravitational force
+        // stronger than inverse square, in order to game more challenging
+        // (if we used the inverse square law, the player ship would orbit 
+        // around the blackhole, instead of being attracted).
+
+        // Update the velocities, given the user input accelerations.
+        velocityX += (keyboard_right - keyboard_left) - (angleX / 100);
+        velocityY += (keyboard_up - keyboard_down) + (angleY / 100);
+
+        // Impose a maximum velocity, otherwise the ship escapes the
+        // screen too easily.
+        VEL_MAX = 5;
+        if (velocityX > VEL_MAX) velocityX = VEL_MAX;
+        if (velocityX < -VEL_MAX) velocityX = -VEL_MAX;
+        if (velocityY > VEL_MAX) velocityY = VEL_MAX;
+        if (velocityY < -VEL_MAX) velocityY = -VEL_MAX;
+
+        // Calculate the gravitational force.
+        distanceX = blackholeX - positionX;
+        distanceY = blackholeY - positionY;
+        distance_squared = distanceX * distanceX + distanceY * distanceY;
+        distance = Math.sqrt(distance_squared) + 61;
+        distanceX /= distance;
+        distanceY /= distance;
+        K = 0.0000077;
+        distanceX /= K * distance_squared;
+        distanceY /= K * distance_squared;
+
+        // Update the player position given the velocity and the 
+        // gravity component.
+        positionX += velocityX + distanceX;
+        positionY += velocityY + distanceY;
+
+        // The points are inversely proportional to the distance,
+        // this way you make more points the closer you are to the blackhole.
+        add_points = 1 / distance_squared;
+        if (add_points > 100) add_points = 100;
+        points += add_points;
+
+        // Redraw the player ship and score.
+        draw_ball();
+
+        // If you get too close to the blackhole, game over;
+        // otherwise, call this game slice again after 20ms.
+        if (distance < 100) {
+          end_game();
+        } else {
+          interval_handler = setTimeout(game_slice, 20);
+        }
+      }
+
+      // Clear the timer handler of a running game.
+      function stop() {
+        if (interval_handler != null) {
+          clearTimeout(interval_handler);
+        }
+      }
+
+      // End the game, by stopping the timer, hiding the player and
+      // displaying the game over animation.
+      function end_game() {
+        stop();
+        ball.style.display = "none";
+        gameover.style.display = "block";
+      }
+
+      // Start a new game.
+      function restart() {
+        stop();
+        start();
+      }
+
+      // Handler for accelerometer changes.
+      function tilt_handler(angles) {
+        // If the game has just started, then store the current angle.
+        if (saved_angleX == null) {
+          saved_angleX = angles[0];
+          saved_angleY = angles[1];
+        }
+        // We don't care about the absolute angles measured by the device,
+        // only about the differences to the starting angles.
+        angleX = angles[0] - saved_angleX;
+        angleY = angles[1] - saved_angleY;
+      }
+
+      // Handler for keydown events.
+      function keydown_handler(event) {
+        check_keyboard(event, 1.0);
+        return true;
+      }
+
+      // Handler for keyup events.
+      function keyup_handler(event) {
+        check_keyboard(event, 0.0);
+        return true;
+      }
+
+      // Check the keycodes of monitored keys and apply an acceleration.
+      function check_keyboard(event, acceleration) {
+        if (event.keyCode == 65) {  // keyCode for A.
+          keyboard_left = acceleration;
+        }
+        if (event.keyCode == 68) {  // keyCode for D.
+          keyboard_right = acceleration;
+        }
+        if (event.keyCode == 83) {  // keyCode for S.
+          keyboard_up = acceleration;
+        }
+        if (event.keyCode == 87) {  // keyCode for W.
+          keyboard_down = acceleration;
+        }
+        return true;
+      }
+
+    </script>
+  </head>
+
+  <!-- The HTML itself is quite simple: just a bunch of divs. -->
+  <body onload="initialize()">
+    <div id="background">
+      <div id="restart" onclick="restart()">
+        Start
+        <div id="score">0 points</div>
+      </div>
+      <div id="blackhole"></div>
+    </div>
+    <div id="ball"></div>
+    <div id="gameover">Game Over</div>
+  </body>
+
+</html>
