@@ -597,3 +597,7 @@ Description: Exercises from the 2011 ml-class.com course.
 Name: 2012-02-spojlib
 Language: C++
 Description: Generic C++ libraries to help solving spoj problems.
+
+Name: 2012-03-html5game
+Language: Javascript
+Description: Small game in javascript to demonstrate HTML5 features.
