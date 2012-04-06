@@ -37,9 +37,9 @@ template<const char *input> string MemoryStdio<input>::output_ = "";
   extern const char input_##name[] = str; \
   typedef MemoryStdio<input_##name> out_##name; \
   typedef _fastio<size, buf, out_##name> fastio_##name; \
-  TEST(IoTest, name) {
+  TEST(IoTest, name)
 
-TEST_IO(ReadInt, 200, 30, "1 12345 -1 -12345 123456789012345")
+TEST_IO(ReadInt, 200, 30, "1 12345 -1 -12345 123456789012345") {
   fastio_ReadInt io;
   EXPECT_EQ(1U, static_cast<unsigned int>(io));
   EXPECT_EQ(12345U, static_cast<unsigned int>(io));
@@ -48,13 +48,13 @@ TEST_IO(ReadInt, 200, 30, "1 12345 -1 -12345 123456789012345")
   EXPECT_EQ(123456789012345LL, static_cast<long long int>(io));
 }
 
-TEST_IO(ReadUnsignedInt, 200, 30, "12345 -12345")
+TEST_IO(ReadUnsignedInt, 200, 30, "12345 -12345") {
   fastio_ReadUnsignedInt io;
   EXPECT_EQ(12345U, static_cast<unsigned int>(io));
   EXPECT_NE(12345U, static_cast<unsigned int>(io));
 }
 
-TEST_IO(ReadIntPipe, 200, 30, "1 12345 -1 -12345 123456789012345")
+TEST_IO(ReadIntPipe, 200, 30, "1 12345 -1 -12345 123456789012345") {
   fastio_ReadIntPipe io;
   unsigned int a, b;
   int c, d;
@@ -67,21 +67,46 @@ TEST_IO(ReadIntPipe, 200, 30, "1 12345 -1 -12345 123456789012345")
   EXPECT_EQ(123456789012345LL, e);
 }
 
-TEST_IO(ReadIntLongBuffer, 6, 3, "1 2 3 4 5 6 7 8 9 10")
+TEST_IO(ReadIntLongBuffer, 6, 3, "1 2 3 4 5 6 7 8 9 10") {
   fastio_ReadIntLongBuffer io;
   int ans[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   for (int i = 0; i < 10; i++)
     EXPECT_EQ(ans[i], static_cast<int>(io));
 }
 
-TEST_IO(ReadIntSpaces, 6, 3, "1 2   3    4\n5\n\n6\t7\t\n8\n  \n9 \n10")
+TEST_IO(ReadIntSpaces, 6, 3, "1 2   3    4\n5\n\n6\t7\t\n8\n  \n9 \n10") {
   fastio_ReadIntSpaces io;
   int ans[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   for (int i = 0; i < 10; i++)
     EXPECT_EQ(ans[i], static_cast<int>(io));
 }
 
-TEST_IO(WriteInt, 200, 30, "")
+TEST_IO(ReadWord, 200, 30, "ricbit ilafox\nvinil") {
+  fastio_ReadWord io;
+  EXPECT_EQ(string("ricbit"), io.word());
+  EXPECT_EQ(string("ilafox"), io.word());
+  EXPECT_EQ(string("vinil"), io.word());
+}
+
+TEST_IO(ReadLineUnix, 200, 30, "ricbit ilafox\nvinil") {
+  fastio_ReadLineUnix io;
+  EXPECT_EQ(string("ricbit ilafox"), io.line());
+  EXPECT_EQ(string("vinil"), io.line());
+}
+
+TEST_IO(ReadLineMac, 200, 30, "ricbit ilafox\rvinil") {
+  fastio_ReadLineMac io;
+  EXPECT_EQ(string("ricbit ilafox"), io.line());
+  EXPECT_EQ(string("vinil"), io.line());
+}
+
+TEST_IO(ReadLineWindows, 200, 30, "ricbit ilafox\r\nvinil") {
+  fastio_ReadLineWindows io;
+  EXPECT_EQ(string("ricbit ilafox"), io.line());
+  EXPECT_EQ(string("vinil"), io.line());
+}
+
+TEST_IO(WriteInt, 200, 30, "") {
   {
     fastio_WriteInt io;
     io << 1U << " " << 12345U << " ";
@@ -89,6 +114,16 @@ TEST_IO(WriteInt, 200, 30, "")
     io << 123456789012345LL;
   }
   EXPECT_EQ(string("1 12345 -1 -12345 123456789012345"), out_WriteInt::get());
+}
+
+TEST_IO(WriteString, 200, 30, "") {
+  {
+    fastio_WriteString io;
+    io << "ricbit ";
+    string ilafox("ilafox");
+    io << ilafox;
+  }
+  EXPECT_EQ(string("ricbit ilafox"), out_WriteString::get());
 }
 
 

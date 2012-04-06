@@ -22,40 +22,74 @@ class _fastio {
 
   ~_fastio() {
     if (q - output_buffer > 0) {
-        CustomIO().write(output_buffer, q - output_buffer);
+      CustomIO().write(output_buffer, q - output_buffer);
     }
+    delete[] input_buffer;
+    delete[] output_buffer;
   }
 
   template<typename T>
   operator T() {
     T input;
-    read_integer(input, Bool<(static_cast<T>(-1) > 0)>());
+    read_integer(input, IsUnsigned<T>());
+    return input;
+  }
+
+  std::string word() {
+    std::string input;
+    update_input();
+    skip_space();
+    while (*p > 32) {
+      input.push_back(*p++);
+    }
+    return input;
+  }
+
+  std::string line() {
+    std::string input;
+    update_input();
+    while (*p != 13 && *p != 10 && *p) {
+      input.push_back(*p++);
+    }
+    if (*p == 13 && *(p + 1) == 10) {
+      p++;
+    }
+    p++;
     return input;
   }
 
   template<typename T>
   _fastio& operator>>(T& input) {
-    return read_integer(input, Bool<(static_cast<T>(-1) > 0)>());
+    return read_integer(input, IsUnsigned<T>());
   }
 
   template<typename T>
   _fastio& operator<<(const T& output) {
-    return write_integer(output, Bool<(static_cast<T>(-1) > 0)>());
+    return write_integer(output, IsUnsigned<T>());
+  }
+
+  _fastio& operator<<(std::string output) {
+    return write_string(output.c_str());
   }
 
   _fastio& operator<<(const char output[]) {
+    return write_string(output);
+  }
+ 
+ private:
+  template<bool> class Bool {};
+  template<class T> class IsUnsigned : public Bool<(static_cast<T>(-1) > 0)> {};
+  char *input_buffer, *output_buffer;
+  char *p, *q;
+  int remaining;
+
+  _fastio& write_string(const char* output) {
     update_output();
     for (const char* x = output; *x; x++) {
       *q++ = *x;
     }
     return *this;
   }
- 
- private:
-  template<bool> class Bool {};
-  char *input_buffer, *output_buffer;
-  char *p, *q;
-  int remaining;
 
   template<typename T>
   _fastio& write_integer(const T& output, Bool<true> b) {
