@@ -3,6 +3,8 @@
 #include <functional>
 #include <memory>
 
+//reserve matrix rows cols id
+
 template<typename T>
 class matrix {
  public:

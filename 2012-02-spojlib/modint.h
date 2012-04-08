@@ -1,3 +1,5 @@
+//reserve modint inverse
+
 template<int M>
 class modint {
  public:

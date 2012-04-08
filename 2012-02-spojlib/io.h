@@ -1,5 +1,9 @@
 #include <cstdio>
 #include <cstring>
+#include <limits>
+#include <string>
+
+//reserve _fastio fastio word line
 
 class Stdio {
  public:
@@ -79,6 +83,7 @@ class _fastio {
  private:
   template<bool> class Bool {};
   template<class T> class IsUnsigned : public Bool<(static_cast<T>(-1) > 0)> {};
+
   char *input_buffer, *output_buffer;
   char *p, *q;
   int remaining;
@@ -112,8 +117,8 @@ class _fastio {
 
   template<typename T>
   void write_absolute(const T& input) {
-    if (input == 0) {
-      *q++ = '0';
+    if (input < 10) {
+      *q++ = '0' + input;
       return;
     }
     char out[20];

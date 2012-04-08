@@ -110,10 +110,11 @@ TEST_IO(WriteInt, 200, 30, "") {
   {
     fastio_WriteInt io;
     io << 1U << " " << 12345U << " ";
-    io << -1 << " " << -12345 << " ";
+    io << -1 << " " << -1599920001 << " ";
     io << 123456789012345LL;
   }
-  EXPECT_EQ(string("1 12345 -1 -12345 123456789012345"), out_WriteInt::get());
+  EXPECT_EQ(string("1 12345 -1 -1599920001 123456789012345"),
+            out_WriteInt::get());
 }
 
 TEST_IO(WriteString, 200, 30, "") {
@@ -121,9 +122,9 @@ TEST_IO(WriteString, 200, 30, "") {
     fastio_WriteString io;
     io << "ricbit ";
     string ilafox("ilafox");
-    io << ilafox;
+    io << ilafox << "\n";
   }
-  EXPECT_EQ(string("ricbit ilafox"), out_WriteString::get());
+  EXPECT_EQ(string("ricbit ilafox\n"), out_WriteString::get());
 }
 
 

@@ -601,3 +601,7 @@ Description: Generic C++ libraries to help solving spoj problems.
 Name: 2012-03-html5game
 Language: Javascript
 Description: Small game in javascript to demonstrate HTML5 features.
+
+Name: 2012-04-spojsamples
+Language: C++
+Description: SPOJ tutorials solved using spojlib.
