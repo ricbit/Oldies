@@ -1,0 +1,12 @@
+function x = freq(n)
+  % input = value of PSG register 6
+  % output = percentage of audible power
+  f = -150000:1:150000;
+  T = n*8.98e-6;
+  s = (sin(pi*T.*f)).**2 ./ (f.**2);
+  m = max(s);
+  s(150001) = m;
+  s = s ./ m;
+  total = sum(s.*s);
+  mid = sum(s.*s .* (abs(f)<20000));
+  x = mid / total;
