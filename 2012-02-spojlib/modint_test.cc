@@ -1,8 +1,11 @@
 #include "gtest/gtest.h"
 #include "modint.h"
 
+const int LIMIT = 0x7FFFFFFF;
+
 typedef modint<7> m7;
 typedef modint<2000000000> mbig;
+typedef modint<LIMIT> mhuge;
 
 TEST(ModintTest, Assign) {
   EXPECT_EQ(0, m7(0));
@@ -10,18 +13,23 @@ TEST(ModintTest, Assign) {
   EXPECT_EQ(0, m7(0));
   EXPECT_EQ(6, m7(-1));
   EXPECT_EQ(1, modint<3>(4));
+  EXPECT_EQ(LIMIT - 1, mhuge(-1));
+  EXPECT_EQ(0, mhuge(LIMIT));
 }
 
 TEST(ModintTest, Add) {
   EXPECT_EQ(0, m7(1) + m7(6));
   EXPECT_EQ(2, m7(1) + m7(1));
   EXPECT_EQ(1, mbig(2) + mbig(1999999999));
+  EXPECT_EQ(0, mhuge(LIMIT) + mhuge(-LIMIT));
+  EXPECT_EQ(LIMIT - 2, mhuge(LIMIT - 1) + mhuge(LIMIT - 1));
 }
 
 TEST(ModintTest, Sub) {
   EXPECT_EQ(5, m7(6) - m7(1));
   EXPECT_EQ(5, m7(1) - m7(3));
   EXPECT_EQ(0, m7(3) - m7(3));
+  EXPECT_EQ(1, mhuge(0) - mhuge(LIMIT - 1));
 }
 
 TEST(ModintTest, Mul) {
@@ -29,6 +37,7 @@ TEST(ModintTest, Mul) {
   EXPECT_EQ(3, m7(2) * m7(5));
   EXPECT_EQ(3, m7(2) * m7(-2));
   EXPECT_EQ(1, mbig(1999999999) * mbig(1999999999));
+  EXPECT_EQ(1, mhuge(LIMIT - 1) * mhuge(LIMIT - 1));
 }
 
 TEST(ModintTest, Power) {
@@ -49,4 +58,6 @@ TEST(ModintTest, Negation) {
   EXPECT_EQ(1, -m7(-1));
   EXPECT_EQ(6, -m7(1));
   EXPECT_EQ(0, -m7(0));
+  EXPECT_EQ(1, -mhuge(LIMIT - 1));
+  EXPECT_EQ(LIMIT - 1, -mhuge(1));
 }

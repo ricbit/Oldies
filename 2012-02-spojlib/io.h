@@ -108,7 +108,12 @@ class _fastio {
     update_output();
     if (output < 0) {
       *q++ = '-';
-      write_absolute(-output);
+      if (std::numeric_limits<T>::min() == output) {
+        write_absolute(-(output + 1));
+        ++*(q - 1);
+      } else {
+        write_absolute(-output);
+      }
     } else {
       write_absolute(output);
     }
@@ -121,7 +126,7 @@ class _fastio {
       *q++ = '0' + input;
       return;
     }
-    char out[20];
+    char out[std::numeric_limits<T>::digits10 + 2];
     out[0] = 0;
     char *r = out + 1;
     T temp(input);

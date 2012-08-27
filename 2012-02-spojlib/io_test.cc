@@ -111,9 +111,15 @@ TEST_IO(WriteInt, 200, 30, "") {
     fastio_WriteInt io;
     io << 1U << " " << 12345U << " ";
     io << -1 << " " << -1599920001 << " ";
-    io << 123456789012345LL;
+    io << 123456789012345LL << " ";
+    io << std::numeric_limits<unsigned long long>::max() << " ";
+    io << std::numeric_limits<long long>::max() << " ";
+    io << std::numeric_limits<long long>::min() << " ";
+    io << std::numeric_limits<int>::min();
   }
-  EXPECT_EQ(string("1 12345 -1 -1599920001 123456789012345"),
+  EXPECT_EQ(string("1 12345 -1 -1599920001 123456789012345 "
+                   "18446744073709551615 9223372036854775807 "
+                   "-9223372036854775808 -2147483648"),
             out_WriteInt::get());
 }
 

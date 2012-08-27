@@ -1,35 +1,36 @@
 //reserve modint inverse
 
-template<int M>
+template<unsigned M> // works only for 1 <= M <= 0x7FFFFFFF
 class modint {
  public:
-  modint(int v) : value_(v < 0 ? M + v % M : v % M) {}
+  modint(unsigned v) : value_(v % M) {}
+  modint(int v) : value_(v < 0 ? M + v % int(M) : v % M) {}
   modint() : value_(0) {}
 
   modint operator+(const modint& b) const {
-    int ans = value_ + b.value_;
+    unsigned ans = value_ + b.value_;
     return ans < M ? build(ans) : build(ans - M);
   }
 
   modint operator-(const modint& b) const {
-    int ans = value_ - b.value_;
-    return ans < 0 ? build(ans + M) : build(ans);
+    unsigned ans = value_ - b.value_;
+    return ans > value_ ? build(ans + M) : build(ans);
   }
 
   modint operator*(const modint& b) const {
-   int ans;
-   asm (
-     "imull %%ebx\n\t"
-     "idivl %%esi\n\t"
-     : "=d" (ans)
-     : "a" (value_), "b" (b.value_), "S" (M)
-     :
-   );
-   return build(ans);
+    unsigned ans,dummy;
+    asm (
+      "imull %%ebx\n\t"
+      "idivl %%esi\n\t"
+      : "=d" (ans), "=a" (dummy)
+      : "1" (value_), "b" (b.value_), "S" (M)
+      : "cc" 
+    );
+    return build(ans);
   }
 
   modint operator-() const {
-    return modint(-value_);
+    return modint(M - value_);
   }
 
   template<typename T>
@@ -54,7 +55,7 @@ class modint {
   }
 
  private:
-  int value_;
+  unsigned value_;
   static const modint one_;
 
   modint build(int v) const {
@@ -64,5 +65,5 @@ class modint {
   }
 };
 
-template<int M>
+template<unsigned M>
 const modint<M> modint<M>::one_(1);
