@@ -1,6 +1,10 @@
 //reserve modint inverse
 
+#ifdef VARMOD
+int M = 1;
+#else
 template<unsigned M> // works only for 1 <= M <= 0x7FFFFFFF
+#endif
 class modint {
  public:
   modint(unsigned v) : value_(v % M) {}
@@ -65,5 +69,10 @@ class modint {
   }
 };
 
+#ifdef VARMOD
+const modint modint::one_(1);
+#else
 template<unsigned M>
 const modint<M> modint<M>::one_(1);
+#endif
+

@@ -65,14 +65,7 @@ class matrix {
 
   matrix<T> operator*(const matrix<T>& b) const {    
     matrix<T> ans(rows_, b.cols());
-    for (int j = 0; j < rows_; j++) {
-      for (int i = 0; i < b.cols(); i++) {
-        ans[j][i] = 0;
-        for (int k = 0; k < cols_; k++) {
-          ans[j][i] = ans[j][i] + mat_[j][k] * b[k][i];
-        }
-      }
-    }
+    mul(*this, b, ans);
     return ans;
   }
 
@@ -90,8 +83,19 @@ class matrix {
   matrix<T> power(S n) const {
     if (n == 0) return id();
     if (n == 1) return *this;
-    matrix<T> half = power(n / 2);
-    return n % 2 ? *this * half * half : half * half;
+
+    matrix<T> b(*this);
+    matrix<T> ans(id());
+    matrix<T> temp(id());
+    for (S exp = n; exp; exp >>= 1) {
+      if (exp & 1) {
+        mul(ans, b, temp);
+        ans.mat_.swap(temp.mat_);
+      }
+      mul(b, b, temp);
+      b.mat_.swap(temp.mat_);
+    }
+    return ans;
   }
   
   bool operator==(const matrix<T>& b) const {
@@ -108,6 +112,17 @@ class matrix {
   }
 
  private:
+  void mul(const matrix<T>& a, const matrix<T>& b, matrix<T>& ans) const {
+    for (int j = 0; j < a.rows(); j++) {
+      for (int i = 0; i < b.cols(); i++) {
+        ans[j][i] = 0;
+        for (int k = 0; k < a.cols(); k++) {
+          ans[j][i] = ans[j][i] + a[j][k] * b[k][i];
+        }
+      }
+    }
+  }
+ 
   vvt mat_;
   int rows_, cols_;
   mutable matrix<T>* id_cache_;

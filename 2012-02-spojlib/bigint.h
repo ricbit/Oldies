@@ -14,11 +14,19 @@ template <int B>
 class _bigint {
  public:
   static const int B10 = P10<B>::P;
+  _bigint() : digits_(1, 0), size_(1) {}
   _bigint(const char* p) {
     build(p);
   }
   _bigint(const std::string s) {
     build(s.c_str());
+  }
+  _bigint(int x) {
+    while (x) {
+      digits_.push_back(x % B10);
+      x /= B10;
+    }
+    size_ = digits_.size();
   }
   operator std::string() const {
     if (size_ == 1 && digits_[0] == 0) {
@@ -48,6 +56,20 @@ class _bigint {
     ans.add(b, 0);
     return ans.trim();
   }
+  _bigint<B> operator-(const _bigint<B>& b) const {
+    _bigint<B> ans = slice(0, size_);
+    int carry = 0;
+    for (int i = 0; i < size_; i++) {
+      if (get(i) < b.get(i) + carry) {
+        ans.digits_[i] = B10 + get(i) - b.get(i) - carry;
+        carry = 1;
+      } else {
+        ans.digits_[i] = get(i) - b.get(i) - carry;
+        carry = 0;
+      }
+    }
+    return ans.trim();
+  }
   _bigint<B> operator*(const _bigint<B>& b) const {
     // TODO: fix this.
     //if (std::max(size_, b.size_) > 50) {
@@ -67,7 +89,6 @@ class _bigint {
     return ans;
   }
  private:
-  _bigint() {}
   void build(const char* p) {
     int n = strlen(p);
     size_ = (n + B - 1) / B;
@@ -108,7 +129,7 @@ class _bigint {
       "idivl %%esi \n\t"
       : "=d"(outlow), "=a"(outhigh)
       : "c"(carry), "a"(a), "b"(b), "S"(B10)
-      :
+      : "cc"
     );
   }
   _bigint<B> karatsuba(const _bigint<B>& b) const {
