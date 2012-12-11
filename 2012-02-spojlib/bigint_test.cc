@@ -67,4 +67,33 @@ TEST(BigintTest, Mul) {
             _bigint<9>("123456789"));
 }
 
+TEST(BigintTest, ModInt) {
+  EXPECT_EQ(11, _bigint<2>("123456789") % 23);
+  EXPECT_EQ(973765431, _bigint<9>("123456789123456789") % 987654321);
+}
+
+TEST(BigintTest, Mod) {
+  EXPECT_EQ(_bigint<2>("11"), _bigint<2>("123456789") % _bigint<2>("23"));
+  EXPECT_EQ(_bigint<1>("0"), _bigint<1>("123") % _bigint<1>("123"));
+  EXPECT_EQ(_bigint<1>("122"), _bigint<1>("122") % _bigint<1>("123"));
+  EXPECT_EQ(_bigint<1>("1"), _bigint<1>("124") % _bigint<1>("123"));
+  EXPECT_EQ(_bigint<9>("973765431"), 
+            _bigint<9>("123456789123456789") % _bigint<9>("987654321"));
+}
+
+TEST(BigintTest, DivInt) {
+  EXPECT_EQ(_bigint<2>("5367686"), _bigint<2>("123456789") / 23);
+  EXPECT_EQ(_bigint<3>("5367686"), _bigint<3>("10735372") / 2);
+  EXPECT_EQ(_bigint<9>("124999998"),
+            _bigint<9>("123456789123456789") / 987654321);
+}
+
+TEST(BigintTest, LessThan) {
+  EXPECT_FALSE(_bigint<2>("12345") < _bigint<2>("12345"));
+  EXPECT_TRUE(_bigint<2>("12344") < _bigint<2>("12345"));
+  EXPECT_FALSE(_bigint<2>("12346") < _bigint<2>("12345"));
+  EXPECT_FALSE(_bigint<2>("12345678") < _bigint<2>("12345"));
+  EXPECT_TRUE(_bigint<2>("1") < _bigint<2>("12345"));
+}
+
 

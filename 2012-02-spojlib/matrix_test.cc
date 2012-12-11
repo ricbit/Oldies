@@ -63,4 +63,20 @@ TEST(MatrixTest, Power) {
   matrix<int> mc(2, 2, c);
   EXPECT_EQ(mb, ma.power(9));
   EXPECT_EQ(mc, ma.power(0));
+  EXPECT_EQ(mc, ma.power(0));
+}
+
+TEST(MatrixTest, Determinant) {
+  const static int a[] = {1};
+  const static int b[] = {1, 2, 3, 4};
+  const static int c[] = {1, 2, 3, 4, 5, 3, 9, 7, 6};
+  const static int d[] = {1, 2, 3, 5, 4, 5, 6, 8, 9, 7, 6, 1, 3, 5, 7, 9};
+  matrix<int> ma(1, 1, a);
+  matrix<int> mb(2, 2, b);
+  matrix<int> mc(3, 3, c);
+  matrix<int> md(4, 4, d);
+  EXPECT_EQ(1, ma.determinant());
+  EXPECT_EQ(-2, mb.determinant());
+  EXPECT_EQ(-36, mc.determinant());
+  EXPECT_EQ(6, md.determinant());
 }

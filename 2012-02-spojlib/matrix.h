@@ -111,6 +111,32 @@ class matrix {
     return !(*this == b);
   }
 
+  T determinant() {
+    if (rows_ != cols_) {
+      return 0;
+    }
+    if (rows_ == 1) {
+      return mat_[0][0];
+    }
+    if (rows_ == 2) {
+      return mat_[0][0] * mat_[1][1] - mat_[0][1] * mat_[1][0];
+    }
+    T ans = 0, sign = 1;
+    for (int e = 0; e < rows_; e++) {
+      matrix<T> m(rows_ - 1, cols_ - 1);
+      for (int j = 0, jj = 0; j < rows_; j++) {
+        if (j == e) continue;
+        for (int i = 1; i < cols_; i++) {
+          m[jj][i - 1] = mat_[j][i];
+        }
+        jj++;
+      }
+      ans += sign * mat_[e][0] * m.determinant();
+      sign = -sign;
+    }
+    return ans;
+  }
+
  private:
   void mul(const matrix<T>& a, const matrix<T>& b, matrix<T>& ans) const {
     for (int j = 0; j < a.rows(); j++) {

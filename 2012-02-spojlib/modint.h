@@ -1,7 +1,7 @@
 //reserve modint inverse
 
 #ifdef VARMOD
-int M = 1;
+unsigned M = 2;
 #else
 template<unsigned M> // works only for 1 <= M <= 0x7FFFFFFF
 #endif
@@ -14,6 +14,14 @@ class modint {
   modint operator+(const modint& b) const {
     unsigned ans = value_ + b.value_;
     return ans < M ? build(ans) : build(ans - M);
+  }
+
+  modint& operator+=(const modint& b) {
+    value_ += b.value_;
+    if (value_ >= M) {
+      value_ -= M;
+    }
+    return *this;
   }
 
   modint operator-(const modint& b) const {

@@ -18,6 +18,8 @@ class _bigint {
   _bigint(const char* p) {
     build(p);
   }
+  _bigint(const _bigint<B>& b)
+      : digits_(b.digits_.begin(), b.digits_.end()), size_(b.size_) {}
   _bigint(const std::string s) {
     build(s.c_str());
   }
@@ -70,6 +72,56 @@ class _bigint {
     }
     return ans.trim();
   }
+  bool operator<(const _bigint<B>& b) const {
+    if (size_ < b.size_) return true;
+    if (size_ > b.size_) return false;
+    for (int i = size_ - 1; i > 0; i--) {
+      if (digits_[i] > b.digits_[i]) return false;
+      if (digits_[i] < b.digits_[i]) return true;
+    }
+    return digits_[0] < b.digits_[0];
+  }
+  int operator%(const int b) const {  // only for b < B10
+    int ans = 0;
+    int cur = 1;
+    for (int i = 0; i < size_; i++) {
+      int low, high;
+      divmul(digits_[i], cur, 0, low, high, b);
+      ans = (ans + low) % b;
+      divmul(cur, B10, 0, cur, high, b);
+    }
+    return ans;
+  }
+  _bigint<B> operator%(const _bigint<B>& bb) const {  // only for b < B10
+    _bigint<B> ans(*this), b(bb);
+    if (*this < b) {
+      return *this;
+    }
+    _bigint<B> two = 2;
+    int i = 0;
+    while (!(ans < b)) {
+      b = b * two;
+      i++;
+    }
+    while (i--) {
+      b = b / 2;
+      if (!(ans < b)) {
+        ans = ans - b;
+      }
+    }
+    return ans;
+  }
+  _bigint<B> operator/(const int b) const {  // only for b < B10
+    _bigint<B> ans;
+    ans.digits_.resize(size_);
+    ans.size_ = size_;
+    int carry = 0;
+    for (int i = size_ - 1; i >= 0; i--) {
+      divmul(carry, B10, get(i), carry, ans.digits_[i], b);
+    }
+    ans.trim();
+    return ans;
+  }
   _bigint<B> operator*(const _bigint<B>& b) const {
     // TODO: fix this.
     //if (std::max(size_, b.size_) > 50) {
@@ -82,7 +134,7 @@ class _bigint {
       int carry = 0;
       for (int j = 0; j < size_ + 1; j++) {
         carry += ans.digits_[j + i];
-        divmul(get(j), b.get(i), carry, ans.digits_[j + i], carry);
+        divmul(get(j), b.get(i), carry, ans.digits_[j + i], carry, B10);
      }
     }
     ans.trim();
@@ -121,14 +173,15 @@ class _bigint {
     }
     return *this;
   }
-  void divmul(int a, int b, int carry, int& outlow, int& outhigh) const {
+  void divmul(int a, int b, int carry, 
+              int& outlow, int& outhigh, int modulus) const {
     asm volatile (
       "imull %%ebx \n\t"
       "addl %%ecx,%%eax \n\t"
       "adcl $0, %%edx \n\t"
       "idivl %%esi \n\t"
       : "=d"(outlow), "=a"(outhigh)
-      : "c"(carry), "a"(a), "b"(b), "S"(B10)
+      : "c"(carry), "a"(a), "b"(b), "S"(modulus)
       : "cc"
     );
   }

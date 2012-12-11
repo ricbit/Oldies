@@ -3,7 +3,7 @@
 #include <cmath>
 #include <vector>
 
-//reserve sieve getprimes factorize sum_of_divisors gcd
+//reserve sieve getprimes factorize sum_of_divisors gcd totient
 
 template<typename PrimeCallback>
 std::vector<bool> sieve(int maxprime, PrimeCallback callback) {
@@ -50,8 +50,18 @@ std::vector<int> getprimes(int maxprime) {
   return p;
 }
 
-template <typename FactorCallback>
-void factorize(int number, const std::vector<int>& primes,
+
+void divmod(int a, int b, int& div, int& mod) {
+  asm (
+    "idivl %%esi\n\t"
+    : "=d" (mod), "=a" (div)
+    : "d" (0), "a" (a), "S" (b)
+    : "cc"
+  );
+}
+
+template <typename FactorCallback, typename T>
+void factorize(T number, const std::vector<int>& primes,
                FactorCallback factor) {
   int maxp = static_cast<int>(sqrt(number));
   for (int i = 0; primes[i] <= maxp; i++) {
@@ -63,6 +73,10 @@ void factorize(int number, const std::vector<int>& primes,
         number /= primes[i];
       }
       factor(primes[i], fac);
+    } else {
+      if (number / primes[i] < primes[i]) {
+        break;
+      }
     }
   }
   if (number > 1) {
@@ -89,6 +103,29 @@ T sum_of_divisors(int n, const std::vector<int>& primes) {
   T ans;
   DivisorSum<T> sum(ans);
   factorize(n, primes, sum);
+  return ans;
+}
+
+template<typename T>
+class Totient {
+ public:
+  Totient(T& acc) : acc_(acc) {
+    acc_ = 1;
+  }
+  void operator()(int prime, int n) {
+    T p(prime);
+    T exp = __gnu_cxx::power(p, n);
+    acc_ *= exp - exp / prime;
+  }
+ private:
+  T& acc_;
+};
+
+template<typename T>
+T totient(int n, const std::vector<int>& primes) {
+  T ans;
+  Totient<T> tot(ans);
+  factorize(n, primes, tot);
   return ans;
 }
 
