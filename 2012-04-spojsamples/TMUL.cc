@@ -3,13 +3,12 @@
 #include "spojlib/bigint.h"
 
 int main(void) {
-  _fastio<32768, 20020> io;
-  int tot = io;
-  while (tot--) {
-    string a = io.word();
-    string b = io.word();
-    string ans = bigint(a) * bigint(b);
-    io << ans << "\n";
+  _fastio<30000, 10000> io;
+  int n = io;
+  while (n--) {
+    string s1 = io.word();
+    string s2 = io.word();
+    io << static_cast<string>(bigint(s1) * bigint(s2)) << "\n";
   }
   return 0;
 }
