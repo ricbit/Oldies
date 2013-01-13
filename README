@@ -617,3 +617,7 @@ Description: Scripts to automate SPOJ using the command line.
 Name: 2013-01-facegif
 Language: Python
 Description: Face recognition using opencv and python.
+
+Name: 2013-01-pigame
+Language: Python
+Description: Try to find a period on the sequence of integer multiples of pi.
