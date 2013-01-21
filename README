@@ -621,3 +621,8 @@ Description: Face recognition using opencv and python.
 Name: 2013-01-pigame
 Language: Python
 Description: Try to find a period on the sequence of integer multiples of pi.
+
+Name: 2013-01-govelha
+Language: Go
+Description: Opens the entire game tree of a tic-tac-toe game, works for
+any game topology.
