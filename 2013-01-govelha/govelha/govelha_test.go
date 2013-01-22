@@ -84,7 +84,7 @@ func TestGeometryRotations(t *testing.T) {
   }
 }
 
-func CheckSet(t *testing.T, set Set, hash uint64, s State, expected bool) {
+func CheckSet(t *testing.T, set Set, hash uint32, s State, expected bool) {
   if set.Present(hash, s) != expected {
     t.Errorf("%d:%v != %t on %v", hash, s, expected, set)
   }
@@ -118,10 +118,8 @@ func TestRotation(t *testing.T) {
   s1 := buildState(sig, []int{1,2,1, 1,2,0, 0,2,0})
   s2 := buildState(sig, []int{1,2,1, 0,2,1, 0,2,0})
   found := false
-  temp := s1.Copy()
   for _, rot := range geom.Rotations {
-    s2.ApplyRotation(temp, sig, rot)
-    if s1.Equal(temp) {
+    if s1.Equal(s2.CopyRotated(sig, rot)) {
       found = true
     }
   }
@@ -132,7 +130,8 @@ func TestRotation(t *testing.T) {
 
 func TestEngine(t *testing.T) {
   sig := NewSignature(3, 2)
-  stats := Engine(sig, 20)
+  engine := NewEngine(sig)
+  stats := engine.Run(20, false)
   if stats.endingX != 91 {
     t.Errorf("Wrong number of endings for X: %d != %d", stats.endingX, 91)
   }
@@ -147,17 +146,21 @@ func TestEngine(t *testing.T) {
 func TestCanonical(t *testing.T) {
   sig := NewSignature(3, 2)
   geom := NewGeometry(sig)
-  state := NewState(sig)
-  state.Set(1, 1)
-  state.Set(2, 2)
-  canonical := Canonical(state, &geom)
-  vec := []int{0,0,0, 0,0,0, 0,1,2}
-  expected := NewState(sig)
-  for i := 0; i < sig.NumCells(); i++ {
-    expected.Set(i, vec[i])
-  }
+  state := buildState(sig, []int{0,1,2, 0,0,0, 0,0,0})
+  canonical, _ := Canonical(state, &geom)
+  expected := buildState(sig, []int{0,0,0, 0,0,0, 0,1,2})
   if !expected.Equal(canonical) {
     t.Errorf("Canonical error:\n%s\n%s\n",
         expected.Render(sig), canonical.Render(sig))
+  }
+}
+
+func TestDraw(t *testing.T) {
+  sig := NewSignature(3, 2)
+  geom := NewGeometry(sig)
+  state := buildState(sig, []int{2,1,2, 2,1,0, 1,2,1})
+  _, draw := isSolution(&geom, state)
+  if !draw {
+    t.Errorf("Draw not detected")
   }
 }

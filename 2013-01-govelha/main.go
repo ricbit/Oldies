@@ -11,7 +11,8 @@ func main() {
   f2, _ := os.Create("govelha.mprof")
   pprof.StartCPUProfile(f)
   sig := govelha.NewSignature(4, 4)
-  govelha.Engine(sig, 3)
+  engine := govelha.NewEngine(sig)
+  engine.Run(3, true)
   pprof.WriteHeapProfile(f2)
   pprof.StopCPUProfile()
 }
