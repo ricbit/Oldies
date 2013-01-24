@@ -1,12 +1,19 @@
 package govelha
 
 import "fmt"
+import "flag"
 import "runtime"
+import "os"
+import "bufio"
 import "time"
 import "sort"
 import "hash/crc32"
 import "bytes"
 import "encoding/binary"
+
+// Flags
+
+var dotfile = flag.String("dotfile", "", "File name of dot file")
 
 // Math helpers.
 
@@ -18,20 +25,30 @@ func Product(n int, value func(int) int) int {
   return ans
 }
 
+// Calculate x ** n
 func Pow(x, n int) int {
   return Product(n, func(int) int {
     return x
   })
 }
 
+// Calculate n!
 func Factorial(n int) int {
   return Product(n, func(i int) int {
     return i + 1
   })
 }
 
+// Create a bitmask with a single bit n.
 func Bit(n int) int {
   return int(1 << uint(n))
+}
+
+func ConvertBase(x int, b int, ans []int) {
+  for i := 0; i < len(ans); i++ {
+    ans[i] = x % b
+    x /= b
+  }
 }
 
 // Combinatorial helpers.
@@ -87,11 +104,7 @@ func ProductSet(n int, dim int) <-chan []int {
     size := Pow(n, dim)
     for i := 0; i < size; i++ {
       set := make([]int, dim)
-      cur := i
-      for j := 0; j < dim; j++ {
-        set[j] = cur % n
-        cur /= n
-      }
+      ConvertBase(i, n, set)
       ch <- set
     }
     close(ch)
@@ -132,10 +145,7 @@ func (sig Signature) NumRotations() int {
 }
 
 func (sig Signature) Decode(pos int, vec []int) {
-  for i := 0; i < sig.Dim; i++ {
-    vec[i] = pos % sig.Side
-    pos /= sig.Side
-  }
+  ConvertBase(pos, sig.Side, vec)
 }
 
 func (sig Signature) Encode(vec []int) int {
@@ -226,14 +236,32 @@ func (s State) Render(sig Signature) string {
   return out
 }
 
+func (s State) RenderHTML(sig Signature) string {
+  value := ".XO"
+  stride := Pow(sig.Side, sig.Dim / 2)
+  size := sig.NumCells()
+  out := "<table><tr>"
+  for i := 0; i < size; i++ {
+    out += "<td>" + string(value[s.Get(int(i))]) + "</td>"
+    if i % sig.Side == sig.Side - 1 {
+      out += " "
+    }
+    if i % stride == stride - 1 {
+      out += "</tr>"
+      if i != size - 1 {
+        out += "<tr>"
+      }
+    }
+  }
+  out += "</table>"
+  return out
+}
 
 // Set of states
 type Set map[uint32] []StateInfo
 
 type StateInfo struct {
   state State
-  parentHash uint32
-  parentPos uint8
   value int8
 }
 
@@ -241,21 +269,26 @@ func NewSet() Set {
   return make(Set)
 }
 
-func (s Set) Present(hash uint32, state State) bool {
+func (s Set) Present(hash uint32, state State) (int, bool) {
   state_list, ok := s[hash]
   if !ok {
-    return false
+    return 0, false
   }
-  for _, cur := range state_list {
+  for i, cur := range state_list {
     if state.Equal(cur.state) {
-      return true
+      return i, true
     }
   }
-  return false
+  return 0, false
 }
 
-func (s Set) Insert(hash uint32, state State) {
-  s[hash] = append(s[hash], StateInfo{state,0,0,0})
+func (s Set) Insert(hash uint32, state State) int {
+  s[hash] = append(s[hash], StateInfo{state,  0})
+  pos := len(s[hash]) - 1
+  if pos == 255 {
+    panic(fmt.Sprintf("Too many collision on hash %x", hash))
+  }
+  return pos
 }
 
 func (s Set) MaxCollision() int {
@@ -347,15 +380,6 @@ func boardPermutation(sig Signature, perm []int, sign []bool) []int {
 
 // Stack-based buffer.
 
-type Unit struct {
-  level int
-  ending bool
-  draw bool
-  canonical int
-  state State
-  hash uint32
-}
-
 type StackNode struct {
   unit Unit
   next *StackNode
@@ -368,8 +392,7 @@ func NewStack(input chan Unit, stats *Stats) chan Unit {
     stats.stack = 0
     for {
       if top == nil {
-        unit := <-input
-        top = PushStack(unit, top, stats)
+        top = PushStack(<-input, top, stats)
       } else {
         select {
         case unit := <-input:
@@ -425,23 +448,16 @@ func PrintFinalStats(stats *Stats) {
   fmt.Printf("memory in use %d Mb\n", m.Alloc / 1048576)
 }
 
-func UpdateStats(unit Unit, rejected int, numcells int, stats *Stats) {
-  stats.accepted++
-  stats.rejected += rejected
-  if unit.ending {
-    if unit.level % 2 == 0 {
-      stats.endingO++
-    } else {
-      stats.endingX++
-    }
-  } else {
-    if unit.level == numcells {
-      stats.draw++
-    }
-  }
-}
-
 // Engine
+
+type Unit struct {
+  level int
+  ending bool
+  draw bool
+  canonical int
+  state State
+  hash uint32
+}
 
 type Engine struct {
   geom Geometry
@@ -462,24 +478,110 @@ func NewEngine(sig Signature) *Engine {
 
 func (eng *Engine) Run(maxlevel int, prune bool) Stats {
   stack := NewStack(eng.accept, &eng.stats)
-  eng.accept <- Unit{0, false, false, 0, NewState(eng.geom.sig), 0}
+  empty := NewState(eng.geom.sig)
+  eng.accept <- Unit{0, false, false, 0, empty, HashState(empty)}
   go PrintStats(&eng.stats)
   for count := 1; count > 0; count-- {
     unit := <-stack
-    if eng.set.Present(unit.hash, unit.state) {
+    if _, ok := eng.set.Present(unit.hash, unit.state); ok {
       eng.stats.ignored++
     } else {
-      eng.set.Insert(unit.hash, unit.state)
+      _ = eng.set.Insert(unit.hash, unit.state)
       if !(prune && eng.PruneUnit(unit)) {
         branched, rejected := eng.Branch(unit, maxlevel)
         count += branched
-        UpdateStats(unit, rejected, eng.geom.sig.NumCells(), &eng.stats)
+        eng.UpdateStats(unit, rejected)
       }
     }
   }
   eng.stats.maxcollision = eng.set.MaxCollision()
   PrintFinalStats(&eng.stats)
+  eng.RenderDotOutput()
   return eng.stats
+}
+
+func (eng *Engine) RenderDotOutput() {
+  if *dotfile == "" {
+    return
+  }
+  f, _ := os.Create(*dotfile)
+  defer f.Close()
+  w := bufio.NewWriter(f)
+  defer w.Flush()
+  w.WriteString("digraph velha {\n")
+  for hash, value := range eng.set {
+    for index, stateInfo := range value {
+      fmt.Printf("state %08X %d\n", hash, index)
+      w.WriteString(fmt.Sprintf("x%08x_%d [label=<%s>]\n",
+          hash, index, stateInfo.state.RenderHTML(eng.geom.sig)))
+      parents := make([]State, 0)
+      for parent := range eng.Parents(stateInfo.state) {
+        parentHash := HashState(parent)
+        _, ok := eng.set.Present(parentHash, parent)
+        if ok {
+          parents = append(parents, parent)
+        }
+      }
+      if len(parents) > 0 {
+        parentHash := HashState(parents[0])
+        parentIndex, _ := eng.set.Present(parentHash, parents[0])
+        w.WriteString(fmt.Sprintf("x%08x_%d -> x%08x_%d;\n",
+            parentHash, parentIndex, hash, index))
+      }
+    }
+  }
+  w.WriteString("}")
+}
+
+func (eng *Engine) Parents(state State) chan State {
+  out := make(chan State)
+  go func() {
+    var mark int
+    if isXTurn(state, eng.geom.sig) {
+      mark = 2
+    } else {
+      mark = 1
+    }
+    set := make(map[string] bool)
+    for i := 0; i < eng.geom.sig.NumCells(); i++ {
+      if state.Get(i) == mark {
+        newstate := state.Copy()
+        newstate.Set(i, 0)
+        canonical, _ := Canonical(newstate, &eng.geom)
+        s := fmt.Sprint(canonical)
+        if _, ok := set[s]; !ok {
+          set[s] = true
+          out <- canonical
+        }
+      }
+    }
+    close(out)
+  }()
+  return out
+}
+
+func isXTurn(state State, sig Signature) bool {
+  var count [3]int
+  for i := 0; i < sig.NumCells(); i++ {
+    count[state.Get(i)]++
+  }
+  return count[1] == count[2]
+}
+
+func (eng *Engine) UpdateStats(unit Unit, rejected int) {
+  eng.stats.accepted++
+  eng.stats.rejected += rejected
+  if unit.ending {
+    if unit.level % 2 == 0 {
+      eng.stats.endingO++
+    } else {
+      eng.stats.endingX++
+    }
+  } else {
+    if unit.level == eng.geom.sig.NumCells() {
+      eng.stats.draw++
+    }
+  }
 }
 
 func (eng *Engine) PruneUnit(unit Unit) bool {
@@ -493,9 +595,9 @@ func (eng *Engine) PruneUnit(unit Unit) bool {
 func (eng *Engine) Branch(unit Unit, maxlevel int) (int, int) {
   accepted, rejected, launched := 0, 0, 0
   if unit.level < maxlevel && !unit.ending {
-    for i := 0; i < eng.geom.sig.NumCells(); i++ {
-      if unit.state.Get(i) == 0 {
-        eng.LaunchBranch(unit, i)
+    for pos := 0; pos < eng.geom.sig.NumCells(); pos++ {
+      if unit.state.Get(pos) == 0 {
+        eng.LaunchBranch(unit, pos)
         launched++
       }
     }
@@ -513,19 +615,19 @@ func (eng *Engine) Branch(unit Unit, maxlevel int) (int, int) {
 func (eng *Engine) LaunchBranch(unit Unit, pos int) {
   newstate := unit.state.Copy()
   newstate.Set(pos, unit.level % 2 + 1)
-  go eng.Check(newstate, unit.level + 1, pos, unit.canonical)
+  go eng.Check(newstate, unit.level, pos, unit.canonical)
 }
 
-func (eng *Engine) Check(state State, level int, pos int, prevcan int) {
-  // I think pos and prevcan can be used to optimize Canonical.
+func (eng *Engine) Check(state State, level, p, prevcan int) {
+  // I think p and prevcan can be used to optimize Canonical.
   // Must think more about it.
   chosen, canonical := Canonical(state, &eng.geom)
   hash := HashState(chosen)
-  if eng.set.Present(hash, chosen) {
+  if _, ok := eng.set.Present(hash, chosen); ok {
     eng.result <- false
   } else {
     ending, draw := isSolution(&eng.geom, chosen)
-    eng.accept <- Unit{level, ending, draw, canonical, chosen, hash}
+    eng.accept <- Unit{level + 1, ending, draw, canonical, chosen, hash}
     eng.result <- true
   }
 }

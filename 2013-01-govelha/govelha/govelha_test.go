@@ -85,7 +85,7 @@ func TestGeometryRotations(t *testing.T) {
 }
 
 func CheckSet(t *testing.T, set Set, hash uint32, s State, expected bool) {
-  if set.Present(hash, s) != expected {
+  if _, ok := set.Present(hash, s); ok != expected {
     t.Errorf("%d:%v != %t on %v", hash, s, expected, set)
   }
 }
