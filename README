@@ -625,4 +625,7 @@ Description: Try to find a period on the sequence of integer multiples of pi.
 Name: 2013-01-govelha
 Language: Go
 Description: Opens the entire game tree of a tic-tac-toe game, works for
-any game topology.
+
+Name: 2013-01-facebook
+Language: C++, Python
+Description: Solutions for problems on the Facebook Hacker Cup 2013.
