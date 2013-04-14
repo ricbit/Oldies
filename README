@@ -629,3 +629,7 @@ Description: Opens the entire game tree of a tic-tac-toe game, works for
 Name: 2013-01-facebook
 Language: C++, Python
 Description: Solutions for problems on the Facebook Hacker Cup 2013.
+
+Name: 2013-04-codejam
+Language: Python
+Description: Solutions for problems on the Google Code Jam 2013.
