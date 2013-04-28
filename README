@@ -633,3 +633,8 @@ Description: Solutions for problems on the Facebook Hacker Cup 2013.
 Name: 2013-04-codejam
 Language: Python
 Description: Solutions for problems on the Google Code Jam 2013.
+
+Name: 2013-04-analytic
+Language: Python
+Description: Exercises and experiments from Sedgewick's Combinatoric
+Analytics course.
