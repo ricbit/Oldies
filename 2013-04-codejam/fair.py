@@ -31,7 +31,6 @@ def count(a,b):
       break
     if is_palin(p2):
       ans += 1
-      print p,p2
   return ans
 
 
