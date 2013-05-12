@@ -35,7 +35,7 @@ def is_zigzag(p):
   cur = p[0]
   zig = True
   for i in p[1:]:
-    if zig != (cur > i):
+    if zig != (cur < i):
       return False
     cur = i
     zig = not zig
