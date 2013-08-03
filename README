@@ -638,3 +638,12 @@ Name: 2013-04-analytic
 Language: Python
 Description: Exercises and experiments from Sedgewick's Combinatoric
 Analytics course.
+
+Name: 2013-07-multirm
+Language: Python
+Description: Traverses a directory tree eliminating repeated files.
+
+Name: 2013-07-voronoi
+Language: C++
+Description: Generates a Pointillism using iterated Voronoi diagrams.
+
