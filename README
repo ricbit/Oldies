@@ -624,7 +624,7 @@ Description: Try to find a period on the sequence of integer multiples of pi.
 
 Name: 2013-01-govelha
 Language: Go
-Description: Opens the entire game tree of a tic-tac-toe game, works for
+Description: Opens the entire game tree of a tic-tac-toe game.
 
 Name: 2013-01-facebook
 Language: C++, Python
@@ -646,4 +646,8 @@ Description: Traverses a directory tree eliminating repeated files.
 Name: 2013-07-voronoi
 Language: C++
 Description: Generates a Pointillism using iterated Voronoi diagrams.
+
+Name: 2013-08-nurikabe
+Language: C++
+Description: Nurikabe solver using MIP.
 
