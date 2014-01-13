@@ -15,11 +15,11 @@
 using namespace std;
 
 template<typename T>
-class AtExit {
+class ScopeGuard {
  public:
-  AtExit(T callback) : callback_(callback) {
+  ScopeGuard(T callback) : callback_(callback) {
   }
-  ~AtExit() {
+  ~ScopeGuard() {
     callback_();
   }
  private:
@@ -27,8 +27,8 @@ class AtExit {
 };
 
 template<typename T>
-AtExit<T> at_exit(T callback) {
-  return AtExit<T>(callback);
+ScopeGuard<T> scope_guard(T callback) {
+  return ScopeGuard<T>(callback);
 }
 
 class FileSystem {
@@ -40,6 +40,9 @@ class FileSystem {
     auto cached_file = cache_.find(url);
     if (cached_file != cache_.end()) {
       return cached_file->second;
+    }
+    if (url.find("..") != string::npos) {
+      return cache_[url] = "";
     }
     ifstream file(base_path_ + url, ios::binary | ios::ate);
     if (!file) {
@@ -152,7 +155,7 @@ class WebServer {
   }
 
   void serve_page(int connection) {
-    auto x = at_exit([&]() {
+    auto x = scope_guard([=]() {
       close(connection);
     });
     const int max_request_size = 1024;
