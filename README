@@ -651,3 +651,7 @@ Name: 2013-08-nurikabe
 Language: C++
 Description: Nurikabe solver using MIP.
 
+Name: 2014-01-webserver
+Language: C++
+Description: Simple web server in idiomatic C++11.
+
