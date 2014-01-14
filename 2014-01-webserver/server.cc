@@ -3,14 +3,12 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <fstream>
-#include <memory>
 #include <vector>
-#include <unordered_map>
-#include <thread>
 
+#include <fcntl.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <sys/sendfile.h>
 
 using namespace std;
 
@@ -31,48 +29,10 @@ ScopeGuard<T> scope_guard(T callback) {
   return ScopeGuard<T>(callback);
 }
 
-class FileSystem {
- public:
-  FileSystem(string base_path) : base_path_(base_path) {
-  }
-
-  string read_file(string url) {
-    auto cached_file = cache_.find(url);
-    if (cached_file != cache_.end()) {
-      return cached_file->second;
-    }
-    if (url.find("..") != string::npos) {
-      return cache_[url] = "";
-    }
-    ifstream file(base_path_ + url, ios::binary | ios::ate);
-    if (!file) {
-      return cache_[url] = "";
-    }
-    int file_size = file.tellg();
-    if (file_size <= 0) {
-      return cache_[url] = "";
-    }
-    file.seekg(0, ios::beg);
-    string contents(file_size, 0);    
-    file.read(&contents[0], file_size);
-    file.close();
-    return cache_[url] = contents;
-  }
- private:
-   string base_path_;
-   unordered_map<string, string> cache_;
-};
-
 class WebServer {
  public:
   WebServer(int port, string base_path) 
-      : port_(port), socket_(0), file_system_(base_path) {
-  }
-
-  bool error(string error_string) {
-    int saved_error = errno;
-    cout << error_string << "\n" << strerror(saved_error) << "\n";
-    return false;
+      : port_(port), socket_(0), base_path_(base_path) {
   }
 
   bool start() {
@@ -104,10 +64,16 @@ class WebServer {
         error("Failed to connect.");
         continue;
       }
-      //thread(&WebServer::serve_page, *this, connection).detach();
       serve_page(connection);
     }
     return true;
+  }
+
+ private:
+  bool error(string error_string) {
+    int saved_error = errno;
+    cout << error_string << "\n" << strerror(saved_error) << "\n";
+    return false;
   }
 
   vector<string> split(string original, char delim, char strip=0) {
@@ -183,20 +149,30 @@ class WebServer {
       not_implemented(connection);
       return;
     }
-    string file = file_system_.read_file(action[1]);
-    if (file.empty()) {
+    string file_name = base_path_ + action[1];
+    int file = open(file_name.c_str(), O_RDONLY);
+    if (file == -1) {
+      not_found(connection);
+      return;
+    }
+    auto y = scope_guard([=]() {
+      close(file);
+    });
+    int file_size = lseek(file, 0, SEEK_END);
+    if (!file_size) {
       not_found(connection);
       return;
     }
     stringstream ss;
-    ss << "HTTP/1.0 200 OK\r\nContent-Length: " << file.size() << "\r\n\r\n";
+    ss << "HTTP/1.0 200 OK\r\nContent-Length: " << file_size << "\r\n\r\n";
     send_string(connection, ss.str());
-    send_string(connection, file);
+    off_t offset = 0;
+    sendfile(connection, file, &offset, file_size);
   }
- private:
+
   int port_;
   int socket_;
-  FileSystem file_system_;
+  string base_path_;
 };
 
 int main() {
