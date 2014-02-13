@@ -655,3 +655,7 @@ Name: 2014-01-webserver
 Language: C++, Go
 Description: Simple web server in idiomatic C++11 and Go.
 
+Name: 2014-02-partition
+Language: C++
+Description: Graph partition using MIP.
+
