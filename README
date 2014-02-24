@@ -659,3 +659,7 @@ Name: 2014-02-partition
 Language: C++
 Description: Graph partition using MIP.
 
+Name: 2014-02-randomwalk
+Language: Python
+Description: Simulation of a one-dimensional random walk.
+
