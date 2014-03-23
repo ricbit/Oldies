@@ -663,3 +663,8 @@ Name: 2014-02-randomwalk
 Language: Python
 Description: Simulation of a one-dimensional random walk.
 
+Name: 2014-03-akari
+Language: C++
+Description: Akari solver using MIP.
+
+
