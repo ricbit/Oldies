@@ -667,4 +667,8 @@ Name: 2014-03-akari
 Language: C++
 Description: Akari solver using MIP.
 
+Name: 2014-03-germantank
+Language: Python
+Description: Simulation of the german tank problem.
+
 
