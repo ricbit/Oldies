@@ -256,6 +256,10 @@ Language: C
 Description: Encoder and decoder for a fractal compression scheme. Quality was
 nice but it took a long, long time to encode an image.
 
+Name: 1999-12-hypefm
+Language: Assembly Z80, C
+Description: Driver to add FM music to Hype.
+
 Name: 1999-12-tmnt
 Language: Assembly Z80
 Description: RGB sprite engine for MSX2+ in screen 10.

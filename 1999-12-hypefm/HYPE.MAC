@@ -1,0 +1,192 @@
+; -----------------------------------------------------------------------        
+;
+;    Music Station 1.6
+;    Copyright (C) 1998 by Ricardo Bittencourt
+;
+;    This program is free software; you can redistribute it and/or modify
+;    it under the terms of the GNU General Public License as published by
+;    the Free Software Foundation; either version 2 of the License, or
+;    (at your option) any later version.
+;
+;    This program is distributed in the hope that it will be useful,
+;    but WITHOUT ANY WARRANTY; without even the implied warranty of
+;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;    GNU General Public License for more details.
+;
+;    You should have received a copy of the GNU General Public License
+;    along with this program; if not, write to the Free Software
+;    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+;
+;    Project started at 26/9/1998. Last modification was on 30/6/1999.
+;    Contact the author through the addresses: 
+;        
+;        ricardo@lsi.usp.br
+;        http://www.lsi.usp.br/~ricardo
+;
+; -----------------------------------------------------------------------        
+;
+; Credits:
+;
+;       Programming
+;               Ricardo Bittencourt (main programmer)
+;               Adriano Cunha       (megaram library)
+;               Daniel Caetano      (msx2 video setup)    
+;
+;       Graphics
+;               Raul Tabajara       (original artwork)
+;               Ricardo Bittencourt (conversion to SCREEN 2)
+;
+;       Thanks to
+;               Walter MARUJO       (MSX-1 forever!)
+;               Giovanni Nunes      (my command line parser was broken!)
+;               Eduardo Brand       (send me more wvzs!)
+;               TFH                 (visit the MUST page at MEP!)
+;               Italo Valerio       (the impossible come true!)
+;               Renato Degiovani    (Graphos III rulez!)
+;
+;
+;       No penguins were harmed during the making of this program.
+;
+; -----------------------------------------------------------------------        
+
+	ASEG
+	ORG     0100h
+
+BDOS    EQU     00005h
+OPEN    EQU     0000Fh
+RDSEQ   EQU     00014h
+PRINT   EQU     00009h
+DTA     EQU     00080h
+INIMLT  EQU     00075h
+INIT32  EQU     0006Fh
+INITXT  EQU     0006Ch
+INIGRP  EQU     00072h
+FILVRM  EQU     00056h
+LDIRMV  EQU     0005Ch
+CLRSPR  EQU     00069h
+PRTCHR  EQU     00002h
+ENASLT  EQU     00024h
+RSLREG  EQU     00138h
+TOTEXT  EQU     000D2h
+BDRCLR  EQU     0F3EBh
+CHGCLR  EQU     007F7h
+DISSCR  EQU     00041h
+ENASCR  EQU     00044h
+EXPTBL  EQU     0FCC1h
+RG1SAV  EQU     0F3E0h
+WRTVDP  EQU     00047h
+RDBLK   EQU     00027h
+SETDTA  EQU     0001Ah
+
+ALIGNF  DEFL    0
+
+; -----------------------------------------------------------------------
+
+ALIGNX          MACRO  X
+
+VOID&X:
+		DS      256*(HIGH (VOID&X+255))-VOID&X
+
+		ENDM
+
+ALIGN           MACRO
+
+		ALIGNX  %ALIGNF
+		ALIGNF  DEFL    ALIGNF+1
+
+		ENDM
+
+; -----------------------------------------------------------------------
+
+START:
+        LD      DE,ENDCODE+04Ah
+        LD      (CUR_ADDR),DE
+
+START_LOOP:
+        HALT
+        CALL    FM_STREAM
+        JR      START_LOOP
+
+FM_STREAM:
+        LD      A,(DELAY)
+        AND     A
+        JP      Z,FM_STREAM_INIT
+
+        DEC     A
+        LD      (DELAY),A
+        RET
+
+FM_STREAM_INIT:
+        LD      DE,(CUR_ADDR)
+
+FM_STREAM_LOOP:
+        LD      A,(DE)
+        CP      0FFh
+        JP      Z,WAIT_ONE
+        CP      0FEh
+        JP      Z,WAIT_MANY
+
+        INC     DE
+        CP      200
+        JP      C,PLAY_FM
+
+        DI
+        SUB     200
+        OUT     (0A0H),A
+        LD      A,(DE)
+        OUT     (0A1H),A
+        EI
+        INC     DE
+        JP      FM_STREAM_LOOP
+
+PLAY_FM:
+        DI
+        
+        LD      H,HIGH (FM_EVENTS)
+        LD      L,A
+        LD      A,(HL)
+        OUT     (07Ch),A
+        EX      (SP),HL
+        EX      (SP),HL
+        INC     H
+        LD      A,(HL)
+        OUT     (07Dh),A
+        EX      (SP),HL
+        EX      (SP),HL
+        EX      (SP),HL
+        EX      (SP),HL
+        EX      (SP),HL
+        EX      (SP),HL
+        EI
+        JP      FM_STREAM_LOOP
+
+WAIT_MANY:
+        INC     DE
+        LD      A,(DE)
+        DEC     A
+        LD      (DELAY),A
+WAIT_ONE:
+        INC     DE
+        LD      (CUR_ADDR),DE
+        RET
+
+
+CUR_ADDR:
+        DW      0
+DELAY:
+        DB      0
+
+ALIGN
+
+FM_EVENTS:
+        INCLUDE FMEVENTS.INC
+
+;IDLE:
+;        DS      04000h-IDLE
+
+ENDCODE:
+
+	END     START
+
+
+
