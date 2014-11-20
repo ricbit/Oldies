@@ -679,4 +679,8 @@ Name: 2014-11-grabfm
 Language: TCL
 Description: Openmsx script to convert fm basic files to the vgm format.
 
+Name: 2014-11-0hh1
+Language: C++
+Description: Solver for the 0hh1 puzzle using MIP.
+
 
