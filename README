@@ -574,6 +574,10 @@ Name: 2011-05-torto
 Language: Prolog
 Description: Solution of the Torto Reverso puzzle using prolog.
 
+Name: 2011-05-bdd
+Language: C++
+Description: An implementation of BDD (binary decision diagram).
+
 Name: 2011-07-constexpr
 Language: C++0x, Python
 Description: An analysis of metaprogramming techniques using C++0x.
