@@ -566,6 +566,10 @@ Name: 2010-11-birthday
 Language: Python
 Description: Compare approximation to the birthday paradox.
 
+Name: 2011-01-geom
+Language: C++
+Description: Generate constructible numbers using forward chaining.
+
 Name: 2011-03-randompi
 Language: BASIC
 Description: Calculates pi using a monte carlo approximation, in ZX-81 BASIC.
