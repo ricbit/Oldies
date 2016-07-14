@@ -17,6 +17,11 @@ Name: 1994-05-pacman
 Language: Pascal
 Description: Pac-man clone for text-mode DOS.
 
+Name: 1994-05-polimac115
+Language: C
+Description: Exercises from the course MAC155 from Poli USP (Introduction
+to Computing for Tech and Sciences).
+
 Name: 1994-09-freecell
 Language: Pascal
 Description: Freecell implementation for text-mode DOS. I think this was the
