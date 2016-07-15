@@ -700,8 +700,10 @@ Name: 2015-01-aleste2
 Language: Assembly Z80, Python, TCL
 Description: Converts Aleste 2 from disks to a ROM files.
 
-name: 2016-04-codeham
+name: 2016-04-codejam
 language: C++, python
 description: Solution for google code jam 2016.
 
-
+name: 2016-07-spojsubmit
+language: python
+description: Script to submit solutions to spoj through the new interface.
