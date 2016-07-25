@@ -707,3 +707,7 @@ description: Solution for google code jam 2016.
 name: 2016-07-spojsubmit
 language: python
 description: Script to submit solutions to spoj through the new interface.
+
+name: 2016-07-bozosearch
+language: python
+description: Monte Carlo simulation of the Binary Bozo Search.
