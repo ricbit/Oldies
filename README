@@ -704,6 +704,10 @@ name: 2016-04-codejam
 language: C++, python
 description: Solution for google code jam 2016.
 
+name: 2016-05-msxpi
+language: Assembly Z80
+description: Calculates 1000 digits of pi using the spigot algorithm.
+
 name: 2016-07-spojsubmit
 language: python
 description: Script to submit solutions to spoj through the new interface.
