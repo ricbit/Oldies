@@ -54,6 +54,26 @@ for x in xrange(10,100):
     m['dC'] = '0.html'
     dump(m, str(x)+"+")
 
+# one plus zero
+for x in xrange(0, 10):
+    m = {'d%d'%i:str(x)+"+"+str(i)+".html" for i in xrange(10)}
+    m['v1'] = 'n.png'
+    m['v0'] = '0.png'
+    m['dP'] = str(x)+'+.html'
+    m['dE'] = str(x)+'.html'
+    m['dC'] = '0.html'
+    dump(m, str(x)+"+0")
+
+# two plus zero
+for x in xrange(10,100):
+    m = {'d%d'%i:str(x)+"+"+str(i)+".html" for i in xrange(10)}
+    m['v1'] = 'n.png'
+    m['v0'] = '0.png'
+    m['dP'] = str(x)+'+.html'
+    m['dE'] = str(x)+'.html'
+    m['dC'] = '0.html'
+    dump(m, str(x)+"+0")
+
 # one plus one
 for x in xrange(0, 10):
     for y in xrange(1, 10):
