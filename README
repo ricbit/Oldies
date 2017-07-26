@@ -728,3 +728,7 @@ pokemons in Pokemon GO.
 name: 2017-05-magicsquare
 language: C++
 description: Solves the magic square with EasySCIP.
+
+name: 2017-07-calculator
+language: Python
+description: Builds a two-digit calculation using only HTML.
