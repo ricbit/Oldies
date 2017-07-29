@@ -1,0 +1,264 @@
+<!doctype html>
+<!--
+HTML5 aims to be the easier version of HTML so far.
+You can notice that by the starting line in this game: the doctype.
+This doctype declartion is much easier to remember than the older ones,
+such as the one for XHTML: !DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 etc etc
+-->
+
+<html>
+  <head>
+    <style>
+
+      @keyframes dirigivel_left {
+        0% {
+          left: 500px;
+          top: 0px;
+        }
+        25% {
+          left: 100px;
+          top: 0px;
+        }
+        40% {
+          left: 100px;
+          top: 0px;
+        }
+        100% {
+          left: 100px;
+          top: -1200px;
+        }
+      }
+      #dirigivel {
+      	position: absolute;
+      	top: 0px;
+      	width: 300px;
+      	height: 300px;
+      	left: 100px;
+      	top: -1200px;
+      	background-image: url('dirigivel.png');
+      	background-size: contain;
+      	background-repeat: no-repeat;      	
+        animation: dirigivel_left 20s ease-out 0s 1 normal;
+      }
+      @keyframes ricbit_parado_anim {
+        0% {
+          left: 215px;
+          top: 110px;
+          opacity: 0;
+        }
+        
+        24% {
+          left: 215px;
+          top: 110px;
+          opacity: 0;
+        }
+        25% {
+          left: 215px;
+          top: 110px;
+          opacity: 1;
+        }
+        40% {
+          left: 215px;
+          top: 110px;
+          opacity: 1;
+        }
+        40.1% {
+          left: 215px;
+          top: 110px;
+          opacity: 0;
+        }
+        100% {
+          left: 215px;
+          top: 110px;
+          opacity: 0;
+        }
+      }
+      #ricbit_parado {
+      	position: absolute;
+      	top: 0px;
+      	width: 70px;
+      	height: 70px;
+      	left: 100px;
+      	top: -400px;
+      	background-image: url('ricbit_salto.png');
+      	background-size: contain;
+      	background-repeat: no-repeat;
+        animation: ricbit_parado_anim 20s linear 0s 1 normal;
+      }
+      @keyframes nuvem1_anim {
+        0% {
+          top: 100%;
+        }
+        
+        100% {
+          top: -2%;
+        }
+        
+      }
+      #nuvem1 {
+      	position: absolute;
+        opacity: 0.5;
+      	top: 0px;
+      	width: 150px;
+      	height: 150px;
+      	left: 100px;
+      	top: -400px;
+      	background-image: url('nuvem_01.png');
+      	background-size: contain;
+      	background-repeat: no-repeat;
+        animation: nuvem1_anim 3s linear 10s infinite normal;
+      }
+      #nuvem2 {
+      	position: absolute;
+        opacity: 0.5;
+      	top: 0px;
+      	width: 150px;
+      	height: 150px;
+      	left: 310px;
+      	top: -400px;
+      	background-image: url('nuvem_02.png');
+      	background-size: contain;
+      	background-repeat: no-repeat;
+        animation: nuvem1_anim 3s linear 12s infinite normal;
+      }
+      @keyframes ricbit_caindo_anim {
+        0% {
+          opacity: 0;
+        }
+        40% {
+          opacity: 0;
+        }
+        40.1% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+      #ricbit_caindo {
+      	position: absolute;
+      	top: 0px;
+      	width: 70px;
+      	height: 70px;
+        left: 215px;
+        top: 110px;
+        opacity: 1;
+      	background-image: url('ricbit_caindo.gif');
+      	background-size: contain;
+      	background-repeat: no-repeat;
+        animation: ricbit_caindo_anim 20s linear 0s 1 normal;
+      }
+   body {
+   	height: 100%;
+  }
+    #sky {
+    	display:block;
+      overflow: hidden;
+      /*set the div in the top-left corner of the screen*/
+      position:absolute;
+      top:0;
+      left:30%;
+    	width: 500px;
+    	height: 100%;
+    	background-image: -webkit-linear-gradient(bottom, rgb(184,219,219) 11%, rgb(20,135,207) 62%);
+    }
+    </style>
+    <script>
+
+      /* The game is controlled by a bunch of global variables. */
+
+      /* Those are just caches to avoid calling getElementById every time. */
+      var ricbit_id = null;
+
+      /* The callback to the main game handler, called each 20ms. */
+      var interval_handler = null;
+
+      /* User input: accelarations due to keyboard. */
+      var keyboard_left = 0.0;
+      var keyboard_right = 0.0;
+
+      var positionX = 215.0;
+
+      /* One-time initialization of the game, performed on page load. */
+      function initialize() {
+        ricbit_id = document.getElementById('ricbit_caindo');
+
+        // Install keyboard handlers.
+        document.onkeydown = keydown_handler;
+        document.onkeyup = keyup_handler;
+
+        if (interval_handler != null) {
+          clearTimeout(interval_handler);
+        }
+        interval_handler = setTimeout(game_slice, 20);
+        positionX = 215.0;
+
+        // Draw the player ship.
+        draw_ball();
+
+        // Configure the main game handler to run each 20ms.
+        interval_handler = setTimeout(game_slice, 20);
+      }
+
+      // Updates the player ship and the score.
+      function draw_ball() {
+        ricbit_id.style.left = positionX + "px";
+      }
+
+      // A slice of game logic, called each 20ms.
+      function game_slice() {
+        // The physics used in the game is not the traditional
+        // Update the velocities, given the user input accelerations.
+        positionX += (keyboard_right - keyboard_left) * 3;
+        
+        // Redraw the player ship and score.
+        draw_ball();
+
+        interval_handler = setTimeout(game_slice, 20);
+      }
+
+      // Clear the timer handler of a running game.
+      function stop() {
+        if (interval_handler != null) {
+          clearTimeout(interval_handler);
+        }
+      }
+
+      // Handler for keydown events.
+      function keydown_handler(event) {
+        check_keyboard(event, 1.0);
+        return true;
+      }
+
+      // Handler for keyup events.
+      function keyup_handler(event) {
+        check_keyboard(event, 0.0);
+        return true;
+      }
+
+      // Check the keycodes of monitored keys and apply an acceleration.
+      function check_keyboard(event, acceleration) {
+        if (event.keyCode == 65) {  // keyCode for A.
+          keyboard_left = acceleration;
+        }
+        if (event.keyCode == 68) {  // keyCode for D.
+          keyboard_right = acceleration;
+        }
+        return true;
+      }
+
+    </script>
+  </head>
+
+  <!-- The HTML itself is quite simple: just a bunch of divs. -->
+  <body onload="initialize()">
+    <div id="sky">
+      <div id="dirigivel"></div>
+      <div id="ricbit_parado"></div>
+      <div id="ricbit_caindo"></div>
+      <div id="nuvem1"></div>
+      <div id="nuvem2"></div>
+    </div>
+  </body>
+
+</html>
