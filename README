@@ -700,10 +700,6 @@ name: 2014-11-0hh1
 language: C++
 description: Solver for the 0hh1 puzzle using mip.
 
-Name: 2015-01-aleste2
-Language: Assembly Z80, Python, TCL
-Description: Converts Aleste 2 from disks to a ROM files.
-
 name: 2016-04-codejam
 language: C++, python
 description: Solution for google code jam 2016.
