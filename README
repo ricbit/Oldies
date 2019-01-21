@@ -736,3 +736,8 @@ description: Builds a two-digit calculation using only HTML.
 name: 2018-03-countpaths
 language: Mathematica
 description: Count the number of paths in a graph, using three different algorithms.
+
+name: 2018-10-serialize
+language: C++
+description: Ideas for automatic serialization in C++.
+
