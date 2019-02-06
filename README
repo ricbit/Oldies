@@ -741,3 +741,6 @@ name: 2018-10-serialize
 language: C++
 description: Ideas for automatic serialization in C++.
 
+name: 2019-02-gplus
+language: Python
+description: Download missing photos from Google+ Takeout.
