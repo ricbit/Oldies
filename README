@@ -748,3 +748,7 @@ description: Ideas for automatic serialization in C++.
 name: 2019-02-gplus
 language: Python
 description: Download missing photos from Google+ Takeout.
+
+name: 2019-02-ocr
+language: Bash
+description: Convert a .ps file to .txt by using gs and tesseract.
