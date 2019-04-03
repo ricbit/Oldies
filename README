@@ -752,3 +752,7 @@ description: Download missing photos from Google+ Takeout.
 name: 2019-02-ocr
 language: Bash
 description: Convert a .ps file to .txt by using gs and tesseract.
+
+name: 2019-04-googledocs
+language: Javascript
+description: Add a menu option on Google Docs to highlight text with a code style.
