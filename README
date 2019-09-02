@@ -760,3 +760,7 @@ description: Convert a .ps file to .txt by using gs and tesseract.
 name: 2019-04-googledocs
 language: Javascript
 description: Add a menu option on Google Docs to highlight text with a code style.
+
+name: 2019-09-blogmigration
+language: Python
+description: Parse a wordpress xml to extract individual blog posts and download images.
