@@ -5,6 +5,14 @@ import re
 import requests
 import sys
 
+def replace_mathurl(text):
+  for img_tag, url in re.findall(r'(<img.*?src="(http://mathurl.com/.*?)\.png".*?/>)', text):
+    req = requests.get(url)
+    match = re.search(r'(?ms)<meta name="twitter:description" content="(.*?)">', req.text)
+    text = text.replace(img_tag, "$$%s$$" % match.group(1))
+    print(url, match.group(1), file=sys.stderr)
+  return text
+
 namespace = {
     "wp": "http://wordpress.org/export/1.2/",
     "content": "http://purl.org/rss/1.0/modules/content/"
@@ -30,7 +38,7 @@ for post in tree.findall("./channel/item"):
         r"https://www.ilafox.com.br/ricbit/images/\1", url)
     text = text.replace(url, new_url)
   f = open("posts/" + date, "w")
-  f.write(text)
+  f.write(replace_mathurl(text))
   f.close()
 for image in images:
   name = re.search(r"[^/]+\.(?:png|jpg|svg)$", image).group(0)
