@@ -764,3 +764,7 @@ description: Add a menu option on Google Docs to highlight text with a code styl
 name: 2019-09-blogmigration
 language: Python
 description: Parse a wordpress xml to extract individual blog posts and download images.
+
+name: 2020-03-birthpalin
+language: Python
+description: Check how many birthdays are palindrome in a given base.
