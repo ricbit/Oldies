@@ -768,3 +768,8 @@ description: Parse a wordpress xml to extract individual blog posts and download
 name: 2020-03-birthpalin
 language: Python
 description: Check how many birthdays are palindrome in a given base.
+
+name: 2020-09-timeturner
+language: OpenSCAD
+description: Add random stars to a 3D model of Hermione's Time Turner, suited to 3D printing.
+
