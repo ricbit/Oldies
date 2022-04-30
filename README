@@ -773,3 +773,8 @@ name: 2020-09-timeturner
 language: OpenSCAD
 description: Add random stars to a 3D model of Hermione's Time Turner, suited to 3D printing.
 
+name: 2022-04-getloot
+language: Python
+description: Download all purchased 3D models from the Loot Studios website.
+
+
