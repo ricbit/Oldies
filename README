@@ -777,4 +777,8 @@ name: 2022-04-getloot
 language: Python
 description: Download all purchased 3D models from the Loot Studios website.
 
+name: 2023-04-hdrecover
+language: C++
+description: Recover all jpeg images from an hdd image.
+
 
