@@ -4,8 +4,10 @@
 #ifndef kSurface
 #define kSurface
 
-#include <iostream.h>
+#include <iostream>
 #include "YoMath.h"
+
+using namespace std;
 
 class Surface {
 public:

@@ -4,9 +4,11 @@
 #ifndef kObjects
 #define kObjects
 
-#include <iostream.h>
+#include <iostream>
 #include "YoMath.h"
 #include "Surface.h"
+
+using namespace std;
 
 class Objeto;
 
