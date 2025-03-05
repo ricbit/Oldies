@@ -4,14 +4,11 @@
 #ifndef kYoMath
 #define kYoMath
 
-#include <iostream>
-#include <cmath>
+#include "Compiler.h"
 
 #define eps 0.00001
 #define true 1
 #define false 0
-
-using namespace std;
 
 typedef double Float;
 

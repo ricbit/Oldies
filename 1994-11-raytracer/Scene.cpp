@@ -47,17 +47,15 @@ void Scene::operator+= (Light *l) {
 }
 
 ostream& _Cdecl operator<< (ostream &a, Scene &s) {
-  ostream_withassign x;
-  x=a << "--- Cena atual\n";
-  x=x << "Resolucao de saida: (" << s.Rx << "," << s.Ry << ")\n";
-  x=x << "Tamanho da janela: (" << s.Wx << "," << s.Wy << ")\n";
-  x=x << "Janela de renderizacao: (" << s.x1 << "," << s.y1;
-  x=x << ")-(" << s.x2 << "," << s.y2 << ")\n";
-  x=x << "Observador: " << s.Obs << "\n";
-  x=x << "Plano de projecao: " << s.Proj << "\n";
-  x=x << "Cor de fundo: " << s.Back << "\n";
-  x=x << "Luz ambiente: " << s.la << "\n";
-  x=x << s.ll;
-  x=x << s.l;
-  return x;
+  return a << "--- Cena atual\n"
+           << "Resolucao de saida: (" << s.Rx << "," << s.Ry << ")\n"
+           << "Tamanho da janela: (" << s.Wx << "," << s.Wy << ")\n"
+           << "Janela de renderizacao: (" << s.x1 << "," << s.y1
+           << ")-(" << s.x2 << "," << s.y2 << ")\n"
+           << "Observador: " << s.Obs << "\n"
+           << "Plano de projecao: " << s.Proj << "\n"
+           << "Cor de fundo: " << s.Back << "\n"
+           << "Luz ambiente: " << s.la << "\n"
+           << s.ll
+           << s.l;
 }

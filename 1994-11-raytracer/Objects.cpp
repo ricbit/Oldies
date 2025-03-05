@@ -103,15 +103,19 @@ ostream& _Cdecl Objeto::operator<< (ostream &a) {
   return a << "Objeto Generico";
 }
 
+#ifndef __BORLANDC__
+ostream& _Cdecl operator<< (ostream &a, Objeto &o) {
+  return a << "Objeto Generico";
+}
+#endif
+
 ostream& _Cdecl operator<< (ostream &a, List &l) {
   List *L;
-  ostream_withassign x;
-  x=a;
   L=&l;
-  while (L->Obj!=NULL) {
-    x=(*(L->Obj)) << x;
+  while (L!=NULL) {
+    a << (*(L->Obj));
     L=L->Prox;
   }
-  return x;
+  return a;
 }
 

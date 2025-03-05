@@ -4,8 +4,7 @@
 #ifndef kPlano
 #define kPlano
 
-#include <iostream.h>
-#include <math.h>
+#include "Compiler.h"
 #include "YoMath.h"
 #include "Surface.h"
 #include "Objects.h"

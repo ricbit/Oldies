@@ -68,20 +68,16 @@ Vetor LightList::LightSources (Ponto P, Reta r, List list) {
 }
 
 ostream& _Cdecl operator<< (ostream &a, Light &l) {
-  ostream_withassign x;
-  x=a << "Lampada pontual\n\tPosicao " << l.o;
-  x=x << "\n\tCor " << l.cor << "\n";
-  return x;
+  return a << "Lampada pontual\n\tPosicao " << l.o
+           << "\n\tCor " << l.cor << "\n";
 }
 
 ostream& _Cdecl operator<< (ostream &a, LightList &l) {
-  ostream_withassign x;
   LightList *L;
-  x=a;
   L=&l;
-  while (L->L!=NULL) {
-    x=x << (*(L->L));
+  while (L!=NULL) {
+    a << (*(L->L));
     L=L->Prox;
   }
-  return x;
+  return a;
 }

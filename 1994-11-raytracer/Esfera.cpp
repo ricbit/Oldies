@@ -36,9 +36,7 @@ Vetor Esfera::Normal (Vetor v) {
 }
 
 ostream& _Cdecl Esfera::operator<< (ostream &a) {
-  ostream_withassign x;
-  x=a << "Esfera\n\tCentro " << o << "\n\tRaio " << r;
-  x=x << "\n\t" << s << "\n";
-  return x;
+  return a << "Esfera\n\tCentro " << o << "\n\tRaio " << r
+           << "\n\t" << s << "\n";
 }
 

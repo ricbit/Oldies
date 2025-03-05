@@ -3,6 +3,7 @@
 #ifndef kVideo
 #define kVideo
 
+#include "Compiler.h"
 #include "YoMath.h"
 
 typedef unsigned char byte_;

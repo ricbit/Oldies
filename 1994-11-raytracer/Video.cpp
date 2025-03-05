@@ -1,27 +1,35 @@
 // Video.cpp
 
+#include "Compiler.h"
 #include "Video.h"
 
 #define sgn(x) (x)<0?-1:(x)>0?1:0
 
 #ifndef __BORLANDC__
 
-Video::Video () {
-}
-
 void Video::Init () {}
 
 void Video::Close () {}
 
-void Video::Point (int x, int y, byte_ cor) {}
+void Video::Point (int x, int y, byte_ cor) {
+  cout << "x " << x << " y " << y << " cor " << int(cor) << "\n";
+}
+
+void Video::WaitForKey (void) {}
+
+void Video::SetRGB (byte_ n, byte_ r, byte_ g, byte_ b) {}
+
+int Video::KeyPressed (void) {
+  return false;
+}
 
 #endif
-
-#ifdef __BORLANDC__
 
 Video::Video () {
   maxpal=0;
 }
+
+#ifdef __BORLANDC__
 
 void Video::Init () {
   MaxX=319;
@@ -163,6 +171,8 @@ int Video::KeyPressed (void) {
   return s;
 }
 
+#endif
+
 byte_ Video::Inclui (Cor c) {
   int i;
   if (maxpal>0)
@@ -172,6 +182,7 @@ byte_ Video::Inclui (Cor c) {
   pal[maxpal]=c;
   SetRGB (maxpal,c.c[0],c.c[1],c.c[2]);
   maxpal++;
+  cout << " maxpal " << maxpal << "\n";
   if (maxpal>255) {
     WaitForKey ();
     Close ();
@@ -191,4 +202,3 @@ Cor::Cor (Vetor v) {
   c[2]=byte_ (v.v[2]*63+0.5);
 }
 
-#endif
