@@ -7,6 +7,8 @@
 
 #include <iostream>
 #include <cmath>
+#include <cstdio>
+#include <vector>
 
 #define _Cdecl
 #define far

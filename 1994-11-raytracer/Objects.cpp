@@ -38,11 +38,11 @@ Ponto Ponto::First (Reta r) {
   p=s=this;
   k=t;
   while (p!=NULL) {
-    p=p->Prox;
     if (p->t < k) {
       k=p->t;
       s=p;
     }
+    p=p->Prox;
   }
   s->pos=r|k;
   s->n=s->Obj->Normal (s->pos);

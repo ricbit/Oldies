@@ -19,7 +19,13 @@ public:
   Cor (Vetor v);
 };
 
-typedef Cor Palette[256];
+#ifdef __BORLANDC__
+#define MAX_PALETTE 256
+#else
+#define MAX_PALETTE 5000
+#endif
+
+typedef Cor Palette[MAX_PALETTE];
 
 class Video {
 public:
@@ -28,6 +34,10 @@ public:
     MaxY;		//Maior coordenada Y
   int maxpal;
   Palette pal;
+
+#ifndef __BORLANDC__
+  vector<byte_> bitmap;
+#endif
 
   //Constructor
   Video ();

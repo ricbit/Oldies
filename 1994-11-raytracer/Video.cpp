@@ -7,12 +7,24 @@
 
 #ifndef __BORLANDC__
 
-void Video::Init () {}
+void Video::Init () {
+  bitmap.resize(320 * 200 * 3);
+}
 
-void Video::Close () {}
+void Video::Close () {
+  FILE *f = fopen("output.pgm", "wt");
+  fprintf(f, "P3\n320 200\n255\n");
+  for (auto c : bitmap) {
+    fprintf(f, "%d\n", int(c));
+  }
+  fclose(f);
+}
 
 void Video::Point (int x, int y, byte_ cor) {
   cout << "x " << x << " y " << y << " cor " << int(cor) << "\n";
+  for (int i = 0; i < 3; i++) {
+    bitmap[(y * 320 + x) * 3 + i] = pal[cor].c[i];
+  }
 }
 
 void Video::WaitForKey (void) {}
@@ -183,7 +195,7 @@ byte_ Video::Inclui (Cor c) {
   SetRGB (maxpal,c.c[0],c.c[1],c.c[2]);
   maxpal++;
   cout << " maxpal " << maxpal << "\n";
-  if (maxpal>255) {
+  if (maxpal>=MAX_PALETTE) {
     WaitForKey ();
     Close ();
     cout << "Estourou o numero maximo de cores";

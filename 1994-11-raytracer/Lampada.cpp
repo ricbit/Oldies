@@ -53,7 +53,7 @@ Vetor LightList::LightSources (Ponto P, Reta r, List list) {
   LightList *L;
   Vetor cor (0,0,0),d;
   L=this;
-  while (L->L!=NULL) {
+  while (L!=NULL) {
     if (!Shadow (P.pos,L->L->o,list)) {
       d=L->L->o - P.pos;
       // Reflexao difusa

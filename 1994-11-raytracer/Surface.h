@@ -7,10 +7,6 @@
 #include <iostream>
 #include "YoMath.h"
 
-#ifndef __BORLANDC__
-#define _Cdecl
-#endif
-
 using namespace std;
 
 class Surface {

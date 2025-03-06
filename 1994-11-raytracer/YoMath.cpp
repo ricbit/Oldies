@@ -3,10 +3,6 @@
 
 #include "YoMath.h"
 
-#ifndef __BORLANDC__
-#define _Cdecl
-#endif
-
 // procedures do Vetor
 
 Vetor::Vetor (Float xx, Float yy, Float zz) {
